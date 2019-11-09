@@ -81,7 +81,7 @@ export class ExpressionEval {
             console.warn('or: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
-        return exp.data.some((value) => isExpression(value) ? this.evalExpression(value): value);
+        return exp.data.some((value) => isExpression(value) ? this.evalExpression(value) : value);
     }
 
     private and(exp: Expression): boolean {
@@ -89,7 +89,7 @@ export class ExpressionEval {
             console.warn('and: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
-        return exp.data.every((value) => isExpression(value) ? this.evalExpression(value): value);
+        return exp.data.every((value) => isExpression(value) ? this.evalExpression(value) : value);
     }
 
     private not(exp: Expression): boolean {
@@ -99,4 +99,79 @@ export class ExpressionEval {
         }
         return !this.evalExpression(exp.data as Expression);
     }
+
+    // ---------- COMPARISONS ----------------
+    private eq(exp: Expression): boolean {
+        if (!Array.isArray(exp.data)) {
+            console.warn('eq: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        let values = [];
+        for (let ind = 0; ind < exp.data.length; ind++) {
+            const val = exp.data[ind];
+            if (isExpression(val)) {
+                values.push(this.evalExpression(val));
+            } else {
+                values.push(val);
+            }
+
+        }
+
+        // check if all values are equal
+        return values.every((val, i, arr) => val === arr[0]);
+    }
+
+    private gt(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('gt: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+
+        const a = isExpression(exp.data[0]) ?
+            this.evalExpression(exp.data[0]) : exp.data[0];
+        const b = isExpression(exp.data[1]) ?
+            this.evalExpression(exp.data[1]) : exp.data[1];
+        return a > b;
+    }
+
+    private gte(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('gte: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+
+        const a = isExpression(exp.data[0]) ?
+            this.evalExpression(exp.data[0]) : exp.data[0];
+        const b = isExpression(exp.data[1]) ?
+            this.evalExpression(exp.data[1]) : exp.data[1];
+        return a >= b;
+    }
+
+    private lt(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('lt: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+
+        const a = isExpression(exp.data[0]) ?
+            this.evalExpression(exp.data[0]) : exp.data[0];
+        const b = isExpression(exp.data[1]) ?
+            this.evalExpression(exp.data[1]) : exp.data[1];
+        return a < b;
+    }
+
+    private lte(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('lte: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+
+        const a = isExpression(exp.data[0]) ?
+            this.evalExpression(exp.data[0]) : exp.data[0];
+        const b = isExpression(exp.data[1]) ?
+            this.evalExpression(exp.data[1]) : exp.data[1];
+        return a <= b;
+    }
+
+
 }
