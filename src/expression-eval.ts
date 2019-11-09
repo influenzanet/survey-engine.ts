@@ -57,17 +57,15 @@ export class ExpressionEval {
             case 'getContext':
                 return this.getContext();
             case 'getResponses':
-                return this.getResponse(expression);
+                return this.getResponses();
             case 'getRenderedItems':
-                console.warn('getRenderedItems not implemented');
-                return;
+                return this.getRenderedItems();
             case 'getAttribute':
                 return this.getAttribute(expression);
             case 'getArrayItemAtIndex':
                 return this.getArrayItem(expression);
             case 'getArrayItemByKey':
-                console.warn('getArrayItemByKey not implemented');
-                return;
+                return this.getArrayItemByKey(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -173,5 +171,84 @@ export class ExpressionEval {
         return a <= b;
     }
 
+    // ---------- ROOT REFERENCES ----------------
+    private getContext(): any {
+        return this.context;
+    }
+
+    private getResponses(): SurveyResponse | undefined {
+        return this.responses;
+    }
+
+    private getRenderedItems(): RenderedQuestionGroup {
+        return this.getRenderedItems();
+    }
+
+    // ---------- WORKING WITH OBJECT/ARRAYS ----------------
+    private getAttribute(attributeRef: Expression): any {
+        if (!Array.isArray(attributeRef.data) || attributeRef.data.length !== 2) {
+            console.warn('getAttribute: data attribute is missing or wrong: ' + attributeRef.data);
+            return null;
+        }
+
+        const obj = this.evalExpression(attributeRef.data[0]);
+        if (!obj || typeof (obj) !== 'object') {
+            console.warn('getAttribute: received wrong type for referenced object: ' + obj);
+            return null;
+        }
+        const attr = obj[attributeRef.data[1]];
+        if (attributeRef.dtype) {
+            return this.typeConvert(attr, attributeRef.dtype);
+        }
+        return attr;
+    }
+
+    private getArrayItem(itemRef: Expression): any {
+        if (!Array.isArray(itemRef.data) || itemRef.data.length !== 2 || typeof(itemRef.data[1]) !== 'number') {
+            console.warn('getArrayItem: data attribute is missing or wrong: ' + itemRef.data);
+            return null;
+        }
+        const arr = this.evalExpression(itemRef.data[0]);
+        if (!arr || !Array.isArray(arr)) {
+            console.warn('getArrayItem: received wrong type for referenced array: ' + arr);
+            return null;
+        }
+        const item = arr[itemRef.data[1]];
+        if (itemRef.dtype) {
+            return this.typeConvert(item, itemRef.dtype);
+        }
+        return item;
+    }
+
+    private getArrayItemByKey(exp: Expression): any {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2 || typeof(exp.data[1]) !== 'string') {
+            console.warn('getArrayItem: data attribute is missing or wrong: ' + exp.data);
+            return null;
+        }
+        const arr = this.evalExpression(exp.data[0]);
+        if (!arr || !Array.isArray(arr)) {
+            console.warn('getArrayItemByKey: received wrong type for referenced array: ' + arr);
+            return null;
+        }
+        const item = arr.find(a => a.key === exp.data[1]);
+        if (!item) {
+            return null;
+        }
+        if (exp.dtype) {
+            return this.typeConvert(item, exp.dtype);
+        }
+        return item;
+    }
+
+
+    private typeConvert(value: any, dtype: string): any {
+        switch (dtype) {
+            case 'int':
+                return typeof (value) === 'string' ? parseInt(value) : Math.floor(value);
+            default:
+                console.warn('typeConvert: dtype is not known: ' + dtype);
+                return value;
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 export interface Expression {
     name: string;
     data?: any;
+    dtype?: string;
 }
 
 export const isExpression = (value: Expression | any): value is Expression => {

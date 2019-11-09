@@ -1,4 +1,3 @@
-import { QuestionGroup } from "./survey-def";
 import { RenderedQuestionGroup } from "./rendered";
 import { SurveyResponse, QResponse } from "./response";
 import { SurveyContext } from "./context";
