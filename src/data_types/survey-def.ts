@@ -1,6 +1,10 @@
 export interface Expression {
     name: string;
-    data: any;
+    data?: any;
+}
+
+export const isExpression = (value: Expression | any): value is Expression => {
+    return typeof(value) === 'object' && (value as Expression).name !== undefined;
 }
 
 export interface SurveyItem {

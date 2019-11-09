@@ -1,4 +1,11 @@
-import { RenderedQuestionGroup, SurveyContext, SurveyResponse, Expression } from "./data_types";
+import {
+    RenderedQuestionGroup,
+    SurveyContext,
+    SurveyResponse,
+    Expression,
+    isExpression
+} from "./data_types";
+
 
 export class ExpressionEval {
     renderedSurvey?: RenderedQuestionGroup;
@@ -66,5 +73,30 @@ export class ExpressionEval {
                 break;
         }
         return false;
+    }
+
+    // ---------- LOGIC OPERATORS ----------------
+    private or(exp: Expression): boolean {
+        if (!Array.isArray(exp.data)) {
+            console.warn('or: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        return exp.data.some((value) => isExpression(value) ? this.evalExpression(value): value);
+    }
+
+    private and(exp: Expression): boolean {
+        if (!Array.isArray(exp.data)) {
+            console.warn('and: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        return exp.data.every((value) => isExpression(value) ? this.evalExpression(value): value);
+    }
+
+    private not(exp: Expression): boolean {
+        if (!exp.data || !isExpression(exp)) {
+            console.warn('not: method expects a sinlge Expression as an argument ');
+            return false;
+        }
+        return !this.evalExpression(exp.data as Expression);
     }
 }
