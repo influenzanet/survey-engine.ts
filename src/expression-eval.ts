@@ -3,7 +3,11 @@ import {
     SurveyContext,
     SurveyResponse,
     Expression,
-    isExpression
+    isExpression,
+    ResponseGroup,
+    RenderedQuestion,
+    isResponseGroup,
+    isRenderedQuestionGroup
 } from "./data_types";
 
 
@@ -66,6 +70,8 @@ export class ExpressionEval {
                 return this.getArrayItem(expression);
             case 'getArrayItemByKey':
                 return this.getArrayItemByKey(expression);
+            case 'getObjByHierarchicalKey':
+                return this.getObjByHierarchicalKey(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -238,6 +244,48 @@ export class ExpressionEval {
             return this.typeConvert(item, exp.dtype);
         }
         return item;
+    }
+
+
+    private getObjByHierarchicalKey(exp: Expression): any {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2 || typeof(exp.data[1]) !== 'string') {
+            console.warn('getObjByHierarchicalKey: data attribute is missing or wrong: ' + exp.data);
+            return null;
+        }
+        let root = this.evalExpression(exp.data[0]);
+        if (!isResponseGroup(root) && !isRenderedQuestionGroup(root)) {
+            console.warn('getObjByHierarchicalKey: root is not a group: ' + root);
+            return null;
+        }
+
+        const ids = exp.data[1].split('.');
+        let obj: ResponseGroup | Response | RenderedQuestionGroup | RenderedQuestion | undefined;
+        let compID = ''
+        ids.forEach(id => {
+            if (!obj) {
+                const ind = root.items.findIndex((item: ResponseGroup) => item.key === id);
+                if (ind < 0) {
+                    console.warn('getObjByHierarchicalKey: cannot find root object for: ' + id);
+                    return;
+                }
+                obj = root.items[ind];
+                compID += id;
+                return;
+            }
+
+            compID += '.' + id;
+            const ind = (obj as ResponseGroup).items.findIndex(item => item.key === compID);
+            if (ind < 0) {
+                console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
+                return null;
+            }
+            obj = (obj as ResponseGroup).items[ind];
+        });
+
+        if (exp.dtype) {
+            return this.typeConvert(obj, exp.dtype);
+        }
+        return obj;
     }
 
 

@@ -14,7 +14,34 @@ test('Op Test', () => {
                     {
                         key: 'q2.2', items: [
                             { key: 'q2.2.1' },
-                            { key: 'q2.2.2' }
+                            {
+                                key: 'q2.2.2', condition: {
+                                    name: 'eq',
+                                    data: [
+                                        {
+                                            name: 'getAttribute',
+                                            data: [
+                                                {
+                                                    name: 'getObjByHierarchicalKey',
+                                                    data: [
+                                                        {
+                                                            name: 'getAttribute', data: [
+                                                                { name: 'getResponses' },
+                                                                'responses'
+                                                            ]
+                                                        },
+                                                        'q2.2.1'
+                                                    ]
+                                                },
+                                                'response'
+                                            ]
+                                        },
+                                        14
+                                    ]
+                                }
+                            },
+                            { key: 'q2.2.3' },
+                            { key: 'q2.2.4' }
                         ]
                     }
                 ]
@@ -34,9 +61,9 @@ test('Op Test', () => {
 
     surveyE.setResponse({
         key: 'q2.2.1',
-        value: 1
+        value: 14
     });
 
-    console.log(JSON.stringify(surveyE.getResponses(), null, 2));
+    console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
     expect(OpTest(3, 2)).toBe(5);
 });
