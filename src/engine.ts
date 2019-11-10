@@ -1,5 +1,6 @@
 import {
     SurveyEngineCoreInterface,
+    Question,
     QuestionGroup,
     RenderedQuestionGroup,
     SurveyContext,
@@ -132,26 +133,31 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         // TODO: add logic with follows and conditions
 
         groupDef.items.forEach(item => {
-
+            this.addRenderedItem(item, parent);
             if (isQuestionGroup(item)) {
-                // TODO: setTimestamp for rendered
-                // TODO :
-                // add item to parent
-                const newGroup: RenderedQuestionGroup = {
-                    key: item.key,
-                    items: []
-                };
-                parent.items.push(newGroup);
-                // TODO: add method to insert or push to array
-                this.setTimestampFor('rendered', item.key);
                 this.initRenderedGroup(item, item.key);
-
-            } else {
-                // add item to parent
-                parent.items.push(item);
-                this.setTimestampFor('rendered', item.key);
             }
         });
+    }
+
+    private addRenderedItem(item: QuestionGroup | Question, parent: RenderedQuestionGroup, atPosition?: number): number {
+        const renderedItem: RenderedQuestionGroup | RenderedQuestion = {
+            ...item
+        };
+        // TODO: item to rendered question
+        console.warn('addRenderedItem: convert to rendered item (e.g. select localisation');
+        if (isQuestionGroup(item)) {
+            (renderedItem as RenderedQuestionGroup).items = [];
+        }
+
+        if (!atPosition) {
+            parent.items.push(renderedItem);
+            this.setTimestampFor('rendered', renderedItem.key);
+            return parent.items.length - 1;
+        }
+        parent.items.splice(atPosition, 0, renderedItem);
+        this.setTimestampFor('rendered', renderedItem.key);
+        return atPosition;
     }
 
     private setTimestampFor(type: TimestampType, itemID: string) {
