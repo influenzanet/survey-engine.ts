@@ -40,8 +40,8 @@ test('Op Test', () => {
                                     ]
                                 }
                             },
-                            { key: 's1.q2.2.3' },
-                            { key: 's1.q2.2.4' }
+                            { key: 's1.q2.2.3', follows: ['s1.q2.2'] },
+                            { key: 's1.q2.2.4', follows: ['s1.q2.2.1'] }
                         ]
                     }
                 ]
@@ -59,6 +59,7 @@ test('Op Test', () => {
         context
     );
 
+    console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
     surveyE.setResponse({
         key: 'q2.2.1',
         value: 14

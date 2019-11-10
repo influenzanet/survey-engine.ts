@@ -11,8 +11,10 @@ import {
     QResponse,
     isResponseGroup,
     RenderedQuestion,
-    isRenderedQuestionGroup
+    isRenderedQuestionGroup,
+    Expression
 } from "./data_types";
+import { pickRandomListItem } from './utils';
 import { ExpressionEval } from "./expression-eval";
 
 export const printResponses = (responses: ResponseGroup | QResponse, prefix: string) => {
@@ -129,15 +131,43 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             return;
         }
         console.log(parent);
-
-        // TODO: add logic with follows and conditions
-
-        groupDef.items.forEach(item => {
-            this.addRenderedItem(item, parent);
-            if (isQuestionGroup(item)) {
-                this.initRenderedGroup(item, item.key);
+        let nextItem = this.getNextItem(groupDef, parent, parent.key, false);
+        while (nextItem !== null) {
+            if (!nextItem) {
+                break;
             }
+            this.addRenderedItem(nextItem, parent);
+            if (isQuestionGroup(nextItem)) {
+                this.initRenderedGroup(nextItem, nextItem.key);
+            }
+            nextItem = this.getNextItem(groupDef, parent, nextItem.key, false);
+        }
+    }
+
+    private getNextItem(groupDef: QuestionGroup, parent: RenderedQuestionGroup, lastKey: string, onlyDirectFollower: boolean ): QuestionGroup | Question | undefined {
+        // get unrendered question groups only
+        const availableItems = groupDef.items.filter(ai => {
+            return !parent.items.some(item => item.key === ai.key) && this.evalConditions(ai.condition);
         });
+
+        if ((!lastKey || lastKey.length <= 0) && onlyDirectFollower) {
+            console.warn('getNextItem: missing input argument for lastKey');
+            return;
+        }
+        const followUpItems = availableItems.filter(item => item.follows && item.follows.includes(lastKey));
+
+
+        if (followUpItems.length > 0) {
+            return pickRandomListItem(followUpItems);
+        } else if (onlyDirectFollower) {
+            return;
+        }
+
+        const groupPool = availableItems.filter(item => !item.follows || item.follows.length < 1);
+        if (groupPool.length < 1) {
+            return;
+        }
+        return pickRandomListItem(groupPool);
     }
 
     private addRenderedItem(item: QuestionGroup | Question, parent: RenderedQuestionGroup, atPosition?: number): number {
@@ -239,6 +269,15 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
         });
         return obj;
+    }
+
+    evalConditions(condition?: Expression): boolean {
+        return this.evalEngine.eval(
+            condition,
+            this.renderedSurvey,
+            this.context,
+            this.responses
+        );
     }
 
 }

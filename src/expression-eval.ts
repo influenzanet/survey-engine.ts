@@ -263,12 +263,11 @@ export class ExpressionEval {
         let compID = ''
         ids.forEach(id => {
             if (!obj) {
-                const ind = root.items.findIndex((item: ResponseGroup) => item.key === id);
-                if (ind < 0) {
+                if (root.key !== id) {
                     console.warn('getObjByHierarchicalKey: cannot find root object for: ' + id);
                     return;
                 }
-                obj = root.items[ind];
+                obj = root;
                 compID += id;
                 return;
             }
