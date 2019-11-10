@@ -4,18 +4,18 @@ import { SurveyContext, QuestionGroup } from '../data_types';
 
 test('Op Test', () => {
     const surveyDef: QuestionGroup = {
-        key: 'weekly',
+        key: 's1',
         items: [
-            { key: 'q1' },
+            { key: 's1.q1' },
             {
-                key: 'q2',
+                key: 's1.q2',
                 items: [
-                    { key: 'q2.1' },
+                    { key: 's1.q2.1' },
                     {
-                        key: 'q2.2', items: [
-                            { key: 'q2.2.1' },
+                        key: 's1.q2.2', items: [
+                            { key: 's1.q2.2.1' },
                             {
-                                key: 'q2.2.2', condition: {
+                                key: 's1.q2.2.2', condition: {
                                     name: 'eq',
                                     data: [
                                         {
@@ -30,7 +30,7 @@ test('Op Test', () => {
                                                                 'responses'
                                                             ]
                                                         },
-                                                        'q2.2.1'
+                                                        's1.q2.2.1'
                                                     ]
                                                 },
                                                 'response'
@@ -40,8 +40,8 @@ test('Op Test', () => {
                                     ]
                                 }
                             },
-                            { key: 'q2.2.3' },
-                            { key: 'q2.2.4' }
+                            { key: 's1.q2.2.3' },
+                            { key: 's1.q2.2.4' }
                         ]
                     }
                 ]
@@ -65,5 +65,6 @@ test('Op Test', () => {
     });
 
     console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
+    console.log(JSON.stringify(surveyE.getResponses(), null, 2));
     expect(OpTest(3, 2)).toBe(5);
 });

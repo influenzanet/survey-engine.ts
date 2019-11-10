@@ -8,7 +8,9 @@ import {
     isQuestionGroup,
     TimestampType,
     QResponse,
-    isResponseGroup
+    isResponseGroup,
+    RenderedQuestion,
+    isRenderedQuestionGroup
 } from "./data_types";
 import { ExpressionEval } from "./expression-eval";
 
@@ -46,7 +48,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             key: definitions.key,
             items: []
         };
-        this.initRenderedSurvey();
+        this.setTimestampFor('rendered', definitions.key);
+        this.initRenderedGroup(definitions, definitions.key);
     }
 
     // PUBLIC METHODS
@@ -118,8 +121,37 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return resp;
     }
 
-    private initRenderedSurvey() {
-        console.warn('todo');
+    private initRenderedGroup(groupDef: QuestionGroup, parentKey: string) {
+        const parent = this.findRenderedItem(parentKey);
+        if (!parent || !isRenderedQuestionGroup(parent)) {
+            console.warn('initRenderedGroup: parent not found or not a group: ' + parentKey);
+            return;
+        }
+        console.log(parent);
+
+        // TODO: add logic with follows and conditions
+
+        groupDef.items.forEach(item => {
+
+            if (isQuestionGroup(item)) {
+                // TODO: setTimestamp for rendered
+                // TODO :
+                // add item to parent
+                const newGroup: RenderedQuestionGroup = {
+                    key: item.key,
+                    items: []
+                };
+                parent.items.push(newGroup);
+                // TODO: add method to insert or push to array
+                this.setTimestampFor('rendered', item.key);
+                this.initRenderedGroup(item, item.key);
+
+            } else {
+                // add item to parent
+                parent.items.push(item);
+                this.setTimestampFor('rendered', item.key);
+            }
+        });
     }
 
     private setTimestampFor(type: TimestampType, itemID: string) {
@@ -141,36 +173,64 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
     }
 
+    findRenderedItem(itemID: string): RenderedQuestion | RenderedQuestionGroup | undefined {
+        const ids = itemID.split('.');
+        let obj: RenderedQuestion | RenderedQuestionGroup | undefined;
+        let compID = '';
+        ids.forEach(id => {
+            if (compID === '') {
+                compID = id;
+            } else {
+                compID += '.' + id;
+            }
+            if (!obj) {
+                if (compID === this.renderedSurvey.key) {
+                    obj = this.renderedSurvey;
+                }
+                return;
+            }
+            if (!isRenderedQuestionGroup(obj)) {
+                return;
+            }
+            const ind = obj.items.findIndex(item => item.key === compID);
+            if (ind < 0) {
+                console.warn('findRenderedItem: cannot find object for : ' + compID);
+                obj = undefined;
+                return;
+            }
+            obj = obj.items[ind];
+
+        });
+        return obj;
+    }
+
     findResponseItem(itemID: string): QResponse | ResponseGroup | undefined {
         const ids = itemID.split('.');
-        let obj: ResponseGroup | QResponse | undefined;
-        let compID = ''
+        let obj: QResponse | ResponseGroup | undefined;
+        let compID = '';
         ids.forEach(id => {
+            if (compID === '') {
+                compID = id;
+            } else {
+                compID += '.' + id;
+            }
             if (!obj) {
-                if (!isResponseGroup(this.responses.responses)) {
-                    console.warn('findResponseItem: root should be a group but is not');
-                    return null;
+                if (compID === this.responses.responses.key) {
+                    obj = this.responses.responses;
                 }
-                const ind = this.responses.responses.items.findIndex(item => item.key === id);
-                if (ind < 0) {
-                    console.warn('findResponseItem: cannot find root object for: ' + id);
-                    return null;
-                }
-                obj = this.responses.responses.items[ind];
-                compID += id;
-                return null;
+                return;
             }
-            if (!isResponseGroup(obj)) {
-                console.warn('findResponseItem: this should be a group but is not: ' + obj.key);
-                return null;
+            if (!isRenderedQuestionGroup(obj)) {
+                return;
             }
-            compID += '.' + id;
             const ind = obj.items.findIndex(item => item.key === compID);
             if (ind < 0) {
                 console.warn('findResponseItem: cannot find object for : ' + compID);
-                return null;
+                obj = undefined;
+                return;
             }
             obj = obj.items[ind];
+
         });
         return obj;
     }
