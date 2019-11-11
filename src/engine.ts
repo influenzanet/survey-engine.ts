@@ -14,7 +14,10 @@ import {
     isRenderedQuestionGroup,
     Expression
 } from "./data_types";
-import { pickRandomListItem } from './utils';
+import {
+    pickRandomListItem,
+    removeItemByKey
+} from './utils';
 import { ExpressionEval } from "./expression-eval";
 
 export const printResponses = (responses: ResponseGroup | QResponse, prefix: string) => {
@@ -60,9 +63,21 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.context = context;
     }
 
-    setResponse(response: any) {
-        this.setTimestampFor('responded', response.key);
-        console.warn('todo');
+    setResponse(targetKey: string, response: any) {
+        const target = this.findResponseItem(targetKey);
+        if (!target) {
+            console.error('setResponse: cannot find target object for key: ' + targetKey);
+            return;
+        }
+        if (isResponseGroup(target)) {
+            console.error('setResponse: object is a response group - not defined: ' + targetKey);
+            return;
+        }
+        target.response = response;
+        this.setTimestampFor('responded', targetKey);
+
+        // Re-render whole tree
+        this.reRenderGroup(this.renderedSurvey.key);
     }
 
     getRenderedSurvey(): RenderedQuestionGroup {
@@ -130,7 +145,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             console.warn('initRenderedGroup: parent not found or not a group: ' + parentKey);
             return;
         }
-        console.log(parent);
+
         let nextItem = this.getNextItem(groupDef, parent, parent.key, false);
         while (nextItem !== null) {
             if (!nextItem) {
@@ -144,7 +159,84 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
     }
 
-    private getNextItem(groupDef: QuestionGroup, parent: RenderedQuestionGroup, lastKey: string, onlyDirectFollower: boolean ): QuestionGroup | Question | undefined {
+    private reRenderGroup(groupKey: string) {
+        const renderedGroup = this.findRenderedItem(groupKey);
+        if (!renderedGroup || !isRenderedQuestionGroup(renderedGroup)) {
+            console.warn('reRenderGroup: renderedGroup not found or not a group: ' + groupKey);
+            return;
+        }
+        const groupDef = this.findSurveyDefItem(groupKey);
+        if (!groupDef || !isQuestionGroup(groupDef)) {
+            console.warn('reRenderGroup: groupDef not found or not a group: ' + groupKey);
+            return;
+        }
+
+        // Add items to the front
+        let currentIndex = 0;
+        let nextItem = this.getNextItem(groupDef, renderedGroup, renderedGroup.key, true);
+        while (nextItem !== null) {
+            if (!nextItem) {
+                break;
+            }
+            this.addRenderedItem(nextItem, renderedGroup, currentIndex);
+            if (isQuestionGroup(nextItem)) {
+                this.initRenderedGroup(nextItem, nextItem.key);
+            }
+            currentIndex += 1;
+            nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
+        }
+
+        renderedGroup.items.forEach(
+            item => {
+                const itemDef = this.findSurveyDefItem(item.key);
+                // Remove item if condition not true
+                if (!itemDef || !this.evalConditions(itemDef.condition)) {
+                    renderedGroup.items = removeItemByKey(renderedGroup.items, item.key);
+                    console.log('removed item: ' + item.key);
+                    return;
+                }
+
+                // Re-Render groups recursively
+                if (isRenderedQuestionGroup(item)) {
+                    this.reRenderGroup(item.key);
+                }
+
+                // Add direct follow ups
+                currentIndex = renderedGroup.items.findIndex(ci => ci.key === item.key);
+                if (currentIndex < 0) {
+                    console.warn('reRenderGroup: index to insert items not found');
+                    return;
+                }
+                let nextItem = this.getNextItem(groupDef, renderedGroup, item.key, true);
+                while (nextItem !== null) {
+                    if (!nextItem) {
+                        break;
+                    }
+                    currentIndex += 1;
+                    this.addRenderedItem(nextItem, renderedGroup, currentIndex);
+                    if (isQuestionGroup(nextItem)) {
+                        this.initRenderedGroup(nextItem, nextItem.key);
+                    }
+                    nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
+                }
+            });
+
+        // Add items at the end if any
+        const lastItem = renderedGroup.items[renderedGroup.items.length - 1];
+        nextItem = this.getNextItem(groupDef, renderedGroup, lastItem.key, false);
+        while (nextItem !== null) {
+            if (!nextItem) {
+                break;
+            }
+            this.addRenderedItem(nextItem, renderedGroup);
+            if (isQuestionGroup(nextItem)) {
+                this.initRenderedGroup(nextItem, nextItem.key);
+            }
+            nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
+        }
+    }
+
+    private getNextItem(groupDef: QuestionGroup, parent: RenderedQuestionGroup, lastKey: string, onlyDirectFollower: boolean): QuestionGroup | Question | undefined {
         // get unrendered question groups only
         const availableItems = groupDef.items.filter(ai => {
             return !parent.items.some(item => item.key === ai.key) && this.evalConditions(ai.condition);
@@ -207,6 +299,37 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 obj.meta.responded.push(Date.now());
                 break;
         }
+    }
+
+    findSurveyDefItem(itemID: string): Question | QuestionGroup | undefined {
+        const ids = itemID.split('.');
+        let obj: Question | QuestionGroup | undefined;
+        let compID = '';
+        ids.forEach(id => {
+            if (compID === '') {
+                compID = id;
+            } else {
+                compID += '.' + id;
+            }
+            if (!obj) {
+                if (compID === this.surveyDef.key) {
+                    obj = this.surveyDef;
+                }
+                return;
+            }
+            if (!isQuestionGroup(obj)) {
+                return;
+            }
+            const ind = obj.items.findIndex(item => item.key === compID);
+            if (ind < 0) {
+                console.warn('findSurveyDefItem: cannot find object for : ' + compID);
+                obj = undefined;
+                return;
+            }
+            obj = obj.items[ind];
+
+        });
+        return obj;
     }
 
     findRenderedItem(itemID: string): RenderedQuestion | RenderedQuestionGroup | undefined {

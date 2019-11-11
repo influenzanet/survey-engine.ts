@@ -60,10 +60,7 @@ test('Op Test', () => {
     );
 
     console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
-    surveyE.setResponse({
-        key: 'q2.2.1',
-        value: 14
-    });
+    surveyE.setResponse('s1.q2.2.1', 14);
 
     console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
     console.log(JSON.stringify(surveyE.getResponses(), null, 2));
