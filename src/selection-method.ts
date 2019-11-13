@@ -33,6 +33,6 @@ export class SelectionMethod {
     }
 
     private sortByPriority(items: Array<any>): Array<any> {
-        return items.sort((a, b) => a.priority < b.priority ? -1 : a.priority > b.priority ? 1 : 0);
+        return items.sort((a, b) => a.priority > b.priority ? -1 : a.priority < b.priority ? 1 : 0);
     }
 }
