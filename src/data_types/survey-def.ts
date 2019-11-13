@@ -12,6 +12,7 @@ export interface SurveyItem {
     key: string;
     follows?: Array<string>;
     condition?: Expression;
+    priority?: number; // can be used to sort items in the list
 }
 
 export interface Question extends SurveyItem {
@@ -21,6 +22,7 @@ export interface Question extends SurveyItem {
 export interface QuestionGroup extends SurveyItem {
     // TODO: define group related properties
     items: Array<QuestionGroup | Question>;
+    selectionMethod?: Expression; // what method to use to pick next item if ambigous - default uniform random
 }
 
 export const isQuestionGroup = (item: QuestionGroup | Question): item is QuestionGroup => {
