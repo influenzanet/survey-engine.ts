@@ -38,7 +38,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private context: SurveyContext;
 
     private evalEngine: ExpressionEval;
-    private itemPicker: SelectionMethod;
 
     constructor(
         definitions: QuestionGroup,
@@ -48,7 +47,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     ) {
         console.log('core engine')
         this.evalEngine = new ExpressionEval();
-        this.itemPicker = new SelectionMethod();
 
         this.surveyDef = definitions;
         this.context = context ? context : {};
@@ -253,7 +251,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
 
         if (followUpItems.length > 0) {
-            return this.itemPicker.pickAnItem(followUpItems, groupDef.selectionMethod);
+            return SelectionMethod.pickAnItem(followUpItems, groupDef.selectionMethod);
         } else if (onlyDirectFollower) {
             return;
         }
@@ -262,7 +260,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         if (groupPool.length < 1) {
             return;
         }
-        return this.itemPicker.pickAnItem(groupPool, groupDef.selectionMethod);
+        return SelectionMethod.pickAnItem(groupPool, groupDef.selectionMethod);
     }
 
     private addRenderedItem(item: QuestionGroup | Question, parent: RenderedQuestionGroup, atPosition?: number): number {

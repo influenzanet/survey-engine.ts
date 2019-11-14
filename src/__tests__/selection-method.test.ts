@@ -1,12 +1,6 @@
 import { SelectionMethod } from "../selection-method";
 
 describe('testing selection methods', () =>{
-    let selectionMethod: SelectionMethod;
-
-    beforeAll(() => {
-        selectionMethod = new SelectionMethod();
-    });
-
     test('without method definition', () => {
         const items = [
             { key: 'q1' },
@@ -14,7 +8,7 @@ describe('testing selection methods', () =>{
             { key: 'q3' },
         ];
 
-        const item = selectionMethod.pickAnItem(items);
+        const item = SelectionMethod.pickAnItem(items);
         expect(item).toBeDefined();
         console.log('selected item is: ' + item.key);
     });
@@ -26,7 +20,7 @@ describe('testing selection methods', () =>{
             { key: 'q3' },
         ];
 
-        const item = selectionMethod.pickAnItem(items, { name: 'uniform' });
+        const item = SelectionMethod.pickAnItem(items, { name: 'uniform' });
         expect(item).toBeDefined();
         console.log('selected item is: ' + item.key);
     });
@@ -38,7 +32,7 @@ describe('testing selection methods', () =>{
             { key: 'q3' },
         ];
 
-        const item = selectionMethod.pickAnItem(items, { name: 'highesPriority' });
+        const item = SelectionMethod.pickAnItem(items, { name: 'highesPriority' });
         expect(item).toBeDefined();
         expect(item.key).toBe('q1');
         console.log('selected item is: ' + item.key);
@@ -52,7 +46,7 @@ describe('testing selection methods', () =>{
             { key: 'q4' },
         ];
 
-        const item = selectionMethod.pickAnItem(items, { name: 'highesPriority' });
+        const item = SelectionMethod.pickAnItem(items, { name: 'highesPriority' });
         expect(item).toBeDefined();
         expect(item.key).toBe('q2');
         console.log('selected item is: ' + item.key);

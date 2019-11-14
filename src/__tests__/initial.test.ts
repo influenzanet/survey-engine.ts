@@ -46,6 +46,17 @@ test('Op Test', () => {
                     }
                 ]
             },
+            {
+                key: 's1.q3',
+                selectionMethod: {
+                    name: 'highestPriority',
+                },
+                items: [
+                    { key: 's1.q3.1', priority: 3 },
+                    { key: 's1.q3.2', priority: 5 },
+                    { key: 's1.q3.3', priority: 1 },
+                ],
+            }
         ]
     };
 

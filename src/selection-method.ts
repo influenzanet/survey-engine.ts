@@ -2,7 +2,7 @@ import { Expression } from "./data_types";
 
 export class SelectionMethod {
 
-    pickAnItem(items: Array<any>, expression?: Expression): any {
+    static pickAnItem(items: Array<any>, expression?: Expression): any {
         if (!expression) {
             return this.uniformRandomSelector(items);
         }
@@ -17,14 +17,14 @@ export class SelectionMethod {
         }
     }
 
-    private uniformRandomSelector(items: Array<any>): any {
+    private static uniformRandomSelector(items: Array<any>): any {
         if (items.length < 1) {
             return;
         }
         return items[Math.floor(Math.random() * items.length)];
     }
 
-    private selectHighestPriority(items: Array<any>): any {
+    private static selectHighestPriority(items: Array<any>): any {
         if (items.length < 1) {
             return;
         }
@@ -32,7 +32,7 @@ export class SelectionMethod {
         return sorted[0];
     }
 
-    private sortByPriority(items: Array<any>): Array<any> {
+    private static sortByPriority(items: Array<any>): Array<any> {
         return items.sort((a, b) => a.priority > b.priority ? -1 : a.priority < b.priority ? 1 : 0);
     }
 }
