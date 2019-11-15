@@ -15,7 +15,6 @@ import {
     Expression
 } from "./data_types";
 import {
-    pickRandomListItem,
     removeItemByKey
 } from './utils';
 import { ExpressionEval } from "./expression-eval";
