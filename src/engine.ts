@@ -99,7 +99,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     }
 
     // INIT METHODS
-    private initResponseObject(qGroup: RenderedQuestionGroup): ResponseGroup {
+    private initResponseObject(qGroup: QuestionGroup): ResponseGroup {
         const respGroup: ResponseGroup = {
             key: qGroup.key,
             meta: {
