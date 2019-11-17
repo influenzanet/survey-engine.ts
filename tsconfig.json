@@ -1,11 +1,19 @@
 {
-    "compilerOptions": {
-      "target": "es2016",
-      "module": "commonjs",
-      "declaration": true,
-      "outDir": "./lib",
-      "strict": true
-    },
-    "include": ["src"],
-    "exclude": ["node_modules", "**/__tests__/*"]
-  }
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./lib",
+    "strict": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/__tests__/*"
+  ]
+}

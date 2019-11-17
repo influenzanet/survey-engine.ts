@@ -62,12 +62,14 @@ export interface LocalizedString extends LocalizedObject {
 }
 
 export interface ResponseOptionItem extends QComponent {
+    key: string;
     softValidation?: Expression;
     hardValidation?: Expression;
     disabled?: Expression;
 }
 
 export interface ResponseOption extends ResponseOptionItem {
+    dtype: string;
     // TODO: define properties of an response item
 }
 
