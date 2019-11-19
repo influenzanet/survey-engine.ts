@@ -10,6 +10,8 @@ export const isExpression = (value: Expression | any): value is Expression => {
 
 export interface SurveyItem {
     key: string;
+    version: number;
+    versionTags: Array<string>;
     follows?: Array<string>;
     condition?: Expression;
     priority?: number; // can be used to sort items in the list

@@ -102,6 +102,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private initResponseObject(qGroup: QuestionGroup): ResponseGroup {
         const respGroup: ResponseGroup = {
             key: qGroup.key,
+            version: qGroup.version,
             meta: {
                 rendered: [],
                 displayed: [],
@@ -117,6 +118,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             } else {
                 respGroup.items.push({
                     key: item.key,
+                    version: item.version,
                     meta: {
                         rendered: [],
                         displayed: [],

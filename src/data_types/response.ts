@@ -16,6 +16,7 @@ export interface SurveyResponse {
 
 interface SurveyResponseItem {
     key: string;
+    version: number;
     meta: ResponseMeta;
 }
 
