@@ -4,6 +4,12 @@ export interface Expression {
     dtype?: string;
 }
 
+export interface Validation {
+    key: string;
+    type: string; // hard or softvalidation
+    rule: Expression;
+}
+
 export const isExpression = (value: Expression | any): value is Expression => {
     return typeof (value) === 'object' && (value as Expression).name !== undefined;
 }
@@ -43,7 +49,8 @@ export interface Question extends SurveyItem {
 }
 
 export interface QComponent {
-    role: string;
+    key: string; // unique identifier
+    role: string; // purpose of the component
     content?: Array<any>; // array with item that are a sub-type of LocalizedObject
     displayCondition?: Expression;
 }
@@ -65,8 +72,7 @@ export interface LocalizedString extends LocalizedObject {
 
 export interface ResponseOptionItem extends QComponent {
     key: string;
-    softValidation?: Expression;
-    hardValidation?: Expression;
+    validations: Array<Validation>;
     disabled?: Expression;
 }
 

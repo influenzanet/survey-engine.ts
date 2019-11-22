@@ -77,19 +77,25 @@
                     "key": "s1.q1.r1",
                     "dytpe": "number",
                     "role": "input",
-                    "hardValidation": {
-                        "name": "and",
-                        "data": [
-                            {
-                                "name": "lt",
-                                "data": 110
-                            },
-                            {
-                                "name": "gt",
-                                "data": 18
+                    "validations": [
+                        {
+                            "key": "range",
+                            "type": "hard",
+                            "rule": {
+                                "name": "and",
+                                "data": [
+                                    {
+                                        "name": "lt",
+                                        "data": 110
+                                    },
+                                    {
+                                        "name": "gt",
+                                        "data": 18
+                                    }
+                                ]
                             }
-                        ]
-                    }
+                        }
+                    ]
                 }
             ]
         }
