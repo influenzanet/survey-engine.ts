@@ -1,18 +1,22 @@
 {
   "name": "survey-engine",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.1",
+  "description": "Implementation of the survey engine to use in typescript/javascript projects.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare" : "npm run build",
+    "prepublishOnly": "npm test && cp ./package.json lib && cp ./README.md lib && cd ./lib",
+    "postpublish": "cd .."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/influenzanet/survey-engine.ts.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["survey engine"],
+  "author": "phev8",
   "license": "ISC",
   "files": [
     "lib/**/*"
