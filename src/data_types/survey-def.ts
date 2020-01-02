@@ -48,6 +48,8 @@ export interface Question extends SurveyItem {
     validations: Array<Validation>;
 }
 
+export type QComponentType = QComponent | ResponseOptionGroup | ResponseOption;
+
 export interface QComponent {
     key: string; // unique identifier
     role: string; // purpose of the component
@@ -71,7 +73,6 @@ export interface LocalizedString extends LocalizedObject {
 }
 
 export interface ResponseOptionItem extends QComponent {
-    key: string;
     disabled?: Expression;
 }
 
