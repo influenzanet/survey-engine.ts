@@ -76,26 +76,32 @@
                 {
                     "key": "s1.q1.r1",
                     "dytpe": "number",
-                    "role": "input",
-                    "validations": [
-                        {
-                            "key": "range",
-                            "type": "hard",
-                            "rule": {
-                                "name": "and",
+                    "role": "input"
+                }
+            ],
+            "validations": [
+                {
+                    "key": "range",
+                    "type": "hard",
+                    "rule": {
+                        "name": "and",
+                        "data": [
+                            {
+                                "name": "lt",
                                 "data": [
-                                    {
-                                        "name": "lt",
-                                        "data": 110
-                                    },
-                                    {
-                                        "name": "gt",
-                                        "data": 18
-                                    }
+                                    { "name": "getResponse", "data": ["s1.q1", "s1.q1.r1"] },
+                                    110
+                                ]
+                            },
+                            {
+                                "name": "gt",
+                                "data": [
+                                    { "name": "getResponse", "data": ["s1.q1", "s1.q1.r1"] },
+                                    18
                                 ]
                             }
-                        }
-                    ]
+                        ]
+                    }
                 }
             ]
         }

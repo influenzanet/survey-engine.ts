@@ -45,7 +45,7 @@ export type QuestionTypes =
 export interface Question extends SurveyItem {
     type: QuestionTypes;
     components: Array<any>; // any sub-type of QComponent
-    mandatory?: boolean; // only relevant if rendered
+    validations: Array<Validation>;
 }
 
 export interface QComponent {
@@ -72,7 +72,6 @@ export interface LocalizedString extends LocalizedObject {
 
 export interface ResponseOptionItem extends QComponent {
     key: string;
-    validations: Array<Validation>;
     disabled?: Expression;
 }
 
@@ -81,11 +80,9 @@ export interface ResponseOption extends ResponseOptionItem {
     // TODO: define properties of an response item
 }
 
-export type OptionOrderTypes = 'sequential' | 'random';
-
 export interface ResponseOptionGroup extends ResponseOptionItem {
     items: Array<ResponseOptionGroup | ResponseOption>;
-    order: OptionOrderTypes;
+    order: Expression;
 }
 
 export const isResponseOptionGroup = (item: ResponseOptionGroup | ResponseOption): item is ResponseOptionGroup => {
