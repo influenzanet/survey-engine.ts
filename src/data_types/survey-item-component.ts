@@ -1,0 +1,45 @@
+import { Expression } from "./expression";
+
+// ----------------------------------------------------------------------
+export type ItemComponent = ItemComponentBase | ResponseCompnentGroup | ResponseComponent;
+
+interface ItemComponentBase {
+    role: string; // purpose of the component
+    key?: string; // unique identifier
+    content?: Array<LocalizedObject>; // array with item that are a sub-type of LocalizedObject
+    displayCondition?: Expression | boolean;
+    disabled?: Expression | boolean;
+}
+
+export interface ResponseComponent extends ItemComponentBase {
+    dtype: string;
+}
+
+export interface ResponseCompnentGroup extends ItemComponentBase {
+    items: Array<ItemComponent>;
+    order: Expression;
+}
+
+export const isResponseOptionGroup = (item: ItemComponent): item is ResponseCompnentGroup => {
+    const items = (item as ResponseCompnentGroup).items;
+    return items !== undefined && items.length > 0;
+}
+
+
+// ----------------------------------------------------------------------
+export type LocalizedObject = LocalizedString | LocalizedMedia;
+
+export interface LocalizedObjectBase {
+    code: string;
+}
+
+export interface LocalizedString extends LocalizedObjectBase {
+    parts: Array<string | Expression>; // in case of an expression it should return a string
+}
+
+export interface LocalizedMedia extends LocalizedObjectBase {
+    // TODO: define common properties
+    // TODO: define image object
+    // TODO: define video object
+    // TODO: define audio object
+}

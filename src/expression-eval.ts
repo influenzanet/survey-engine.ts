@@ -1,26 +1,26 @@
 import {
     RenderedQuestionGroup,
     SurveyContext,
-    SurveyResponse,
     Expression,
     isExpression,
-    ResponseGroup,
     RenderedQuestion,
-    isResponseGroup,
-    isRenderedQuestionGroup
+    isRenderedQuestionGroup,
+    SurveyItemGroupResponse,
+    SurveyItemResponse,
+    isSurveyItemGroupResponse
 } from "./data_types";
 
 
 export class ExpressionEval {
     renderedSurvey?: RenderedQuestionGroup;
     context?: SurveyContext;
-    responses?: SurveyResponse;
+    responses?: SurveyItemGroupResponse;
 
     public eval(
         expression?: Expression,
         renderedSurvey?: RenderedQuestionGroup,
         context?: SurveyContext,
-        responses?: SurveyResponse
+        responses?: SurveyItemGroupResponse
     ): boolean {
         // Default if no conditions found:
         if (!expression) {
@@ -93,15 +93,15 @@ export class ExpressionEval {
             console.warn('and: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
-        return exp.data.every((value) => isExpression(value) ? this.evalExpression(value) : value);
+        return exp.data.every((value) => isExpression(value.exp) ? this.evalExpression(value.exp) : value.num);
     }
 
     private not(exp: Expression): boolean {
-        if (!exp.data || !isExpression(exp)) {
+        if (!Array.isArray(exp.data) || exp.data?.length !== 1) {
             console.warn('not: method expects a sinlge Expression as an argument ');
             return false;
         }
-        return !this.evalExpression(exp.data as Expression);
+        return !this.evalExpression(exp.data[0].exp as Expression);
     }
 
     // ---------- COMPARISONS ----------------
@@ -131,10 +131,10 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0]) ?
-            this.evalExpression(exp.data[0]) : exp.data[0];
-        const b = isExpression(exp.data[1]) ?
-            this.evalExpression(exp.data[1]) : exp.data[1];
+        const a = isExpression(exp.data[0].exp) ?
+            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
+        const b = isExpression(exp.data[1].exp) ?
+            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
         return a > b;
     }
 
@@ -144,10 +144,10 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0]) ?
-            this.evalExpression(exp.data[0]) : exp.data[0];
-        const b = isExpression(exp.data[1]) ?
-            this.evalExpression(exp.data[1]) : exp.data[1];
+        const a = isExpression(exp.data[0].exp) ?
+            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
+        const b = isExpression(exp.data[1].exp) ?
+            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
         return a >= b;
     }
 
@@ -157,10 +157,10 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0]) ?
-            this.evalExpression(exp.data[0]) : exp.data[0];
-        const b = isExpression(exp.data[1]) ?
-            this.evalExpression(exp.data[1]) : exp.data[1];
+        const a = isExpression(exp.data[0].exp) ?
+            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
+        const b = isExpression(exp.data[1].exp) ?
+            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
         return a < b;
     }
 
@@ -170,10 +170,10 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0]) ?
-            this.evalExpression(exp.data[0]) : exp.data[0];
-        const b = isExpression(exp.data[1]) ?
-            this.evalExpression(exp.data[1]) : exp.data[1];
+        const a = isExpression(exp.data[0].exp) ?
+            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
+        const b = isExpression(exp.data[1].exp) ?
+            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
         return a <= b;
     }
 
@@ -182,7 +182,7 @@ export class ExpressionEval {
         return this.context;
     }
 
-    private getResponses(): SurveyResponse | undefined {
+    private getResponses(): SurveyItemGroupResponse | undefined {
         return this.responses;
     }
 
@@ -197,12 +197,21 @@ export class ExpressionEval {
             return null;
         }
 
-        const obj = this.evalExpression(attributeRef.data[0]);
+        if (!isExpression(attributeRef.data[0].exp)) {
+            console.warn('first argument is not a valid expression');
+            return null;
+        }
+        if (!attributeRef.data[1].str) {
+            console.warn('second argument is not a valid string');
+            return null;
+        }
+
+        const obj = this.evalExpression(attributeRef.data[0].exp);
         if (!obj || typeof (obj) !== 'object') {
             console.warn('getAttribute: received wrong type for referenced object: ' + obj);
             return null;
         }
-        const attr = obj[attributeRef.data[1]];
+        const attr = obj[attributeRef.data[1].str];
         if (attributeRef.dtype) {
             return this.typeConvert(attr, attributeRef.dtype);
         }
@@ -210,16 +219,25 @@ export class ExpressionEval {
     }
 
     private getArrayItem(itemRef: Expression): any {
-        if (!Array.isArray(itemRef.data) || itemRef.data.length !== 2 || typeof(itemRef.data[1]) !== 'number') {
+        if (!Array.isArray(itemRef.data) || itemRef.data.length !== 2) {
             console.warn('getArrayItem: data attribute is missing or wrong: ' + itemRef.data);
             return null;
         }
-        const arr = this.evalExpression(itemRef.data[0]);
+        if (!isExpression(itemRef.data[0].exp)) {
+            console.warn('first argument is not a valid expression');
+            return null;
+        }
+        if (!itemRef.data[1].num) {
+            console.warn('second argument is not a valid string');
+            return null;
+        }
+
+        const arr = this.evalExpression(itemRef.data[0].exp);
         if (!arr || !Array.isArray(arr)) {
             console.warn('getArrayItem: received wrong type for referenced array: ' + arr);
             return null;
         }
-        const item = arr[itemRef.data[1]];
+        const item = arr[itemRef.data[1].num];
         if (itemRef.dtype) {
             return this.typeConvert(item, itemRef.dtype);
         }
@@ -227,16 +245,27 @@ export class ExpressionEval {
     }
 
     private getArrayItemByKey(exp: Expression): any {
-        if (!Array.isArray(exp.data) || exp.data.length !== 2 || typeof(exp.data[1]) !== 'string') {
+        if (!exp.data || !Array.isArray(exp.data) || exp.data.length !== 2) {
             console.warn('getArrayItem: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
-        const arr = this.evalExpression(exp.data[0]);
+
+        if (!isExpression(exp.data[0].exp)) {
+            console.warn('first argument is not a valid expression');
+            return null;
+        }
+        if (!exp.data[1].str) {
+            console.warn('second argument is not a valid string');
+            return null;
+        }
+        const key = exp.data[1].str;
+
+        const arr = this.evalExpression(exp.data[0].exp);
         if (!arr || !Array.isArray(arr)) {
             console.warn('getArrayItemByKey: received wrong type for referenced array: ' + arr);
             return null;
         }
-        const item = arr.find(a => a.key === exp.data[1]);
+        const item = arr.find(a => a.key === key);
         if (!item) {
             return null;
         }
@@ -248,18 +277,29 @@ export class ExpressionEval {
 
 
     private getObjByHierarchicalKey(exp: Expression): any {
-        if (!Array.isArray(exp.data) || exp.data.length !== 2 || typeof(exp.data[1]) !== 'string') {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
             console.warn('getObjByHierarchicalKey: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
-        let root = this.evalExpression(exp.data[0]);
-        if (!isResponseGroup(root) && !isRenderedQuestionGroup(root)) {
+
+        if (!isExpression(exp.data[0].exp)) {
+            console.warn('first argument is not a valid expression');
+            return null;
+        }
+        if (!exp.data[1].str) {
+            console.warn('second argument is not a valid string');
+            return null;
+        }
+        const key = exp.data[1].str;
+
+        let root = this.evalExpression(exp.data[0].exp);
+        if (!isSurveyItemGroupResponse(root) && !isRenderedQuestionGroup(root)) {
             console.warn('getObjByHierarchicalKey: root is not a group: ' + root);
             return null;
         }
 
-        const ids = exp.data[1].split('.');
-        let obj: ResponseGroup | Response | RenderedQuestionGroup | RenderedQuestion | undefined;
+        const ids = key.split('.');
+        let obj: SurveyItemResponse | Response | RenderedQuestionGroup | RenderedQuestion | undefined;
         let compID = ''
         ids.forEach(id => {
             if (!obj) {
@@ -273,12 +313,12 @@ export class ExpressionEval {
             }
 
             compID += '.' + id;
-            const ind = (obj as ResponseGroup).items.findIndex(item => item.key === compID);
+            const ind = (obj as SurveyItemGroupResponse).items.findIndex(item => item.key === compID);
             if (ind < 0) {
                 console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
                 return null;
             }
-            obj = (obj as ResponseGroup).items[ind];
+            obj = (obj as SurveyItemGroupResponse).items[ind];
         });
 
         if (exp.dtype) {

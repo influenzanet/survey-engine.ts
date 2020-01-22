@@ -6,7 +6,7 @@ export class SelectionMethod {
         if (!expression) {
             return this.uniformRandomSelector(items);
         }
-        switch(expression.name) {
+        switch (expression.name) {
             case 'uniform':
                 return this.uniformRandomSelector(items);
             case 'highestPriority':
@@ -27,21 +27,24 @@ export class SelectionMethod {
     }
 
     private static exponentialRandomSelector(items: Array<any>, expression?: Expression): any {
-        if (items.length < 1 || !expression || typeof(expression.data) !== 'number') {
+        if (items.length < 1 || !expression || !expression.data || expression.data.length !== 1) {
+            return;
+        }
+        if (!expression.data[0].num) {
             return;
         }
         // TODO: rate is pointless right now - adapt formula if necessary
-        const rate = expression.data;
+        const rate = expression.data[0].num;
         const scaling = -Math.log(0.002) / rate;
 
         const sorted = this.sortByPriority(items);
         const uniform = Math.random();
 
-        let exp = (-1/rate) * Math.log(uniform) / scaling;
+        let exp = (-1 / rate) * Math.log(uniform) / scaling;
         if (exp > 1) {
             exp = 1;
         }
-        let index =  Math.floor(exp * items.length);
+        let index = Math.floor(exp * items.length);
         if (index >= items.length) {
             index = items.length - 1;
         }

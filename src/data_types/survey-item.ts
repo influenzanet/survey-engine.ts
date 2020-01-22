@@ -1,0 +1,48 @@
+import { Expression } from './expression';
+import { ItemComponent } from './survey-item-component';
+
+
+interface SurveyItemBase {
+    key: string;
+    version: number;
+    versionTags?: Array<string>;
+    follows?: Array<string>;
+    condition?: Expression;
+    priority?: number; // can be used to sort items in the list
+}
+
+export type SurveyItem = SurveyItemGroup | SingleSurveyItem;
+
+// ----------------------------------------------------------------------
+export interface SurveyItemGroup extends SurveyItemBase {
+    items: Array<SurveyItem>;
+    selectionMethod?: Expression; // what method to use to pick next item if ambigous - default uniform random
+}
+
+export const isSurveyItemGroup = (item: SurveyItem): item is SurveyItemGroup => {
+    const items = (item as SurveyItemGroup).items;
+    return items !== undefined && items.length > 0;
+}
+
+// ----------------------------------------------------------------------
+// Single Survey Items: (Questions, Titles etc.)
+export type SurveyItemTypes =
+    'basic.static.title' |
+    'basic.static.description' |
+    'basic.input.numeric' |
+    'basic.input.single-choice' |
+    'basic.input.multiple-choice' |
+    'concepts.v1.age.simple-age'
+    ;
+
+export interface SingleSurveyItem extends SurveyItemBase {
+    type: SurveyItemTypes;
+    components: Array<ItemComponent>; // any sub-type of ItemComponent
+    validations: Array<Validation>;
+}
+
+export interface Validation {
+    key: string;
+    type: string; // hard or softvalidation
+    rule: Expression;
+}

@@ -1,6 +1,6 @@
 import { SelectionMethod } from "../selection-method";
 
-describe('testing selection methods', () =>{
+describe('testing selection methods', () => {
     test('without method definition', () => {
         const items = [
             { key: 'q1' },
@@ -72,7 +72,7 @@ describe('testing selection methods', () =>{
             { key: 'q4' },
         ];
 
-        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: '2' });
+        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: [{ str: '2' }] });
         expect(item).toBeUndefined();
     });
 
@@ -84,7 +84,7 @@ describe('testing selection methods', () =>{
             { key: 'q4' },
         ];
 
-        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: 0.5 });
+        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: [{ num: 0.5 }] });
         expect(item).toBeDefined();
         console.log('selected item is: ' + item.key);
     });

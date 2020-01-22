@@ -1,18 +1,22 @@
 import {
     SurveyEngineCoreInterface,
-    Question,
-    QuestionGroup,
+
     RenderedQuestionGroup,
     SurveyContext,
-    SurveyResponse,
-    ResponseGroup,
-    isQuestionGroup,
+
     TimestampType,
-    QResponse,
-    isResponseGroup,
+
     RenderedQuestion,
     isRenderedQuestionGroup,
-    Expression
+    Expression,
+    SurveyItemResponse,
+    isSurveyItemGroupResponse,
+    SurveyItemGroup,
+    SurveyItemGroupResponse,
+    SurveyItem,
+    isSurveyItemGroup,
+    SingleSurveyItemResponse,
+    SingleSurveyItem
 } from "./data_types";
 import {
     removeItemByKey
@@ -20,10 +24,10 @@ import {
 import { ExpressionEval } from "./expression-eval";
 import { SelectionMethod } from "./selection-method";
 
-export const printResponses = (responses: ResponseGroup | QResponse, prefix: string) => {
+export const printResponses = (responses: SurveyItemResponse, prefix: string) => {
     console.log(prefix + responses.key);
     console.log(prefix + responses.meta);
-    if (isResponseGroup(responses)) {
+    if (isSurveyItemGroupResponse(responses)) {
         responses.items.forEach(i => {
             printResponses(i, prefix + '\t');
         })
@@ -31,17 +35,15 @@ export const printResponses = (responses: ResponseGroup | QResponse, prefix: str
 }
 
 export class SurveyEngineCore implements SurveyEngineCoreInterface {
-    private surveyDef: QuestionGroup;
+    private surveyDef: SurveyItemGroup;
     private renderedSurvey: RenderedQuestionGroup;
-    private responses: SurveyResponse;
+    private responses: SurveyItemGroupResponse;
     private context: SurveyContext;
 
     private evalEngine: ExpressionEval;
 
     constructor(
-        definitions: QuestionGroup,
-        reporter: string,
-        profileID: string,
+        definitions: SurveyItemGroup,
         context?: SurveyContext
     ) {
         console.log('core engine')
@@ -49,7 +51,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
         this.surveyDef = definitions;
         this.context = context ? context : {};
-        this.responses = this.createResponseContainer(reporter, profileID);
+        this.responses = this.initResponseObject(this.surveyDef);
         this.renderedSurvey = {
             key: definitions.key,
             items: []
@@ -63,13 +65,13 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.context = context;
     }
 
-    setResponse(targetKey: string, response: any) {
+    setResponse(targetKey: string, response: SurveyItemResponse) {
         const target = this.findResponseItem(targetKey);
         if (!target) {
             console.error('setResponse: cannot find target object for key: ' + targetKey);
             return;
         }
-        if (isResponseGroup(target)) {
+        if (isSurveyItemGroupResponse(target)) {
             console.error('setResponse: object is a response group - not defined: ' + targetKey);
             return;
         }
@@ -91,7 +93,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         console.warn('todo');
     }
 
-    getResponses(): SurveyResponse {
+    getResponses(): SurveyItemGroupResponse {
         console.warn('todo - get current index for each question, and do final checkings');
         return {
             ...this.responses,
@@ -99,49 +101,45 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     }
 
     // INIT METHODS
-    private initResponseObject(qGroup: QuestionGroup): ResponseGroup {
-        const respGroup: ResponseGroup = {
+    private initResponseObject(qGroup: SurveyItemGroup): SurveyItemGroupResponse {
+        const respGroup: SurveyItemGroupResponse = {
             key: qGroup.key,
-            version: qGroup.version,
             meta: {
                 rendered: [],
                 displayed: [],
                 responded: [],
-                position: -1
+                position: -1,
+                localeCode: '',
+                version: qGroup.version,
             },
             items: [],
         };
 
         qGroup.items.forEach(item => {
-            if (isQuestionGroup(item)) {
+            if (isSurveyItemGroup(item)) {
                 respGroup.items.push(this.initResponseObject(item));
             } else {
-                respGroup.items.push({
+                const itemResp: SingleSurveyItemResponse = {
                     key: item.key,
-                    version: item.version,
                     meta: {
                         rendered: [],
                         displayed: [],
                         responded: [],
-                        position: -1
+                        position: -1,
+                        localeCode: '',
+                        version: item.version,
                     },
-                })
+                    response: undefined,
+                };
+                respGroup.items.push(itemResp);
             }
         });
 
         return respGroup;
     }
 
-    private createResponseContainer(reporter: string, profileID: string): SurveyResponse {
-        const resp: SurveyResponse = {
-            reporter: reporter,
-            for: profileID,
-            responses: this.initResponseObject(this.surveyDef),
-        }
-        return resp;
-    }
 
-    private initRenderedGroup(groupDef: QuestionGroup, parentKey: string) {
+    private initRenderedGroup(groupDef: SurveyItemGroup, parentKey: string) {
         const parent = this.findRenderedItem(parentKey);
         if (!parent || !isRenderedQuestionGroup(parent)) {
             console.warn('initRenderedGroup: parent not found or not a group: ' + parentKey);
@@ -154,7 +152,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 break;
             }
             this.addRenderedItem(nextItem, parent);
-            if (isQuestionGroup(nextItem)) {
+            if (isSurveyItemGroup(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
             nextItem = this.getNextItem(groupDef, parent, nextItem.key, false);
@@ -168,7 +166,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             return;
         }
         const groupDef = this.findSurveyDefItem(groupKey);
-        if (!groupDef || !isQuestionGroup(groupDef)) {
+        if (!groupDef || !isSurveyItemGroup(groupDef)) {
             console.warn('reRenderGroup: groupDef not found or not a group: ' + groupKey);
             return;
         }
@@ -181,7 +179,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 break;
             }
             this.addRenderedItem(nextItem, renderedGroup, currentIndex);
-            if (isQuestionGroup(nextItem)) {
+            if (isSurveyItemGroup(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
             currentIndex += 1;
@@ -216,7 +214,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                     }
                     currentIndex += 1;
                     this.addRenderedItem(nextItem, renderedGroup, currentIndex);
-                    if (isQuestionGroup(nextItem)) {
+                    if (isSurveyItemGroup(nextItem)) {
                         this.initRenderedGroup(nextItem, nextItem.key);
                     }
                     nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
@@ -231,14 +229,14 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 break;
             }
             this.addRenderedItem(nextItem, renderedGroup);
-            if (isQuestionGroup(nextItem)) {
+            if (isSurveyItemGroup(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
             nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
         }
     }
 
-    private getNextItem(groupDef: QuestionGroup, parent: RenderedQuestionGroup, lastKey: string, onlyDirectFollower: boolean): QuestionGroup | Question | undefined {
+    private getNextItem(groupDef: SurveyItemGroup, parent: RenderedQuestionGroup, lastKey: string, onlyDirectFollower: boolean): SurveyItem | undefined {
         // get unrendered question groups only
         const availableItems = groupDef.items.filter(ai => {
             return !parent.items.some(item => item.key === ai.key) && this.evalConditions(ai.condition);
@@ -264,13 +262,13 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return SelectionMethod.pickAnItem(groupPool, groupDef.selectionMethod);
     }
 
-    private addRenderedItem(item: QuestionGroup | Question, parent: RenderedQuestionGroup, atPosition?: number): number {
+    private addRenderedItem(item: SurveyItem, parent: RenderedQuestionGroup, atPosition?: number): number {
         const renderedItem: RenderedQuestionGroup | RenderedQuestion = {
             ...item
         };
         // TODO: item to rendered question
         console.warn('addRenderedItem: convert to rendered item (e.g. select localisation');
-        if (isQuestionGroup(item)) {
+        if (isSurveyItemGroup(item)) {
             (renderedItem as RenderedQuestionGroup).items = [];
         }
 
@@ -303,9 +301,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
     }
 
-    findSurveyDefItem(itemID: string): Question | QuestionGroup | undefined {
+    findSurveyDefItem(itemID: string): SurveyItem | undefined {
         const ids = itemID.split('.');
-        let obj: Question | QuestionGroup | undefined;
+        let obj: SurveyItem | undefined;
         let compID = '';
         ids.forEach(id => {
             if (compID === '') {
@@ -319,7 +317,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 }
                 return;
             }
-            if (!isQuestionGroup(obj)) {
+            if (!isSurveyItemGroup(obj)) {
                 return;
             }
             const ind = obj.items.findIndex(item => item.key === compID);
@@ -365,9 +363,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return obj;
     }
 
-    findResponseItem(itemID: string): QResponse | ResponseGroup | undefined {
+    findResponseItem(itemID: string): SurveyItemResponse | undefined {
         const ids = itemID.split('.');
-        let obj: QResponse | ResponseGroup | undefined;
+        let obj: SurveyItemResponse | undefined;
         let compID = '';
         ids.forEach(id => {
             if (compID === '') {
@@ -376,8 +374,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 compID += '.' + id;
             }
             if (!obj) {
-                if (compID === this.responses.responses.key) {
-                    obj = this.responses.responses;
+                if (compID === this.responses.key) {
+                    obj = this.responses;
                 }
                 return;
             }

@@ -1,12 +1,12 @@
 import { OpTest } from '../index';
 import { SurveyEngineCore, printResponses } from '../engine';
-import { SurveyContext, QuestionGroup } from '../data_types';
+import { SurveyContext, SurveyItemGroup } from '../data_types';
 
 import simpleSurvey1 from './test-surveys/simple-survey-1.json'
 
 test('Op Test', () => {
     console.log(simpleSurvey1);
-    const surveyDef: QuestionGroup = simpleSurvey1 as QuestionGroup;
+    const surveyDef: SurveyItemGroup = simpleSurvey1 as SurveyItemGroup;
 
     const context: SurveyContext = {
         mode: 'test'
