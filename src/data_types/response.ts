@@ -8,7 +8,7 @@ interface SurveyItemResponseBase {
 }
 
 export interface SurveySingleItemResponse extends SurveyItemResponseBase {
-    response?: ResponseValue;
+    response?: ResponseItem;
 }
 
 export interface SurveyGroupItemResponse extends SurveyItemResponseBase {
@@ -20,11 +20,11 @@ export const isSurveyItemGroupResponse = (item: SurveyGroupItemResponse | Survey
     return items !== undefined && items.length > 0;
 }
 
-export interface ResponseValue {
+export interface ResponseItem {
     key: string;
     value?: string;
     dtype?: string;
-    items?: ResponseValue[];
+    items?: ResponseItem[];
 }
 
 export interface ResponseMeta {

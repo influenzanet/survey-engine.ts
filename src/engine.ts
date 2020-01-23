@@ -13,6 +13,7 @@ import {
     SurveyItem,
     isSurveyItemGroup,
     SurveySingleItemResponse,
+    ResponseItem,
 } from "./data_types";
 import {
     removeItemByKey
@@ -61,7 +62,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.context = context;
     }
 
-    setResponse(targetKey: string, response: SurveyItemResponse) {
+    setResponse(targetKey: string, response: ResponseItem) {
         const target = this.findResponseItem(targetKey);
         if (!target) {
             console.error('setResponse: cannot find target object for key: ' + targetKey);
