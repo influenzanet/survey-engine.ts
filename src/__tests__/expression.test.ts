@@ -1,7 +1,8 @@
-import { Expression, ExpressionArg } from '../data_types';
+import { Expression } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
 
 
+// ---------- LOGIC OPERATORS ----------------
 test('testing OR expression', () => {
     const expEval = new ExpressionEval();
     expect(expEval.eval({ name: 'or', data: [{ dtype: 'number', num: 1 }, { dtype: 'number', num: 0 }] })).toBeTruthy();
@@ -27,6 +28,8 @@ test('testing NOT expression', () => {
     expect(expEval.eval({ name: 'not', data: [{ dtype: 'exp', exp: falseExp }] })).toBeTruthy();
 });
 
+
+// ---------- COMPARISONS ----------------
 test('testing EQ expression', () => {
     const expEval = new ExpressionEval();
     // numbers
@@ -88,4 +91,49 @@ test('testing GTE expression', () => {
     expect(expEval.eval({ name: 'gte', data: [{ dtype: 'string', str: "test3" }, { dtype: 'string', str: "test2" }] })).toBeTruthy();
     expect(expEval.eval({ name: 'gte', data: [{ dtype: 'string', str: "test2" }, { dtype: 'string', str: "test2" }] })).toBeTruthy();
     expect(expEval.eval({ name: 'gte', data: [{ dtype: 'string', str: "test1" }, { dtype: 'string', str: "test2" }] })).toBeFalsy();
+})
+
+// ---------- ROOT REFERENCES ----------------
+test('testing expression: getContext', () => {
+    const expEval = new ExpressionEval();
+    expect(expEval.eval({ name: 'getContext' })).toBeUndefined();
+    expect(expEval.eval({ name: 'getContext' }, undefined, {
+        mode: 'test',
+    })).toBeDefined();
+})
+
+test('testing expression: getResponses', () => {
+    const expEval = new ExpressionEval();
+    expect(expEval.eval({ name: 'getResponses' })).toBeUndefined();
+    expect(expEval.eval({ name: 'getResponses' }, undefined, undefined, {
+        key: 'test',
+        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        items: []
+    })).toBeDefined();
+})
+
+test('testing expression: getRenderedItems', () => {
+    const expEval = new ExpressionEval();
+    expect(expEval.eval({ name: 'getRenderedItems' })).toBeUndefined();
+    expect(expEval.eval({ name: 'getRenderedItems' }, {
+        key: 'test',
+        items: []
+    })).toBeDefined();
+})
+
+// ---------- WORKING WITH OBJECT/ARRAYS ----------------
+test('testing expression: getAttribute', () => {
+    expect('not implemented').toBeNull();
+})
+
+test('testing expression: getArrayItemAtIndex', () => {
+    expect('not implemented').toBeNull();
+})
+
+test('testing expression: getArrayItemByKey', () => {
+    expect('not implemented').toBeNull();
+})
+
+test('testing expression: getObjByHierarchicalKey', () => {
+    expect('not implemented').toBeNull();
 })

@@ -199,8 +199,8 @@ export class ExpressionEval {
         return this.responses;
     }
 
-    private getRenderedItems(): RenderedQuestionGroup {
-        return this.getRenderedItems();
+    private getRenderedItems(): RenderedQuestionGroup | undefined {
+        return this.renderedSurvey;
     }
 
     // ---------- WORKING WITH OBJECT/ARRAYS ----------------
