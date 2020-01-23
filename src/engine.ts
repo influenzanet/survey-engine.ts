@@ -28,6 +28,18 @@ export const printResponses = (responses: SurveyItemResponse, prefix: string) =>
         responses.items.forEach(i => {
             printResponses(i, prefix + '\t');
         })
+    } else {
+        console.log(prefix + responses.response);
+    }
+
+}
+
+export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
+    console.log(prefix + surveyItem.key);
+    if (isSurveyGroupItem(surveyItem)) {
+        surveyItem.items.forEach(i => {
+            printSurveyItem(i, prefix + '\t');
+        })
     }
 }
 

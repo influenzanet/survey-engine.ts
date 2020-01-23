@@ -72,7 +72,7 @@ describe('testing selection methods', () => {
             { key: 'q4' },
         ];
 
-        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: [{ str: '2' }] });
+        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: [{ dtype: 'str', str: '2' }] });
         expect(item).toBeUndefined();
     });
 
@@ -84,7 +84,7 @@ describe('testing selection methods', () => {
             { key: 'q4' },
         ];
 
-        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: [{ num: 0.5 }] });
+        const item = SelectionMethod.pickAnItem(items, { name: 'exponential', data: [{ dtype: 'num', num: 0.5 }] });
         expect(item).toBeDefined();
         console.log('selected item is: ' + item.key);
     });

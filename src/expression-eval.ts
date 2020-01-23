@@ -8,7 +8,9 @@ import {
     SurveyGroupItemResponse,
     SurveyItemResponse,
     isSurveyGroupItemResponse,
-    ExpressionArg
+    ExpressionArg,
+    ResponseItem,
+    SurveyItem
 } from "./data_types";
 
 
@@ -22,7 +24,7 @@ export class ExpressionEval {
         renderedSurvey?: RenderedQuestionGroup,
         context?: SurveyContext,
         responses?: SurveyGroupItemResponse
-    ): boolean {
+    ): any {
         // Default if no conditions found:
         if (!expression) {
             return true;
@@ -55,6 +57,8 @@ export class ExpressionEval {
                 return this.gt(expression);
             case 'gte':
                 return this.gte(expression);
+            case 'isDefined':
+                return this.isDefined(expression);
             case 'regex':
                 console.warn('regex not implemented');
                 return;
@@ -190,6 +194,20 @@ export class ExpressionEval {
         return typeof (a) === "string" ? a.localeCompare(b) <= 0 : a <= b;
     }
 
+    private isDefined(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 1) {
+            console.warn('lte: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        const arg1 = expressionArgParser(exp.data[0]);
+        if (!isExpression(arg1)) {
+            return arg1;
+        }
+
+        const value = this.evalExpression(arg1);
+        return value !== null && value !== undefined;
+    }
+
     // ---------- ROOT REFERENCES ----------------
     private getContext(): any {
         return this.context;
@@ -225,8 +243,8 @@ export class ExpressionEval {
             return null;
         }
         const attr = obj[attributeRef.data[1].str];
-        if (attributeRef.dtype) {
-            return this.typeConvert(attr, attributeRef.dtype);
+        if (attributeRef.returnType) {
+            return this.typeConvert(attr, attributeRef.returnType);
         }
         return attr;
     }
@@ -236,23 +254,25 @@ export class ExpressionEval {
             console.warn('getArrayItem: data attribute is missing or wrong: ' + itemRef.data);
             return null;
         }
-        if (!isExpression(itemRef.data[0].exp)) {
+        const arg1 = expressionArgParser(itemRef.data[0]);
+        const arg2 = expressionArgParser(itemRef.data[1]);
+        if (!isExpression(arg1)) {
             console.warn('first argument is not a valid expression');
             return null;
         }
-        if (!itemRef.data[1].num) {
-            console.warn('second argument is not a valid string');
+        if (typeof (arg2) !== 'number') {
+            console.warn('second argument is not a valid number', arg2);
             return null;
         }
 
-        const arr = this.evalExpression(itemRef.data[0].exp);
+        const arr = this.evalExpression(arg1);
         if (!arr || !Array.isArray(arr)) {
             console.warn('getArrayItem: received wrong type for referenced array: ' + arr);
             return null;
         }
-        const item = arr[itemRef.data[1].num];
-        if (itemRef.dtype) {
-            return this.typeConvert(item, itemRef.dtype);
+        const item = arr[arg2];
+        if (itemRef.returnType) {
+            return this.typeConvert(item, itemRef.returnType);
         }
         return item;
     }
@@ -282,8 +302,8 @@ export class ExpressionEval {
         if (!item) {
             return null;
         }
-        if (exp.dtype) {
-            return this.typeConvert(item, exp.dtype);
+        if (exp.returnType) {
+            return this.typeConvert(item, exp.returnType);
         }
         return item;
     }
@@ -295,26 +315,33 @@ export class ExpressionEval {
             return null;
         }
 
-        if (!isExpression(exp.data[0].exp)) {
+        const arg1 = expressionArgParser(exp.data[0]);
+        const key = expressionArgParser(exp.data[1]);
+        if (!isExpression(arg1)) {
             console.warn('first argument is not a valid expression');
             return null;
         }
-        if (!exp.data[1].str) {
+        if (!key || typeof (key) !== 'string') {
             console.warn('second argument is not a valid string');
             return null;
         }
-        const key = exp.data[1].str;
 
-        let root = this.evalExpression(exp.data[0].exp);
-        if (!isSurveyGroupItemResponse(root) && !isRenderedQuestionGroup(root)) {
+        // find root:
+        let root = this.evalExpression(arg1);
+
+        if (!root.items || root.items.length < 1) {
             console.warn('getObjByHierarchicalKey: root is not a group: ' + root);
             return null;
         }
 
         const ids = key.split('.');
-        let obj: SurveyItemResponse | Response | RenderedQuestionGroup | RenderedQuestion | undefined;
-        let compID = ''
-        ids.forEach(id => {
+        let obj: SurveyItem | SurveyItemResponse | ResponseItem | RenderedQuestionGroup | RenderedQuestion | undefined;
+        let compID = '';
+
+
+        for (let i = 0; i < ids.length; i++) {
+            const id = ids[i];
+
             if (!obj) {
                 if (root.key !== id) {
                     console.warn('getObjByHierarchicalKey: cannot find root object for: ' + id);
@@ -322,20 +349,20 @@ export class ExpressionEval {
                 }
                 obj = root;
                 compID += id;
-                return;
+                continue;
             }
 
             compID += '.' + id;
-            const ind = (obj as SurveyGroupItemResponse).items.findIndex(item => item.key === compID);
+            const ind = (obj as { items: any[] }).items.findIndex(item => item.key === compID);
             if (ind < 0) {
                 console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
                 return null;
             }
-            obj = (obj as SurveyGroupItemResponse).items[ind];
-        });
+            obj = (obj as { items: any[] }).items[ind];
+        }
 
-        if (exp.dtype) {
-            return this.typeConvert(obj, exp.dtype);
+        if (exp.returnType) {
+            return this.typeConvert(obj, exp.returnType);
         }
         return obj;
     }
@@ -345,6 +372,8 @@ export class ExpressionEval {
         switch (dtype) {
             case 'int':
                 return typeof (value) === 'string' ? parseInt(value) : Math.floor(value);
+            case 'float':
+                return typeof (value) === 'string' ? parseFloat(value) : value;
             default:
                 console.warn('typeConvert: dtype is not known: ' + dtype);
                 return value;
@@ -355,9 +384,9 @@ export class ExpressionEval {
 
 const expressionArgParser = (arg: ExpressionArg): any => {
     switch (arg.dtype) {
-        case 'number':
+        case 'num':
             return arg.num;
-        case 'string':
+        case 'str':
             return arg.str;
         case 'exp':
             return arg.exp;
