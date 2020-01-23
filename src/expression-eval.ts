@@ -7,7 +7,8 @@ import {
     isRenderedQuestionGroup,
     SurveyGroupItemResponse,
     SurveyItemResponse,
-    isSurveyGroupItemResponse
+    isSurveyGroupItemResponse,
+    ExpressionArg
 } from "./data_types";
 
 
@@ -85,7 +86,10 @@ export class ExpressionEval {
             console.warn('or: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
-        return exp.data.some((value) => isExpression(value.exp) ? this.evalExpression(value.exp) : value.num);
+        return exp.data.some((value) => {
+            const arg = expressionArgParser(value);
+            return isExpression(arg) ? this.evalExpression(arg) : arg
+        });
     }
 
     private and(exp: Expression): boolean {
@@ -93,7 +97,10 @@ export class ExpressionEval {
             console.warn('and: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
-        return exp.data.every((value) => isExpression(value.exp) ? this.evalExpression(value.exp) : value.num);
+        return exp.data.every((value) => {
+            const arg = expressionArgParser(value);
+            return isExpression(arg) ? this.evalExpression(arg) : arg
+        });
     }
 
     private not(exp: Expression): boolean {
@@ -101,18 +108,20 @@ export class ExpressionEval {
             console.warn('not: method expects a sinlge Expression as an argument ');
             return false;
         }
-        return !this.evalExpression(exp.data[0].exp as Expression);
+
+        return !this.evalExpression(expressionArgParser(exp.data[0]) as Expression);
     }
 
     // ---------- COMPARISONS ----------------
     private eq(exp: Expression): boolean {
-        if (!Array.isArray(exp.data)) {
+        if (!Array.isArray(exp.data) || exp.data.length < 1) {
             console.warn('eq: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
+
         let values = [];
         for (let ind = 0; ind < exp.data.length; ind++) {
-            const val = exp.data[ind];
+            const val = expressionArgParser(exp.data[ind]);
             if (isExpression(val)) {
                 values.push(this.evalExpression(val));
             } else {
@@ -122,7 +131,7 @@ export class ExpressionEval {
         }
 
         // check if all values are equal
-        return values.every((val, i, arr) => val === arr[0]);
+        return values.every((val, i, arr) => typeof (val) === 'string' ? (val.localeCompare(arr[0]) === 0) : (arr[0] === val));
     }
 
     private gt(exp: Expression): boolean {
@@ -131,11 +140,12 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0].exp) ?
-            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
-        const b = isExpression(exp.data[1].exp) ?
-            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
-        return a > b;
+        const arg1 = expressionArgParser(exp.data[0]);
+        const arg2 = expressionArgParser(exp.data[1]);
+
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        const b = isExpression(arg2) ? this.evalExpression(arg2) : arg2;
+        return typeof (a) === "string" ? a.localeCompare(b) > 0 : a > b;
     }
 
     private gte(exp: Expression): boolean {
@@ -144,11 +154,12 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0].exp) ?
-            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
-        const b = isExpression(exp.data[1].exp) ?
-            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
-        return a >= b;
+        const arg1 = expressionArgParser(exp.data[0]);
+        const arg2 = expressionArgParser(exp.data[1]);
+
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        const b = isExpression(arg2) ? this.evalExpression(arg2) : arg2;
+        return typeof (a) === "string" ? a.localeCompare(b) >= 0 : a >= b;
     }
 
     private lt(exp: Expression): boolean {
@@ -157,11 +168,12 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0].exp) ?
-            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
-        const b = isExpression(exp.data[1].exp) ?
-            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
-        return a < b;
+        const arg1 = expressionArgParser(exp.data[0]);
+        const arg2 = expressionArgParser(exp.data[1]);
+
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        const b = isExpression(arg2) ? this.evalExpression(arg2) : arg2;
+        return typeof (a) === "string" ? a.localeCompare(b) < 0 : a < b;
     }
 
     private lte(exp: Expression): boolean {
@@ -170,11 +182,12 @@ export class ExpressionEval {
             return false;
         }
 
-        const a = isExpression(exp.data[0].exp) ?
-            this.evalExpression(exp.data[0].exp) : exp.data[0].num;
-        const b = isExpression(exp.data[1].exp) ?
-            this.evalExpression(exp.data[1].exp) : exp.data[1].num;
-        return a <= b;
+        const arg1 = expressionArgParser(exp.data[0]);
+        const arg2 = expressionArgParser(exp.data[1]);
+
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        const b = isExpression(arg2) ? this.evalExpression(arg2) : arg2;
+        return typeof (a) === "string" ? a.localeCompare(b) <= 0 : a <= b;
     }
 
     // ---------- ROOT REFERENCES ----------------
@@ -338,4 +351,18 @@ export class ExpressionEval {
         }
     }
 
+}
+
+const expressionArgParser = (arg: ExpressionArg): any => {
+    switch (arg.dtype) {
+        case 'number':
+            return arg.num;
+        case 'string':
+            return arg.str;
+        case 'exp':
+            return arg.exp;
+        default:
+            console.warn('expression arg could not be parsed', arg);
+            return undefined;
+    }
 }
