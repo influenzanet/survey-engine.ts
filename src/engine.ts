@@ -7,11 +7,11 @@ import {
     isRenderedQuestionGroup,
     Expression,
     SurveyItemResponse,
-    isSurveyItemGroupResponse,
+    isSurveyGroupItemResponse,
     SurveyGroupItem,
     SurveyGroupItemResponse,
     SurveyItem,
-    isSurveyItemGroup,
+    isSurveyGroupItem,
     SurveySingleItemResponse,
     ResponseItem,
 } from "./data_types";
@@ -24,7 +24,7 @@ import { SelectionMethod } from "./selection-method";
 export const printResponses = (responses: SurveyItemResponse, prefix: string) => {
     console.log(prefix + responses.key);
     console.log(prefix + responses.meta);
-    if (isSurveyItemGroupResponse(responses)) {
+    if (isSurveyGroupItemResponse(responses)) {
         responses.items.forEach(i => {
             printResponses(i, prefix + '\t');
         })
@@ -68,7 +68,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             console.error('setResponse: cannot find target object for key: ' + targetKey);
             return;
         }
-        if (isSurveyItemGroupResponse(target)) {
+        if (isSurveyGroupItemResponse(target)) {
             console.error('setResponse: object is a response group - not defined: ' + targetKey);
             return;
         }
@@ -113,7 +113,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         };
 
         qGroup.items.forEach(item => {
-            if (isSurveyItemGroup(item)) {
+            if (isSurveyGroupItem(item)) {
                 respGroup.items.push(this.initResponseObject(item));
             } else {
                 const itemResp: SurveySingleItemResponse = {
@@ -149,7 +149,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 break;
             }
             this.addRenderedItem(nextItem, parent);
-            if (isSurveyItemGroup(nextItem)) {
+            if (isSurveyGroupItem(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
             nextItem = this.getNextItem(groupDef, parent, nextItem.key, false);
@@ -163,7 +163,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             return;
         }
         const groupDef = this.findSurveyDefItem(groupKey);
-        if (!groupDef || !isSurveyItemGroup(groupDef)) {
+        if (!groupDef || !isSurveyGroupItem(groupDef)) {
             console.warn('reRenderGroup: groupDef not found or not a group: ' + groupKey);
             return;
         }
@@ -176,7 +176,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 break;
             }
             this.addRenderedItem(nextItem, renderedGroup, currentIndex);
-            if (isSurveyItemGroup(nextItem)) {
+            if (isSurveyGroupItem(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
             currentIndex += 1;
@@ -211,7 +211,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                     }
                     currentIndex += 1;
                     this.addRenderedItem(nextItem, renderedGroup, currentIndex);
-                    if (isSurveyItemGroup(nextItem)) {
+                    if (isSurveyGroupItem(nextItem)) {
                         this.initRenderedGroup(nextItem, nextItem.key);
                     }
                     nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
@@ -226,7 +226,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 break;
             }
             this.addRenderedItem(nextItem, renderedGroup);
-            if (isSurveyItemGroup(nextItem)) {
+            if (isSurveyGroupItem(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
             nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
@@ -265,7 +265,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         };
         // TODO: item to rendered question
         console.warn('addRenderedItem: convert to rendered item (e.g. select localisation');
-        if (isSurveyItemGroup(item)) {
+        if (isSurveyGroupItem(item)) {
             (renderedItem as RenderedQuestionGroup).items = [];
         }
 
@@ -314,7 +314,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 }
                 return;
             }
-            if (!isSurveyItemGroup(obj)) {
+            if (!isSurveyGroupItem(obj)) {
                 return;
             }
             const ind = obj.items.findIndex(item => item.key === compID);

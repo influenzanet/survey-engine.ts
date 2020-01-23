@@ -19,7 +19,7 @@ export interface SurveyGroupItem extends SurveyItemBase {
     selectionMethod?: Expression; // what method to use to pick next item if ambigous - default uniform random
 }
 
-export const isSurveyItemGroup = (item: SurveyItem): item is SurveyGroupItem => {
+export const isSurveyGroupItem = (item: SurveyItem): item is SurveyGroupItem => {
     const items = (item as SurveyGroupItem).items;
     return items !== undefined && items.length > 0;
 }

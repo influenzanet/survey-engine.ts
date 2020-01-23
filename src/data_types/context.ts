@@ -1,7 +1,7 @@
-import { SurveyItemGroupResponse } from "./response";
+import { SurveyGroupItemResponse } from "./response";
 
 export interface SurveyContext {
-    previousResponses?: Array<SurveyItemGroupResponse>;
+    previousResponses?: Array<SurveyGroupItemResponse>;
     profile?: any; // TODO: define
     mode?: string;
     // TODO: have geolocation and other attributes

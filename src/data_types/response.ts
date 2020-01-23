@@ -15,7 +15,7 @@ export interface SurveyGroupItemResponse extends SurveyItemResponseBase {
     items: Array<SurveyItemResponse | SurveyItemResponse>
 }
 
-export const isSurveyItemGroupResponse = (item: SurveyGroupItemResponse | SurveyItemResponse): item is SurveyGroupItemResponse => {
+export const isSurveyGroupItemResponse = (item: SurveyGroupItemResponse | SurveyItemResponse): item is SurveyGroupItemResponse => {
     const items = (item as SurveyGroupItemResponse).items;
     return items !== undefined && items.length > 0;
 }

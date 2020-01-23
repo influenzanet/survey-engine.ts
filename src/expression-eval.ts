@@ -7,7 +7,7 @@ import {
     isRenderedQuestionGroup,
     SurveyGroupItemResponse,
     SurveyItemResponse,
-    isSurveyItemGroupResponse
+    isSurveyGroupItemResponse
 } from "./data_types";
 
 
@@ -293,7 +293,7 @@ export class ExpressionEval {
         const key = exp.data[1].str;
 
         let root = this.evalExpression(exp.data[0].exp);
-        if (!isSurveyItemGroupResponse(root) && !isRenderedQuestionGroup(root)) {
+        if (!isSurveyGroupItemResponse(root) && !isRenderedQuestionGroup(root)) {
             console.warn('getObjByHierarchicalKey: root is not a group: ' + root);
             return null;
         }
