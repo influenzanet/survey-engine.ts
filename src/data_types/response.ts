@@ -1,22 +1,22 @@
 export type TimestampType = 'rendered' | 'displayed' | 'responded';
 
-export type SurveyItemResponse = SingleSurveyItemResponse | SurveyItemGroupResponse;
+export type SurveyItemResponse = SurveySingleItemResponse | SurveyGroupItemResponse;
 
 interface SurveyItemResponseBase {
     key: string;
     meta: ResponseMeta;
 }
 
-export interface SingleSurveyItemResponse extends SurveyItemResponseBase {
+export interface SurveySingleItemResponse extends SurveyItemResponseBase {
     response?: ResponseValue;
 }
 
-export interface SurveyItemGroupResponse extends SurveyItemResponseBase {
+export interface SurveyGroupItemResponse extends SurveyItemResponseBase {
     items: Array<SurveyItemResponse | SurveyItemResponse>
 }
 
-export const isSurveyItemGroupResponse = (item: SurveyItemGroupResponse | SurveyItemResponse): item is SurveyItemGroupResponse => {
-    const items = (item as SurveyItemGroupResponse).items;
+export const isSurveyItemGroupResponse = (item: SurveyGroupItemResponse | SurveyItemResponse): item is SurveyGroupItemResponse => {
+    const items = (item as SurveyGroupItemResponse).items;
     return items !== undefined && items.length > 0;
 }
 

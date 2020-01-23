@@ -11,16 +11,16 @@ interface SurveyItemBase {
     priority?: number; // can be used to sort items in the list
 }
 
-export type SurveyItem = SurveyItemGroup | SingleSurveyItem;
+export type SurveyItem = SurveyGroupItem | SurveySingleItem;
 
 // ----------------------------------------------------------------------
-export interface SurveyItemGroup extends SurveyItemBase {
+export interface SurveyGroupItem extends SurveyItemBase {
     items: Array<SurveyItem>;
     selectionMethod?: Expression; // what method to use to pick next item if ambigous - default uniform random
 }
 
-export const isSurveyItemGroup = (item: SurveyItem): item is SurveyItemGroup => {
-    const items = (item as SurveyItemGroup).items;
+export const isSurveyItemGroup = (item: SurveyItem): item is SurveyGroupItem => {
+    const items = (item as SurveyGroupItem).items;
     return items !== undefined && items.length > 0;
 }
 
@@ -35,7 +35,7 @@ export type SurveyItemTypes =
     'concepts.v1.age.simple-age'
     ;
 
-export interface SingleSurveyItem extends SurveyItemBase {
+export interface SurveySingleItem extends SurveyItemBase {
     type: SurveyItemTypes;
     components: Array<ItemComponent>; // any sub-type of ItemComponent
     validations: Array<Validation>;

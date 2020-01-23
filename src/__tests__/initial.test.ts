@@ -1,20 +1,18 @@
 import { OpTest } from '../index';
 import { SurveyEngineCore, printResponses } from '../engine';
-import { SurveyContext, SurveyItemGroup } from '../data_types';
+import { SurveyContext, SurveyGroupItem } from '../data_types';
 
 import simpleSurvey1 from './test-surveys/simple-survey-1.json'
 
 test('Op Test', () => {
     console.log(simpleSurvey1);
-    const surveyDef: SurveyItemGroup = simpleSurvey1 as SurveyItemGroup;
+    const surveyDef: SurveyGroupItem = simpleSurvey1 as SurveyGroupItem;
 
     const context: SurveyContext = {
         mode: 'test'
     };
     const surveyE = new SurveyEngineCore(
         surveyDef,
-        'test-reporter',
-        'test-reportee',
         context
     );
 

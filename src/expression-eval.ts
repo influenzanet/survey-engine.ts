@@ -5,7 +5,7 @@ import {
     isExpression,
     RenderedQuestion,
     isRenderedQuestionGroup,
-    SurveyItemGroupResponse,
+    SurveyGroupItemResponse,
     SurveyItemResponse,
     isSurveyItemGroupResponse
 } from "./data_types";
@@ -14,13 +14,13 @@ import {
 export class ExpressionEval {
     renderedSurvey?: RenderedQuestionGroup;
     context?: SurveyContext;
-    responses?: SurveyItemGroupResponse;
+    responses?: SurveyGroupItemResponse;
 
     public eval(
         expression?: Expression,
         renderedSurvey?: RenderedQuestionGroup,
         context?: SurveyContext,
-        responses?: SurveyItemGroupResponse
+        responses?: SurveyGroupItemResponse
     ): boolean {
         // Default if no conditions found:
         if (!expression) {
@@ -85,7 +85,7 @@ export class ExpressionEval {
             console.warn('or: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
-        return exp.data.some((value) => isExpression(value) ? this.evalExpression(value) : value);
+        return exp.data.some((value) => isExpression(value.exp) ? this.evalExpression(value.exp) : value.num);
     }
 
     private and(exp: Expression): boolean {
@@ -182,7 +182,7 @@ export class ExpressionEval {
         return this.context;
     }
 
-    private getResponses(): SurveyItemGroupResponse | undefined {
+    private getResponses(): SurveyGroupItemResponse | undefined {
         return this.responses;
     }
 
@@ -313,12 +313,12 @@ export class ExpressionEval {
             }
 
             compID += '.' + id;
-            const ind = (obj as SurveyItemGroupResponse).items.findIndex(item => item.key === compID);
+            const ind = (obj as SurveyGroupItemResponse).items.findIndex(item => item.key === compID);
             if (ind < 0) {
                 console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
                 return null;
             }
-            obj = (obj as SurveyItemGroupResponse).items[ind];
+            obj = (obj as SurveyGroupItemResponse).items[ind];
         });
 
         if (exp.dtype) {

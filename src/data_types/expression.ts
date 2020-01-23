@@ -9,6 +9,7 @@ export const isExpression = (value: Expression | any): value is Expression => {
 }
 
 export interface ExpressionArg {
+    dtype: string;
     exp?: Expression;
     str?: string;
     num?: number;
