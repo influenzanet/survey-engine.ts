@@ -54,7 +54,21 @@
                             "code": "en",
                             "parts": [
                                 {
-                                    "str": "How old are you?"
+                                    "str": "How old are you? - "
+                                },
+                                {
+                                    "dtype": "exp",
+                                    "exp": {
+                                        "name": "getResponseItem",
+                                        "data": [
+                                            {
+                                                "str": "s1.q1"
+                                            },
+                                            {
+                                                "str": "r1"
+                                            }
+                                        ]
+                                    }
                                 }
                             ]
                         },
@@ -63,6 +77,20 @@
                             "parts": [
                                 {
                                     "str": "Wie alt sind Sie?"
+                                },
+                                {
+                                    "dtype": "exp",
+                                    "exp": {
+                                        "name": "getResponseItem",
+                                        "data": [
+                                            {
+                                                "str": "s1.q1"
+                                            },
+                                            {
+                                                "str": "r1"
+                                            }
+                                        ]
+                                    }
                                 }
                             ]
                         }
@@ -90,14 +118,86 @@
                     ]
                 },
                 {
-                    "key": "s1.q1.r1",
+                    "key": "r1",
                     "dytpe": "number",
                     "role": "input"
+                },
+                {
+                    "role": "hint",
+                    "displayCondition": {
+                        "name": "not",
+                        "data": [
+                            {
+                                "dtype": "exp",
+                                "exp": {
+                                    "name": "getSurveyItemValidation",
+                                    "data": [
+                                        {
+                                            "str": "this"
+                                        },
+                                        {
+                                            "str": "v1"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "content": [
+                        {
+                            "code": "en",
+                            "parts": [
+                                {
+                                    "str": "validation not ok"
+                                }
+                            ]
+                        },
+                        {
+                            "code": "de",
+                            "parts": [
+                                {
+                                    "str": "Validierung nicht erfüllt"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "role": "hint",
+                    "disabled": {
+                        "name": "getSurveyItemValidation",
+                        "data": [
+                            {
+                                "str": "this"
+                            },
+                            {
+                                "str": "v1"
+                            }
+                        ]
+                    },
+                    "content": [
+                        {
+                            "code": "en",
+                            "parts": [
+                                {
+                                    "str": "validation not ok - disabled"
+                                }
+                            ]
+                        },
+                        {
+                            "code": "de",
+                            "parts": [
+                                {
+                                    "str": "Validierung nicht erfüllt - disbled"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ],
             "validations": [
                 {
-                    "key": "range",
+                    "key": "v1",
                     "type": "hard",
                     "rule": {
                         "name": "and",
@@ -106,15 +206,27 @@
                                 "name": "lt",
                                 "data": [
                                     {
-                                        "name": "getResponseItem",
-                                        "data": [
-                                            {
-                                                "str": "s1.q1"
-                                            },
-                                            {
-                                                "str": "s1.q1.r1"
-                                            }
-                                        ]
+                                        "dtype": "exp",
+                                        "exp": {
+                                            "name": "getAttribute",
+                                            "returnType": "int",
+                                            "data": [
+                                                {
+                                                    "dtype": "exp",
+                                                    "exp": {
+                                                        "name": "getResponseItem",
+                                                        "data": [
+                                                            {
+                                                                "str": "s1.q1"
+                                                            },
+                                                            {
+                                                                "str": "r1"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
                                     },
                                     110
                                 ]
@@ -123,15 +235,27 @@
                                 "name": "gt",
                                 "data": [
                                     {
-                                        "name": "getResponseItem",
-                                        "data": [
-                                            {
-                                                "str": "s1.q1"
-                                            },
-                                            {
-                                                "str": "s1.q1.r1"
-                                            }
-                                        ]
+                                        "dtype": "exp",
+                                        "exp": {
+                                            "name": "getAttribute",
+                                            "returnType": "int",
+                                            "data": [
+                                                {
+                                                    "dtype": "exp",
+                                                    "exp": {
+                                                        "name": "getResponseItem",
+                                                        "data": [
+                                                            {
+                                                                "str": "s1.q1"
+                                                            },
+                                                            {
+                                                                "str": "r1"
+                                                            }
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
                                     },
                                     18
                                 ]

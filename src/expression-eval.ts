@@ -7,7 +7,8 @@ import {
     ExpressionArg,
     ResponseItem,
     SurveyItem,
-    SurveyGroupItem
+    SurveyGroupItem,
+    SurveySingleItem
 } from "./data_types";
 
 
@@ -15,12 +16,14 @@ export class ExpressionEval {
     renderedSurvey?: SurveyGroupItem;
     context?: SurveyContext;
     responses?: SurveyGroupItemResponse;
+    temporaryItem?: SurveySingleItem; // for items not in the rendered tree yet
 
     public eval(
         expression?: Expression,
         renderedSurvey?: SurveyGroupItem,
         context?: SurveyContext,
-        responses?: SurveyGroupItemResponse
+        responses?: SurveyGroupItemResponse,
+        temporaryItem?: SurveySingleItem,
     ): any {
         // Default if no conditions found:
         if (!expression) {
@@ -30,6 +33,7 @@ export class ExpressionEval {
         this.renderedSurvey = renderedSurvey;
         this.context = context;
         this.responses = responses;
+        this.temporaryItem = temporaryItem;
 
         return this.evalExpression(expression);
     }
@@ -77,6 +81,8 @@ export class ExpressionEval {
             // shortcut methods:
             case 'getResponseItem':
                 return this.getResponseItem(expression);
+            case 'getSurveyItemValidation':
+                return this.getSurveyItemValidation(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -398,6 +404,38 @@ export class ExpressionEval {
         return this.evalExpression(getResponseItemExp);
     }
 
+    private getSurveyItemValidation(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            return true;
+        }
+        const itemRef = expressionArgParser(exp.data[0]);
+        const valRef = expressionArgParser(exp.data[1]);
+
+        let root: SurveySingleItem | undefined;
+        if (itemRef === 'this') {
+            root = this.temporaryItem;
+        } else {
+            const getSurveyItemExp: Expression = {
+                name: 'getObjByHierarchicalKey', data: [
+                    { dtype: 'exp', exp: { name: 'getRenderedItems' } },
+                    { str: itemRef }
+                ]
+            }
+            root = this.getObjByHierarchicalKey(getSurveyItemExp);
+        }
+
+        if (!root?.validations) {
+            return true;
+        }
+
+        const currentVal = root?.validations.find(v => v.key === valRef);
+        if (!currentVal) {
+            return true;
+        }
+        return currentVal.rule as boolean;
+    }
+
 
     private typeConvert(value: any, dtype: string): any {
         switch (dtype) {
@@ -410,7 +448,6 @@ export class ExpressionEval {
                 return value;
         }
     }
-
 }
 
 const expressionArgParser = (arg: ExpressionArg): any => {

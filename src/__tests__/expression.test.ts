@@ -1,4 +1,4 @@
-import { Expression, SurveyGroupItem, SurveyItemResponse } from '../data_types';
+import { Expression, SurveyGroupItem, SurveyItemResponse, SurveySingleItem } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
 
 
@@ -423,4 +423,50 @@ test('testing expression: getResponseItem', () => {
             { str: 'SOMETHING' }
         ]
     }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+})
+
+test('testing expression: getSurveyItemValidation', () => {
+    const expEval = new ExpressionEval();
+    const testRenderedSurveyItem: SurveySingleItem = {
+        key: 'TS',
+        version: 1,
+        type: 'basic.static.title',
+        components: [],
+        validations: [
+            {
+                key: 'v1',
+                type: 'hard',
+                rule: true
+            },
+            {
+                key: 'v2',
+                type: 'hard',
+                rule: false
+            }
+        ]
+    }
+
+    expect(expEval.eval({
+        name: 'getSurveyItemValidation',
+        data: [
+            { str: 'this' },
+            { str: 'v1' }
+        ]
+    }, undefined, undefined, undefined, testRenderedSurveyItem)).toBeTruthy();
+
+    expect(expEval.eval({
+        name: 'getSurveyItemValidation',
+        data: [
+            { str: 'this' },
+            { str: 'v2' }
+        ]
+    }, undefined, undefined, undefined, testRenderedSurveyItem)).toBeFalsy();
+
+    expect(expEval.eval({
+        name: 'getSurveyItemValidation',
+        data: [
+            { str: 'this' },
+            { str: 'v3' }
+        ]
+    }, undefined, undefined, undefined, testRenderedSurveyItem)).toBeTruthy();
 })

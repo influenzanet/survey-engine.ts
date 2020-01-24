@@ -11,6 +11,7 @@ import {
     isSurveyGroupItem,
     SurveySingleItemResponse,
     ResponseItem,
+    SurveySingleItem,
 } from "./data_types";
 import {
     removeItemByKey
@@ -269,14 +270,14 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     }
 
     private addRenderedItem(item: SurveyItem, parent: SurveyGroupItem, atPosition?: number): number {
-        const renderedItem: SurveyItem = {
+        let renderedItem: SurveyItem = {
             ...item
         };
 
-        // TODO: item to rendered question
-        console.warn('addRenderedItem: convert to rendered item (e.g. select localisation');
         if (isSurveyGroupItem(item)) {
             (renderedItem as SurveyGroupItem).items = [];
+        } else {
+            renderedItem = this.renderSingleSurveyItem(item);
         }
 
         if (!atPosition) {
@@ -287,6 +288,41 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         parent.items.splice(atPosition, 0, renderedItem);
         this.setTimestampFor('rendered', renderedItem.key);
         return atPosition;
+    }
+
+    private renderSingleSurveyItem(item: SurveySingleItem): SurveySingleItem {
+        const renderedItem = {
+            ...item,
+        }
+
+        if (item.validations) {
+            renderedItem.validations = item.validations.map(validation => {
+                return {
+                    ...validation,
+                    rule: this.evalConditions(validation.rule as Expression)
+                }
+            });
+        }
+
+        renderedItem.components = item.components.map(comp => {
+            return {
+                ...comp,
+                disabled: comp.disabled ? this.evalConditions(comp.disabled as Expression, renderedItem) : undefined,
+                displayCondition: comp.displayCondition ? this.evalConditions(comp.displayCondition as Expression, renderedItem) : undefined,
+            }
+        })
+
+        console.error('not implemented')
+        console.log(renderedItem)
+        renderedItem.components.forEach(c => console.log(c))
+
+
+
+        // TODO: resolve dynamic content
+        // TODO: ordering response items
+        console.error('resolve dynamic content not implemented')
+        console.error('ordering response items not implemented')
+        return renderedItem;
     }
 
     private setTimestampFor(type: TimestampType, itemID: string) {
@@ -396,17 +432,17 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 return;
             }
             obj = obj.items[ind];
-
         });
         return obj;
     }
 
-    evalConditions(condition?: Expression): boolean {
+    evalConditions(condition?: Expression, temporaryItem?: SurveySingleItem): boolean {
         return this.evalEngine.eval(
             condition,
             this.renderedSurvey,
             this.context,
-            this.responses
+            this.responses,
+            temporaryItem,
         );
     }
 
