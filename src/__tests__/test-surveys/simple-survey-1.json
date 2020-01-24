@@ -59,13 +59,24 @@
                                 {
                                     "dtype": "exp",
                                     "exp": {
-                                        "name": "getResponseItem",
+                                        "name": "getAttribute",
                                         "data": [
                                             {
-                                                "str": "s1.q1"
+                                                "dtype": "exp",
+                                                "exp": {
+                                                    "name": "getResponseItem",
+                                                    "data": [
+                                                        {
+                                                            "str": "s1.q1"
+                                                        },
+                                                        {
+                                                            "str": "r1"
+                                                        }
+                                                    ]
+                                                }
                                             },
                                             {
-                                                "str": "r1"
+                                                "str": "value"
                                             }
                                         ]
                                     }
@@ -81,13 +92,24 @@
                                 {
                                     "dtype": "exp",
                                     "exp": {
-                                        "name": "getResponseItem",
+                                        "name": "getAttribute",
                                         "data": [
                                             {
-                                                "str": "s1.q1"
+                                                "dtype": "exp",
+                                                "exp": {
+                                                    "name": "getResponseItem",
+                                                    "data": [
+                                                        {
+                                                            "str": "s1.q1"
+                                                        },
+                                                        {
+                                                            "str": "r1"
+                                                        }
+                                                    ]
+                                                }
                                             },
                                             {
-                                                "str": "r1"
+                                                "str": "value"
                                             }
                                         ]
                                     }

@@ -234,21 +234,30 @@ export class ExpressionEval {
             return null;
         }
 
-        if (!isExpression(attributeRef.data[0].exp)) {
-            console.warn('first argument is not a valid expression');
-            return null;
-        }
         if (!attributeRef.data[1].str) {
             console.warn('second argument is not a valid string');
             return null;
         }
 
-        const obj = this.evalExpression(attributeRef.data[0].exp);
-        if (!obj || typeof (obj) !== 'object') {
-            console.warn('getAttribute: received wrong type for referenced object: ' + obj);
+        const itemRef = expressionArgParser(attributeRef.data[0]);
+        let root: any;
+        if (!isExpression(itemRef)) {
+            if (!this.temporaryItem) {
+                console.warn('first argument is not a valid expression or temporary object not set');
+                return null;
+            }
+            if (itemRef === 'this') {
+                root = this.temporaryItem;
+            }
+        } else {
+            root = this.evalExpression(itemRef);
+        }
+
+        if (!root || typeof (root) !== 'object') {
+            console.warn('getAttribute: received wrong type for referenced object: ' + root);
             return null;
         }
-        const attr = obj[attributeRef.data[1].str];
+        const attr = root[attributeRef.data[1].str];
         if (attributeRef.returnType) {
             return this.typeConvert(attr, attributeRef.returnType);
         }
@@ -333,8 +342,11 @@ export class ExpressionEval {
 
         // find root:
         let root = this.evalExpression(arg1);
-
-        if (!root.items || root.items.length < 1) {
+        if (!root) {
+            console.warn('getObjByHierarchicalKey: root is not found for: ' + arg1);
+            return null;
+        }
+        if ((!root.items || root.items.length < 1) && root.key !== key) {
             console.warn('getObjByHierarchicalKey: root is not a group: ' + root);
             return null;
         }

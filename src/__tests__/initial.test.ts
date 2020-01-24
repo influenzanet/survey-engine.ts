@@ -26,6 +26,8 @@ test('Op Test', () => {
     }
     surveyE.setResponse('s1.q1', resp);
 
+    printSurveyItem(surveyE.getRenderedSurvey(), '');
+
     //console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
     //console.log(JSON.stringify(surveyE.getResponses(), null, 2));
 });

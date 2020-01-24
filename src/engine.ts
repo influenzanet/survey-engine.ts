@@ -12,6 +12,11 @@ import {
     SurveySingleItemResponse,
     ResponseItem,
     SurveySingleItem,
+    ResponseGroupComponent,
+    isResponseOptionGroup,
+    LocalizedString,
+    LocalizedObject,
+    LocalizedObjectBase,
 } from "./data_types";
 import {
     removeItemByKey
@@ -37,6 +42,12 @@ export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
         surveyItem.items.forEach(i => {
             printSurveyItem(i, prefix + '\t');
         })
+    } else {
+        console.log(surveyItem.components.map(c => {
+            const content = c.content ? c.content[0] : { parts: [] };
+            return prefix + (content as LocalizedString).parts.join('');
+
+        }).join('\n'));
     }
 }
 
@@ -203,17 +214,22 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                     return;
                 }
 
-                // Re-Render groups recursively
-                if (isSurveyGroupItem(item)) {
-                    this.reRenderGroup(item.key);
-                }
-
                 // Add direct follow ups
                 currentIndex = renderedGroup.items.findIndex(ci => ci.key === item.key);
                 if (currentIndex < 0) {
                     console.warn('reRenderGroup: index to insert items not found');
                     return;
                 }
+
+
+                if (isSurveyGroupItem(item)) {
+                    // Re-Render groups recursively
+                    this.reRenderGroup(item.key);
+                } else {
+                    renderedGroup.items[currentIndex] = this.renderSingleSurveyItem(itemDef as SurveySingleItem, true);
+                }
+
+
                 let nextItem = this.getNextItem(groupDef, renderedGroup, item.key, true);
                 while (nextItem !== null) {
                     if (!nextItem) {
@@ -290,7 +306,11 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return atPosition;
     }
 
-    private renderSingleSurveyItem(item: SurveySingleItem): SurveySingleItem {
+    private renderSingleSurveyItem(item: SurveySingleItem, rerender?: boolean): SurveySingleItem {
+        if (rerender) {
+            console.error("RERENDER SURVEY ITEM")
+        }
+
         const renderedItem = {
             ...item,
         }
@@ -305,24 +325,67 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
 
         renderedItem.components = item.components.map(comp => {
+            if (isResponseOptionGroup(comp)) {
+                return this.resolveComponentGroup(comp, renderedItem, rerender);
+            }
             return {
                 ...comp,
                 disabled: comp.disabled ? this.evalConditions(comp.disabled as Expression, renderedItem) : undefined,
                 displayCondition: comp.displayCondition ? this.evalConditions(comp.displayCondition as Expression, renderedItem) : undefined,
+                content: this.resolveContent(comp.content),
             }
         })
 
-        console.error('not implemented')
+
         console.log(renderedItem)
         renderedItem.components.forEach(c => console.log(c))
 
-
-
-        // TODO: resolve dynamic content
-        // TODO: ordering response items
-        console.error('resolve dynamic content not implemented')
-        console.error('ordering response items not implemented')
         return renderedItem;
+    }
+
+    private resolveComponentGroup(group: ResponseGroupComponent, parentItem: SurveySingleItem, rerender?: boolean): ResponseGroupComponent {
+        if (group.order.name === 'sequential') {
+            return {
+                ...group,
+                items: group.items.map(comp => {
+                    if (isResponseOptionGroup(comp)) {
+                        return this.resolveComponentGroup(comp, parentItem);
+                    }
+                    return {
+                        ...comp,
+                        disabled: comp.disabled ? this.evalConditions(comp.disabled as Expression, parentItem) : undefined,
+                        displayCondition: comp.displayCondition ? this.evalConditions(comp.displayCondition as Expression, parentItem) : undefined,
+                        content: this.resolveContent(comp.content),
+                    }
+                }),
+            }
+        }
+        if (rerender) {
+            console.error('define how to deal with rerendering - order should not change');
+        }
+        console.error('order type not implemented: ', group.order.name);
+        return {
+            ...group
+        }
+    }
+
+    private resolveContent(contents: LocalizedObject[] | undefined): LocalizedObject[] | undefined {
+        if (!contents) { return; }
+
+        return contents.map(cont => {
+            if ((cont as LocalizedString).parts && (cont as LocalizedString).parts.length > 0) {
+                console.log(cont)
+                return {
+                    code: cont.code,
+                    parts: (cont as LocalizedString).parts.map(
+                        p => p.dtype === 'exp' ? this.resolveExpression(p.exp) : p.str
+                    )
+                }
+            }
+            return {
+                ...cont
+            }
+        })
     }
 
     private setTimestampFor(type: TimestampType, itemID: string) {
@@ -434,6 +497,16 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             obj = obj.items[ind];
         });
         return obj;
+    }
+
+    resolveExpression(exp?: Expression, temporaryItem?: SurveySingleItem): any {
+        return this.evalEngine.eval(
+            exp,
+            this.renderedSurvey,
+            this.context,
+            this.responses,
+            temporaryItem,
+        );
     }
 
     evalConditions(condition?: Expression, temporaryItem?: SurveySingleItem): boolean {
