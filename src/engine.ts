@@ -1,10 +1,7 @@
 import {
     SurveyEngineCoreInterface,
-    RenderedQuestionGroup,
     SurveyContext,
     TimestampType,
-    RenderedQuestion,
-    isRenderedQuestionGroup,
     Expression,
     SurveyItemResponse,
     isSurveyGroupItemResponse,
@@ -31,7 +28,6 @@ export const printResponses = (responses: SurveyItemResponse, prefix: string) =>
     } else {
         console.log(prefix + responses.response);
     }
-
 }
 
 export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
@@ -45,7 +41,7 @@ export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
 
 export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private surveyDef: SurveyGroupItem;
-    private renderedSurvey: RenderedQuestionGroup;
+    private renderedSurvey: SurveyGroupItem;
     private responses: SurveyGroupItemResponse;
     private context: SurveyContext;
 
@@ -63,6 +59,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.responses = this.initResponseObject(this.surveyDef);
         this.renderedSurvey = {
             key: definitions.key,
+            version: definitions.version,
             items: []
         };
         this.setTimestampFor('rendered', definitions.key);
@@ -91,7 +88,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.reRenderGroup(this.renderedSurvey.key);
     }
 
-    getRenderedSurvey(): RenderedQuestionGroup {
+    getRenderedSurvey(): SurveyGroupItem {
         return {
             ...this.renderedSurvey,
             items: this.renderedSurvey.items.slice()
@@ -149,9 +146,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
 
     private initRenderedGroup(groupDef: SurveyGroupItem, parentKey: string) {
-        const parent = this.findRenderedItem(parentKey);
-        if (!parent || !isRenderedQuestionGroup(parent)) {
-            console.warn('initRenderedGroup: parent not found or not a group: ' + parentKey);
+        const parent = this.findRenderedItem(parentKey) as SurveyGroupItem;
+        if (!parent) {
+            console.warn('initRenderedGroup: parent not found: ' + parentKey);
             return;
         }
 
@@ -170,7 +167,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
     private reRenderGroup(groupKey: string) {
         const renderedGroup = this.findRenderedItem(groupKey);
-        if (!renderedGroup || !isRenderedQuestionGroup(renderedGroup)) {
+        if (!renderedGroup || !isSurveyGroupItem(renderedGroup)) {
             console.warn('reRenderGroup: renderedGroup not found or not a group: ' + groupKey);
             return;
         }
@@ -206,7 +203,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 }
 
                 // Re-Render groups recursively
-                if (isRenderedQuestionGroup(item)) {
+                if (isSurveyGroupItem(item)) {
                     this.reRenderGroup(item.key);
                 }
 
@@ -245,7 +242,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
     }
 
-    private getNextItem(groupDef: SurveyGroupItem, parent: RenderedQuestionGroup, lastKey: string, onlyDirectFollower: boolean): SurveyItem | undefined {
+    private getNextItem(groupDef: SurveyGroupItem, parent: SurveyGroupItem, lastKey: string, onlyDirectFollower: boolean): SurveyItem | undefined {
         // get unrendered question groups only
         const availableItems = groupDef.items.filter(ai => {
             return !parent.items.some(item => item.key === ai.key) && this.evalConditions(ai.condition);
@@ -271,14 +268,15 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return SelectionMethod.pickAnItem(groupPool, groupDef.selectionMethod);
     }
 
-    private addRenderedItem(item: SurveyItem, parent: RenderedQuestionGroup, atPosition?: number): number {
-        const renderedItem: RenderedQuestionGroup | RenderedQuestion = {
+    private addRenderedItem(item: SurveyItem, parent: SurveyGroupItem, atPosition?: number): number {
+        const renderedItem: SurveyItem = {
             ...item
         };
+
         // TODO: item to rendered question
         console.warn('addRenderedItem: convert to rendered item (e.g. select localisation');
         if (isSurveyGroupItem(item)) {
-            (renderedItem as RenderedQuestionGroup).items = [];
+            (renderedItem as SurveyGroupItem).items = [];
         }
 
         if (!atPosition) {
@@ -341,9 +339,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return obj;
     }
 
-    findRenderedItem(itemID: string): RenderedQuestion | RenderedQuestionGroup | undefined {
+    findRenderedItem(itemID: string): SurveyItem | undefined {
         const ids = itemID.split('.');
-        let obj: RenderedQuestion | RenderedQuestionGroup | undefined;
+        let obj: SurveyItem | undefined;
         let compID = '';
         ids.forEach(id => {
             if (compID === '') {
@@ -357,7 +355,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 }
                 return;
             }
-            if (!isRenderedQuestionGroup(obj)) {
+            if (!isSurveyGroupItem(obj)) {
                 return;
             }
             const ind = obj.items.findIndex(item => item.key === compID);
@@ -388,7 +386,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 }
                 return;
             }
-            if (!isRenderedQuestionGroup(obj)) {
+            if (!isSurveyGroupItemResponse(obj)) {
                 return;
             }
             const ind = obj.items.findIndex(item => item.key === compID);

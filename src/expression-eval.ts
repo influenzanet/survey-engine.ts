@@ -1,25 +1,24 @@
 import {
-    RenderedQuestionGroup,
     SurveyContext,
     Expression,
     isExpression,
-    RenderedQuestion,
     SurveyGroupItemResponse,
     SurveyItemResponse,
     ExpressionArg,
     ResponseItem,
-    SurveyItem
+    SurveyItem,
+    SurveyGroupItem
 } from "./data_types";
 
 
 export class ExpressionEval {
-    renderedSurvey?: RenderedQuestionGroup;
+    renderedSurvey?: SurveyGroupItem;
     context?: SurveyContext;
     responses?: SurveyGroupItemResponse;
 
     public eval(
         expression?: Expression,
-        renderedSurvey?: RenderedQuestionGroup,
+        renderedSurvey?: SurveyGroupItem,
         context?: SurveyContext,
         responses?: SurveyGroupItemResponse
     ): any {
@@ -75,6 +74,9 @@ export class ExpressionEval {
                 return this.getArrayItemByKey(expression);
             case 'getObjByHierarchicalKey':
                 return this.getObjByHierarchicalKey(expression);
+            // shortcut methods:
+            case 'getResponseItem':
+                return this.getResponseItem(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -215,7 +217,7 @@ export class ExpressionEval {
         return this.responses;
     }
 
-    private getRenderedItems(): RenderedQuestionGroup | undefined {
+    private getRenderedItems(): SurveyGroupItem | undefined {
         return this.renderedSurvey;
     }
 
@@ -306,7 +308,6 @@ export class ExpressionEval {
         return item;
     }
 
-
     private getObjByHierarchicalKey(exp: Expression): any {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
             console.warn('getObjByHierarchicalKey: data attribute is missing or wrong: ' + exp.data);
@@ -333,7 +334,7 @@ export class ExpressionEval {
         }
 
         const ids = key.split('.');
-        let obj: SurveyItem | SurveyItemResponse | ResponseItem | RenderedQuestionGroup | RenderedQuestion | undefined;
+        let obj: SurveyItem | SurveyItemResponse | ResponseItem | undefined;
         let compID = '';
 
 
@@ -363,6 +364,38 @@ export class ExpressionEval {
             return this.typeConvert(obj, exp.returnType);
         }
         return obj;
+    }
+
+    private getResponseItem(exp: Expression): ResponseItem | undefined {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            return;
+        }
+        const itemRef = expressionArgParser(exp.data[0]);
+        const respItemRef = expressionArgParser(exp.data[1]);
+
+        const getSurveyItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: { name: 'getResponses' } },
+                { str: itemRef }
+            ]
+        }
+
+        const getResponseRootExp: Expression = {
+            name: 'getAttribute', data: [
+                { dtype: 'exp', exp: getSurveyItemExp },
+                { str: 'response' }
+            ]
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: getResponseRootExp },
+                { str: respItemRef }
+            ]
+        }
+
+        return this.evalExpression(getResponseItemExp);
     }
 
 

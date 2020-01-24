@@ -29,8 +29,8 @@ export interface ResponseItem {
 
 export interface ResponseMeta {
     position: number; // position in the list
-    localeCode: string;
-    version: number;
+    localeCode?: string;
+    version?: number;
     // timestamps:
     rendered: Array<number>;
     displayed: Array<number>;

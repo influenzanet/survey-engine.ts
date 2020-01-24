@@ -18,15 +18,23 @@
                         {
                             "code": "en",
                             "parts": [
-                                "This is a test",
-                                " survey"
+                                {
+                                    "str": "This is a test"
+                                },
+                                {
+                                    "str": "survey"
+                                }
                             ]
                         },
                         {
                             "code": "de",
                             "parts": [
-                                "Das ist eine ",
-                                " Test-Umfrage"
+                                {
+                                    "str": "Das ist eine "
+                                },
+                                {
+                                    "str": " Test-Umfrage"
+                                }
                             ]
                         }
                     ]
@@ -45,13 +53,17 @@
                         {
                             "code": "en",
                             "parts": [
-                                "How old are you?"
+                                {
+                                    "str": "How old are you?"
+                                }
                             ]
                         },
                         {
                             "code": "de",
                             "parts": [
-                                "Wie alt sind Sie?"
+                                {
+                                    "str": "Wie alt sind Sie?"
+                                }
                             ]
                         }
                     ]
@@ -62,13 +74,17 @@
                         {
                             "code": "en",
                             "parts": [
-                                "Please enter your current age."
+                                {
+                                    "str": "Please enter your current age."
+                                }
                             ]
                         },
                         {
                             "code": "de",
                             "parts": [
-                                "Bitte geben Sie Ihr aktuelles Alter ein."
+                                {
+                                    "str": "Bitte geben Sie Ihr aktuelles Alter ein."
+                                }
                             ]
                         }
                     ]
@@ -89,14 +105,34 @@
                             {
                                 "name": "lt",
                                 "data": [
-                                    { "name": "getResponse", "data": ["s1.q1", "s1.q1.r1"] },
+                                    {
+                                        "name": "getResponseItem",
+                                        "data": [
+                                            {
+                                                "str": "s1.q1"
+                                            },
+                                            {
+                                                "str": "s1.q1.r1"
+                                            }
+                                        ]
+                                    },
                                     110
                                 ]
                             },
                             {
                                 "name": "gt",
                                 "data": [
-                                    { "name": "getResponse", "data": ["s1.q1", "s1.q1.r1"] },
+                                    {
+                                        "name": "getResponseItem",
+                                        "data": [
+                                            {
+                                                "str": "s1.q1"
+                                            },
+                                            {
+                                                "str": "s1.q1.r1"
+                                            }
+                                        ]
+                                    },
                                     18
                                 ]
                             }

@@ -163,6 +163,7 @@ test('testing expression: getRenderedItems', () => {
     expect(expEval.eval({ name: 'getRenderedItems' })).toBeUndefined();
     expect(expEval.eval({ name: 'getRenderedItems' }, {
         key: 'test',
+        version: 1,
         items: []
     })).toBeDefined();
 })
@@ -378,4 +379,48 @@ test('testing expression: getObjByHierarchicalKey', () => {
             { dtype: 'str', str: 'TS.IWRONG' }
         ]
     }, undefined, undefined, testSurveyResponses)).toBeNull();
+})
+
+test('testing expression: getResponseItem', () => {
+    const expEval = new ExpressionEval();
+    const testSurveyResponses: SurveyItemResponse = {
+        key: 'TS',
+        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        items: [
+            {
+                key: 'TS.I1',
+                meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+                response: {
+                    key: 'RG1',
+                    items: [
+                        { key: 'RG1.R1', value: 'testvalue' }
+                    ]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval({
+        name: 'getResponseItem',
+        data: [
+            { str: 'TS.I1' },
+            { str: 'RG1.R1' }
+        ]
+    }, undefined, undefined, testSurveyResponses).value).toEqual('testvalue');
+
+    expect(expEval.eval({
+        name: 'getResponseItem',
+        data: [
+            { str: 'TS.I1' },
+            { str: 'RG1' }
+        ]
+    }, undefined, undefined, testSurveyResponses).items).toHaveLength(1);
+
+    expect(expEval.eval({
+        name: 'getResponseItem',
+        data: [
+            { str: 'TS.I1' },
+            { str: 'SOMETHING' }
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
 })
