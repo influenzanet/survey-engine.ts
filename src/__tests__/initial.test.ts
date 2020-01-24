@@ -1,8 +1,8 @@
-import { OpTest } from '../index';
-import { SurveyEngineCore, printResponses, printSurveyItem } from '../engine';
+import { SurveyEngineCore } from '../engine';
 import { SurveyContext, SurveyGroupItem, ResponseItem } from '../data_types';
 
 import simpleSurvey1 from './test-surveys/simple-survey-1.json'
+import { printSurveyItem } from '../utils';
 
 test('Op Test', () => {
     // console.log(simpleSurvey1);
