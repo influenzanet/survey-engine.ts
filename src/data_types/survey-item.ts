@@ -44,5 +44,5 @@ export interface SurveySingleItem extends SurveyItemBase {
 export interface Validation {
     key: string;
     type: string; // hard or softvalidation
-    rule: Expression;
+    rule: Expression | boolean;
 }

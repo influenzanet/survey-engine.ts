@@ -38,7 +38,7 @@ test('testing EQ expression', () => {
 
     // strings
     expect(expEval.eval({ name: 'eq', data: [{ dtype: 'str', str: "test1" }, { dtype: 'str', str: "test2" }] })).toBeFalsy();
-    expect(expEval.eval({ name: 'eq', data: [{ dtype: 'str', str: "test1" }, { dtype: 'str', str: "test1" }] })).toBeTruthy();
+    expect(expEval.eval({ name: 'eq', data: [{ str: "test1" }, { str: "test1" }] })).toBeTruthy();
 })
 
 test('testing LT expression', () => {

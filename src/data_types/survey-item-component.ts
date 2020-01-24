@@ -1,4 +1,4 @@
-import { Expression } from "./expression";
+import { Expression, ExpressionArg } from "./expression";
 
 // ----------------------------------------------------------------------
 export type ItemComponent = ItemComponentBase | ResponseGroupComponent | ResponseComponent;
@@ -34,7 +34,7 @@ export interface LocalizedObjectBase {
 }
 
 export interface LocalizedString extends LocalizedObjectBase {
-    parts: Array<string | Expression>; // in case of an expression it should return a string
+    parts: Array<ExpressionArg>; // in case of an expression it should return a string
 }
 
 export interface LocalizedMedia extends LocalizedObjectBase {

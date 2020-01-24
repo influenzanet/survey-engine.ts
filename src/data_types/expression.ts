@@ -11,7 +11,7 @@ export const isExpression = (value: Expression | any): value is Expression => {
 export type ExpressionArgDType = 'exp' | 'num' | 'str';
 
 export interface ExpressionArg {
-    dtype: ExpressionArgDType;
+    dtype?: ExpressionArgDType; // should default to str;
     exp?: Expression;
     str?: string;
     num?: number;

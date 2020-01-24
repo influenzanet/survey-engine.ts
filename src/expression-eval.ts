@@ -4,10 +4,8 @@ import {
     Expression,
     isExpression,
     RenderedQuestion,
-    isRenderedQuestionGroup,
     SurveyGroupItemResponse,
     SurveyItemResponse,
-    isSurveyGroupItemResponse,
     ExpressionArg,
     ResponseItem,
     SurveyItem
@@ -391,7 +389,6 @@ const expressionArgParser = (arg: ExpressionArg): any => {
         case 'exp':
             return arg.exp;
         default:
-            console.warn('expression arg could not be parsed', arg);
-            return undefined;
+            return arg.str;
     }
 }
