@@ -229,7 +229,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             if (isSurveyGroupItem(nextItem)) {
                 this.initRenderedGroup(nextItem, nextItem.key);
             }
-            nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, true);
+            nextItem = this.getNextItem(groupDef, renderedGroup, nextItem.key, false);
         }
     }
 
@@ -245,7 +245,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
         const followUpItems = availableItems.filter(item => item.follows && item.follows.includes(lastKey));
 
-
         if (followUpItems.length > 0) {
             return SelectionMethod.pickAnItem(followUpItems, groupDef.selectionMethod);
         } else if (onlyDirectFollower) {
@@ -256,6 +255,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         if (groupPool.length < 1) {
             return;
         }
+
         return SelectionMethod.pickAnItem(groupPool, groupDef.selectionMethod);
     }
 
@@ -282,7 +282,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
     private renderSingleSurveyItem(item: SurveySingleItem, rerender?: boolean): SurveySingleItem {
         if (rerender) {
-            console.error("RERENDER SURVEY ITEM")
+            console.log("RERENDER SURVEY ITEM: " + item.key)
         }
 
         const renderedItem = {
@@ -309,11 +309,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 content: this.resolveContent(comp.content),
             }
         })
-
-
-        console.log(renderedItem)
-        renderedItem.components.forEach(c => console.log(c))
-
         return renderedItem;
     }
 
@@ -348,7 +343,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
         return contents.map(cont => {
             if ((cont as LocalizedString).parts && (cont as LocalizedString).parts.length > 0) {
-                console.log(cont)
                 return {
                     code: cont.code,
                     parts: (cont as LocalizedString).parts.map(

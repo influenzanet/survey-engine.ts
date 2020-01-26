@@ -343,7 +343,8 @@ export class ExpressionEval {
         // find root:
         let root = this.evalExpression(arg1);
         if (!root) {
-            console.warn('getObjByHierarchicalKey: root is not found for: ' + arg1);
+            console.warn('getObjByHierarchicalKey: root is not found for: ');
+            console.warn(arg1);
             return null;
         }
         if ((!root.items || root.items.length < 1) && root.key !== key) {

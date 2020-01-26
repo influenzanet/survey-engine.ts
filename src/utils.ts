@@ -11,13 +11,14 @@ export const removeItemByKey = (items: Array<any>, key: string): Array<any> => {
 
 export const printResponses = (responses: SurveyItemResponse, prefix: string) => {
     console.log(prefix + responses.key);
-    console.log(prefix + responses.meta);
+    // console.log(prefix + responses.meta);
     if (isSurveyGroupItemResponse(responses)) {
         responses.items.forEach(i => {
             printResponses(i, prefix + '\t');
         })
     } else {
-        console.log(prefix + responses.response);
+        console.log(prefix + responses.response?.key);
+        console.log(prefix + responses.response?.items?.length);
     }
 }
 
