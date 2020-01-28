@@ -12,8 +12,8 @@ import {
     SurveySingleItemResponse,
     ResponseItem,
     SurveySingleItem,
-    ResponseGroupComponent,
-    isResponseOptionGroup,
+    ItemGroupComponent,
+    isItemGroupComponent,
     LocalizedString,
     LocalizedObject,
     LocalizedObjectBase,
@@ -299,7 +299,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
 
         renderedItem.components = item.components.map(comp => {
-            if (isResponseOptionGroup(comp)) {
+            if (isItemGroupComponent(comp)) {
                 return this.resolveComponentGroup(comp, renderedItem, rerender);
             }
             return {
@@ -312,12 +312,12 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return renderedItem;
     }
 
-    private resolveComponentGroup(group: ResponseGroupComponent, parentItem: SurveySingleItem, rerender?: boolean): ResponseGroupComponent {
+    private resolveComponentGroup(group: ItemGroupComponent, parentItem: SurveySingleItem, rerender?: boolean): ItemGroupComponent {
         if (group.order.name === 'sequential') {
             return {
                 ...group,
                 items: group.items.map(comp => {
-                    if (isResponseOptionGroup(comp)) {
+                    if (isItemGroupComponent(comp)) {
                         return this.resolveComponentGroup(comp, parentItem);
                     }
                     return {

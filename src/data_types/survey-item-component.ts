@@ -1,7 +1,7 @@
 import { Expression, ExpressionArg } from "./expression";
 
 // ----------------------------------------------------------------------
-export type ItemComponent = ItemComponentBase | ResponseGroupComponent | ResponseComponent;
+export type ItemComponent = ItemComponentBase | ItemGroupComponent | ResponseComponent;
 
 interface ItemComponentBase {
     role: string; // purpose of the component
@@ -15,13 +15,13 @@ export interface ResponseComponent extends ItemComponentBase {
     dtype: string;
 }
 
-export interface ResponseGroupComponent extends ItemComponentBase {
+export interface ItemGroupComponent extends ItemComponentBase {
     items: Array<ItemComponent>;
     order: Expression;
 }
 
-export const isResponseOptionGroup = (item: ItemComponent): item is ResponseGroupComponent => {
-    const items = (item as ResponseGroupComponent).items;
+export const isItemGroupComponent = (item: ItemComponent): item is ItemGroupComponent => {
+    const items = (item as ItemGroupComponent).items;
     return items !== undefined && items.length > 0;
 }
 
