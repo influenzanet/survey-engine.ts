@@ -9,6 +9,7 @@ interface ItemComponentBase {
     content?: Array<LocalizedObject>; // array with item that are a sub-type of LocalizedObject
     displayCondition?: Expression | boolean;
     disabled?: Expression | boolean;
+    style?: Array<{ key: string, value: string }>;
 }
 
 export interface ResponseComponent extends ItemComponentBase {
@@ -17,7 +18,7 @@ export interface ResponseComponent extends ItemComponentBase {
 
 export interface ItemGroupComponent extends ItemComponentBase {
     items: Array<ItemComponent>;
-    order: Expression;
+    order?: Expression;
 }
 
 export const isItemGroupComponent = (item: ItemComponent): item is ItemGroupComponent => {

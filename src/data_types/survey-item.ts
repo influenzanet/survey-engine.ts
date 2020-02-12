@@ -1,5 +1,5 @@
 import { Expression } from './expression';
-import { ItemComponent } from './survey-item-component';
+import { ItemGroupComponent } from './survey-item-component';
 
 
 interface SurveyItemBase {
@@ -37,7 +37,7 @@ export type SurveyItemTypes =
 
 export interface SurveySingleItem extends SurveyItemBase {
     type?: SurveyItemTypes;
-    components: Array<ItemComponent>; // any sub-type of ItemComponent
+    components: ItemGroupComponent; // any sub-type of ItemComponent
     validations: Array<Validation>;
 }
 
