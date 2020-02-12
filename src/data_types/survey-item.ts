@@ -36,7 +36,7 @@ export type SurveyItemTypes =
     ;
 
 export interface SurveySingleItem extends SurveyItemBase {
-    type: SurveyItemTypes;
+    type?: SurveyItemTypes;
     components: Array<ItemComponent>; // any sub-type of ItemComponent
     validations: Array<Validation>;
 }
