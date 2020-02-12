@@ -298,22 +298,13 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             });
         }
 
-        renderedItem.components = item.components.map(comp => {
-            if (isItemGroupComponent(comp)) {
-                return this.resolveComponentGroup(comp, renderedItem, rerender);
-            }
-            return {
-                ...comp,
-                disabled: comp.disabled ? this.evalConditions(comp.disabled as Expression, renderedItem) : undefined,
-                displayCondition: comp.displayCondition ? this.evalConditions(comp.displayCondition as Expression, renderedItem) : undefined,
-                content: this.resolveContent(comp.content),
-            }
-        })
+        renderedItem.components = this.resolveComponentGroup(item.components, renderedItem, rerender);
+
         return renderedItem;
     }
 
     private resolveComponentGroup(group: ItemGroupComponent, parentItem: SurveySingleItem, rerender?: boolean): ItemGroupComponent {
-        if (group.order.name === 'sequential') {
+        if (!group.order || group.order.name === 'sequential') {
             return {
                 ...group,
                 items: group.items.map(comp => {

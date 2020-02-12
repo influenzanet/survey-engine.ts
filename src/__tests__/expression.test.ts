@@ -431,7 +431,10 @@ test('testing expression: getSurveyItemValidation', () => {
         key: 'TS',
         version: 1,
         type: 'basic.static.title',
-        components: [],
+        components: {
+            role: 'root',
+            items: []
+        },
         validations: [
             {
                 key: 'v1',

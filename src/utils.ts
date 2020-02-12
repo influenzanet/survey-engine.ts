@@ -29,7 +29,7 @@ export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
             printSurveyItem(i, prefix + '\t');
         })
     } else {
-        console.log(surveyItem.components.map(c => {
+        console.log(surveyItem.components.items.map(c => {
             const content = c.content ? c.content[0] : { parts: [] };
             return prefix + (content as LocalizedString).parts.join('');
 

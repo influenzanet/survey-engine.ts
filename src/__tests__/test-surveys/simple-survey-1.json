@@ -46,177 +46,180 @@
             "version": 1,
             "versionTags": [],
             "type": "basic.input.numeric",
-            "components": [
-                {
-                    "role": "title",
-                    "content": [
-                        {
-                            "code": "en",
-                            "parts": [
-                                {
-                                    "str": "How old are you? - "
-                                },
-                                {
-                                    "dtype": "exp",
-                                    "exp": {
-                                        "name": "getAttribute",
-                                        "data": [
-                                            {
-                                                "dtype": "exp",
-                                                "exp": {
-                                                    "name": "getResponseItem",
-                                                    "data": [
-                                                        {
-                                                            "str": "s1.q1"
-                                                        },
-                                                        {
-                                                            "str": "r1"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                "str": "value"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "code": "de",
-                            "parts": [
-                                {
-                                    "str": "Wie alt sind Sie?"
-                                },
-                                {
-                                    "dtype": "exp",
-                                    "exp": {
-                                        "name": "getAttribute",
-                                        "data": [
-                                            {
-                                                "dtype": "exp",
-                                                "exp": {
-                                                    "name": "getResponseItem",
-                                                    "data": [
-                                                        {
-                                                            "str": "s1.q1"
-                                                        },
-                                                        {
-                                                            "str": "r1"
-                                                        }
-                                                    ]
-                                                }
-                                            },
-                                            {
-                                                "str": "value"
-                                            }
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "role": "description",
-                    "content": [
-                        {
-                            "code": "en",
-                            "parts": [
-                                {
-                                    "str": "Please enter your current age."
-                                }
-                            ]
-                        },
-                        {
-                            "code": "de",
-                            "parts": [
-                                {
-                                    "str": "Bitte geben Sie Ihr aktuelles Alter ein."
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "key": "r1",
-                    "dytpe": "number",
-                    "role": "input"
-                },
-                {
-                    "role": "hint",
-                    "displayCondition": {
-                        "name": "not",
-                        "data": [
+            "components": {
+                "role": "root",
+                "items": [
+                    {
+                        "role": "title",
+                        "content": [
                             {
-                                "dtype": "exp",
-                                "exp": {
-                                    "name": "getSurveyItemValidation",
-                                    "data": [
-                                        {
-                                            "str": "this"
-                                        },
-                                        {
-                                            "str": "v1"
+                                "code": "en",
+                                "parts": [
+                                    {
+                                        "str": "How old are you? - "
+                                    },
+                                    {
+                                        "dtype": "exp",
+                                        "exp": {
+                                            "name": "getAttribute",
+                                            "data": [
+                                                {
+                                                    "dtype": "exp",
+                                                    "exp": {
+                                                        "name": "getResponseItem",
+                                                        "data": [
+                                                            {
+                                                                "str": "s1.q1"
+                                                            },
+                                                            {
+                                                                "str": "r1"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "str": "value"
+                                                }
+                                            ]
                                         }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "content": [
-                        {
-                            "code": "en",
-                            "parts": [
-                                {
-                                    "str": "validation not ok"
-                                }
-                            ]
-                        },
-                        {
-                            "code": "de",
-                            "parts": [
-                                {
-                                    "str": "Validierung nicht erfüllt"
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "role": "hint",
-                    "disabled": {
-                        "name": "getSurveyItemValidation",
-                        "data": [
-                            {
-                                "str": "this"
+                                    }
+                                ]
                             },
                             {
-                                "str": "v1"
+                                "code": "de",
+                                "parts": [
+                                    {
+                                        "str": "Wie alt sind Sie?"
+                                    },
+                                    {
+                                        "dtype": "exp",
+                                        "exp": {
+                                            "name": "getAttribute",
+                                            "data": [
+                                                {
+                                                    "dtype": "exp",
+                                                    "exp": {
+                                                        "name": "getResponseItem",
+                                                        "data": [
+                                                            {
+                                                                "str": "s1.q1"
+                                                            },
+                                                            {
+                                                                "str": "r1"
+                                                            }
+                                                        ]
+                                                    }
+                                                },
+                                                {
+                                                    "str": "value"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     },
-                    "content": [
-                        {
-                            "code": "en",
-                            "parts": [
+                    {
+                        "role": "description",
+                        "content": [
+                            {
+                                "code": "en",
+                                "parts": [
+                                    {
+                                        "str": "Please enter your current age."
+                                    }
+                                ]
+                            },
+                            {
+                                "code": "de",
+                                "parts": [
+                                    {
+                                        "str": "Bitte geben Sie Ihr aktuelles Alter ein."
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "key": "r1",
+                        "dytpe": "number",
+                        "role": "input"
+                    },
+                    {
+                        "role": "hint",
+                        "displayCondition": {
+                            "name": "not",
+                            "data": [
                                 {
-                                    "str": "validation not ok - disabled"
+                                    "dtype": "exp",
+                                    "exp": {
+                                        "name": "getSurveyItemValidation",
+                                        "data": [
+                                            {
+                                                "str": "this"
+                                            },
+                                            {
+                                                "str": "v1"
+                                            }
+                                        ]
+                                    }
                                 }
                             ]
                         },
-                        {
-                            "code": "de",
-                            "parts": [
+                        "content": [
+                            {
+                                "code": "en",
+                                "parts": [
+                                    {
+                                        "str": "validation not ok"
+                                    }
+                                ]
+                            },
+                            {
+                                "code": "de",
+                                "parts": [
+                                    {
+                                        "str": "Validierung nicht erfüllt"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "role": "hint",
+                        "disabled": {
+                            "name": "getSurveyItemValidation",
+                            "data": [
                                 {
-                                    "str": "Validierung nicht erfüllt - disbled"
+                                    "str": "this"
+                                },
+                                {
+                                    "str": "v1"
                                 }
                             ]
-                        }
-                    ]
-                }
-            ],
+                        },
+                        "content": [
+                            {
+                                "code": "en",
+                                "parts": [
+                                    {
+                                        "str": "validation not ok - disabled"
+                                    }
+                                ]
+                            },
+                            {
+                                "code": "de",
+                                "parts": [
+                                    {
+                                        "str": "Validierung nicht erfüllt - disbled"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
             "validations": [
                 {
                     "key": "v1",
