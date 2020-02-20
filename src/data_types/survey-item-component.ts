@@ -10,10 +10,18 @@ interface ItemComponentBase {
     displayCondition?: Expression | boolean;
     disabled?: Expression | boolean;
     style?: Array<{ key: string, value: string }>;
+    description?: Array<LocalizedObject>; // optional explanation to the content
 }
 
 export interface ResponseComponent extends ItemComponentBase {
-    dtype: string;
+    key: string;
+    dtype?: string;
+    properties?: {
+        min: ExpressionArg;
+        max: ExpressionArg;
+        stepSize: ExpressionArg;
+    }
+
 }
 
 export interface ItemGroupComponent extends ItemComponentBase {
