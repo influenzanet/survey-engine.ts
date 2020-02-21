@@ -16,3 +16,16 @@ export interface ExpressionArg {
     str?: string;
     num?: number;
 }
+
+export const expressionArgParser = (arg: ExpressionArg): any => {
+    switch (arg.dtype) {
+        case 'num':
+            return arg.num;
+        case 'str':
+            return arg.str;
+        case 'exp':
+            return arg.exp;
+        default:
+            return arg.str;
+    }
+}

@@ -11,17 +11,12 @@ interface ItemComponentBase {
     disabled?: Expression | boolean;
     style?: Array<{ key: string, value: string }>;
     description?: Array<LocalizedObject>; // optional explanation to the content
+    properties?: ComponentProperties;
 }
 
 export interface ResponseComponent extends ItemComponentBase {
     key: string;
     dtype?: string;
-    properties?: {
-        min: ExpressionArg;
-        max: ExpressionArg;
-        stepSize: ExpressionArg;
-    }
-
 }
 
 export interface ItemGroupComponent extends ItemComponentBase {
@@ -34,6 +29,11 @@ export const isItemGroupComponent = (item: ItemComponent): item is ItemGroupComp
     return items !== undefined && items.length > 0;
 }
 
+export interface ComponentProperties {
+    min?: ExpressionArg | number;
+    max?: ExpressionArg | number;
+    stepSize?: ExpressionArg | number;
+}
 
 // ----------------------------------------------------------------------
 export type LocalizedObject = LocalizedString | LocalizedMedia;

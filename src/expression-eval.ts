@@ -8,7 +8,8 @@ import {
     ResponseItem,
     SurveyItem,
     SurveyGroupItem,
-    SurveySingleItem
+    SurveySingleItem,
+    expressionArgParser
 } from "./data_types";
 
 
@@ -343,8 +344,8 @@ export class ExpressionEval {
         // find root:
         let root = this.evalExpression(arg1);
         if (!root) {
-            console.warn('getObjByHierarchicalKey: root is not found for: ');
-            console.warn(arg1);
+            // console.warn('getObjByHierarchicalKey: root is not found for: ');
+            // console.warn(arg1);
             return null;
         }
         if ((!root.items || root.items.length < 1) && root.key !== key) {
@@ -463,15 +464,3 @@ export class ExpressionEval {
     }
 }
 
-const expressionArgParser = (arg: ExpressionArg): any => {
-    switch (arg.dtype) {
-        case 'num':
-            return arg.num;
-        case 'str':
-            return arg.str;
-        case 'exp':
-            return arg.exp;
-        default:
-            return arg.str;
-    }
-}

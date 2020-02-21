@@ -1,4 +1,4 @@
-import { Expression, SurveyGroupItem, SurveyItemResponse, SurveySingleItem } from '../data_types';
+import { Expression, SurveyItemResponse, SurveySingleItem } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
 
 

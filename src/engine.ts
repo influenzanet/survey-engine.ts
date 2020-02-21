@@ -17,6 +17,10 @@ import {
     LocalizedString,
     LocalizedObject,
     LocalizedObjectBase,
+    ComponentProperties,
+    ExpressionArg,
+    isExpression,
+    expressionArgParser,
 } from "./data_types";
 import {
     removeItemByKey
@@ -316,6 +320,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                         disabled: comp.disabled ? this.evalConditions(comp.disabled as Expression, parentItem) : undefined,
                         displayCondition: comp.displayCondition ? this.evalConditions(comp.displayCondition as Expression, parentItem) : undefined,
                         content: this.resolveContent(comp.content),
+                        description: this.resolveContent(comp.description),
+                        properties: this.resolveComponentProperties(comp.properties),
                     }
                 }),
             }
@@ -345,6 +351,24 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 ...cont
             }
         })
+    }
+
+    private resolveComponentProperties(props: ComponentProperties | undefined): ComponentProperties | undefined {
+        if (!props) { return; }
+
+        const resolvedProps = { ...props };
+        if (resolvedProps.min) {
+            const arg = expressionArgParser(resolvedProps.min as ExpressionArg);
+            resolvedProps.min = isExpression(arg) ? this.resolveExpression(arg) : arg;
+        } if (resolvedProps.max) {
+            const arg = expressionArgParser(resolvedProps.max as ExpressionArg);
+            resolvedProps.max = isExpression(arg) ? this.resolveExpression(arg) : arg;
+        }
+        if (resolvedProps.stepSize) {
+            const arg = expressionArgParser(resolvedProps.stepSize as ExpressionArg);
+            resolvedProps.stepSize = isExpression(arg) ? this.resolveExpression(arg) : arg;
+        }
+        return resolvedProps;
     }
 
     private setTimestampFor(type: TimestampType, itemID: string) {
