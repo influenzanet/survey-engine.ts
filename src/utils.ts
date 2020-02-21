@@ -1,4 +1,4 @@
-import { SurveyItemResponse, isSurveyGroupItemResponse, SurveyItem, isSurveyGroupItem, LocalizedString } from "./data_types";
+import { SurveyItemResponse, isSurveyGroupItemResponse, SurveyItem, isSurveyGroupItem, LocalizedString, SurveyGroupItem, SurveySingleItem, SurveySingleItemResponse } from "./data_types";
 
 export const pickRandomListItem = (items: Array<any>): any => {
     return items[Math.floor(Math.random() * items.length)];
@@ -9,17 +9,10 @@ export const removeItemByKey = (items: Array<any>, key: string): Array<any> => {
 }
 
 
-export const printResponses = (responses: SurveyItemResponse, prefix: string) => {
-    console.log(prefix + responses.key);
-    // console.log(prefix + responses.meta);
-    if (isSurveyGroupItemResponse(responses)) {
-        responses.items.forEach(i => {
-            printResponses(i, prefix + '\t');
-        })
-    } else {
-        console.log(prefix + responses.response?.key);
-        console.log(prefix + responses.response?.items?.length);
-    }
+export const printResponses = (responses: SurveySingleItemResponse[], prefix: string) => {
+    responses.forEach((item => {
+        console.log(prefix, item);
+    }));
 }
 
 export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
@@ -35,4 +28,17 @@ export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
 
         }).join('\n'));
     }
+}
+
+export const flattenSurveyItemTree = (itemTree: SurveyGroupItem): SurveySingleItem[] => {
+    const flatTree = new Array<SurveySingleItem>();
+
+    itemTree.items.forEach(item => {
+        if (isSurveyGroupItem(item)) {
+            flatTree.push(...flattenSurveyItemTree(item));
+        } else {
+            flatTree.push({ ...item });
+        }
+    });
+    return flatTree;
 }

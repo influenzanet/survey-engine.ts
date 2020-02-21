@@ -23,7 +23,7 @@ import {
     expressionArgParser,
 } from "./data_types";
 import {
-    removeItemByKey
+    removeItemByKey, flattenSurveyItemTree
 } from './utils';
 import { ExpressionEval } from "./expression-eval";
 import { SelectionMethod } from "./selection-method";
@@ -89,11 +89,19 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         console.warn('todo');
     }
 
-    getResponses(): SurveyGroupItemResponse {
-        console.warn('todo - get current index for each question, and do final checkings');
-        return {
-            ...this.responses,
-        };
+    getResponses(): SurveySingleItemResponse[] {
+        const itemsInOrder = flattenSurveyItemTree(this.renderedSurvey);
+        const responses: SurveySingleItemResponse[] = [];
+
+        itemsInOrder.forEach((item, index) => {
+            const obj = this.findResponseItem(item.key);
+            if (!obj) {
+                return;
+            }
+            obj.meta.position = index;
+            responses.push({ ...obj });
+        })
+        return responses;
     }
 
     // INIT METHODS

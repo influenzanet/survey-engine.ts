@@ -1,4 +1,4 @@
-import { SurveyGroupItemResponse } from "./response";
+import { SurveySingleItemResponse } from "./response";
 import { SurveyContext } from "./context";
 import { SurveyGroupItem } from "./survey-item";
 
@@ -10,5 +10,5 @@ export interface SurveyEngineCoreInterface {
     getRenderedSurvey: () => SurveyGroupItem;
     questionDisplayed: (questionID: string) => void; // should be called by the client when displaying a question
 
-    getResponses: () => SurveyGroupItemResponse;
+    getResponses: () => SurveySingleItemResponse[];
 }
