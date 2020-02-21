@@ -85,8 +85,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         };
     };
 
-    questionDisplayed(questionID: string) {
-        console.warn('todo');
+    questionDisplayed(itemKey: string) {
+        this.setTimestampFor('displayed', itemKey);
     }
 
     getResponses(): SurveySingleItemResponse[] {

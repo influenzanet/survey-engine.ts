@@ -19,6 +19,8 @@ test('Op Test', () => {
     );
 
     printSurveyItem(surveyE.getRenderedSurvey(), '');
+    surveyE.questionDisplayed('QG0.QG4.Q4');
+    surveyE.questionDisplayed('QG0.QG4.Q4');
 
     //console.log(JSON.stringify(surveyE.getRenderedSurvey(), null, 2));
     const resp: ResponseItem = {
