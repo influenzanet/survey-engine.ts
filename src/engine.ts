@@ -319,6 +319,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         if (!group.order || group.order.name === 'sequential') {
             return {
                 ...group,
+                content: this.resolveContent(group.content),
+                description: this.resolveContent(group.description),
                 items: group.items.map(comp => {
                     if (isItemGroupComponent(comp)) {
                         return this.resolveComponentGroup(comp, parentItem);
