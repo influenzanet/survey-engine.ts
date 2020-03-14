@@ -1,16 +1,4 @@
-import {
-    SurveyContext,
-    Expression,
-    isExpression,
-    SurveyGroupItemResponse,
-    SurveyItemResponse,
-    ExpressionArg,
-    ResponseItem,
-    SurveyItem,
-    SurveyGroupItem,
-    SurveySingleItem,
-    expressionArgParser
-} from "./data_types";
+import { Expression, expressionArgParser, isExpression, ResponseItem, SurveyContext, SurveyGroupItem, SurveyGroupItemResponse, SurveyItem, SurveyItemResponse, SurveySingleItem } from "./data_types";
 
 
 export class ExpressionEval {
@@ -203,7 +191,7 @@ export class ExpressionEval {
 
     private isDefined(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 1) {
-            console.warn('lte: data attribute is missing or wrong: ' + exp.data);
+            console.warn('isDefined: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const arg1 = expressionArgParser(exp.data[0]);
