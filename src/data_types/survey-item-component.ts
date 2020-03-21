@@ -33,6 +33,7 @@ export interface ComponentProperties {
     min?: ExpressionArg | number;
     max?: ExpressionArg | number;
     stepSize?: ExpressionArg | number;
+    dateInputMode?: ExpressionArg | string;
 }
 
 // ----------------------------------------------------------------------

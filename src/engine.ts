@@ -378,6 +378,10 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             const arg = expressionArgParser(resolvedProps.stepSize as ExpressionArg);
             resolvedProps.stepSize = isExpression(arg) ? this.resolveExpression(arg) : arg;
         }
+        if (resolvedProps.dateInputMode) {
+            const arg = expressionArgParser(resolvedProps.dateInputMode as ExpressionArg);
+            resolvedProps.dateInputMode = isExpression(arg) ? this.resolveExpression(arg) : arg;
+        }
         return resolvedProps;
     }
 
