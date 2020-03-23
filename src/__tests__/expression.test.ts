@@ -526,7 +526,7 @@ test('testing expression: getPreviousResponses', () => {
     expect(expEval.eval({ name: 'getPreviousResponses', data: [{ str: 'weekly.q1' }] }, undefined, context)).toHaveLength(2);
 })
 
-test('testing expression: filterResponsesByIncludesKey', () => {
+test('testing expression: filterResponsesByIncludesKeys', () => {
     const context: SurveyContext = {
         previousResponses: [
             { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
@@ -548,7 +548,7 @@ test('testing expression: filterResponsesByIncludesKey', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', items: [{ key: '1.1.2' }] }
+                                { key: '1.1', items: [{ key: '1.1.1' }, { key: '1.1.2' }] }
                             ]
                         }
                     }
@@ -559,14 +559,15 @@ test('testing expression: filterResponsesByIncludesKey', () => {
 
     const expEval = new ExpressionEval();
     expect(expEval.eval({
-        name: 'filterResponsesByIncludesKey', data: [
+        name: 'filterResponsesByIncludesKeys', data: [
             { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
             { str: '1.1.2' },
         ]
     })).toHaveLength(0);
+
     expect(expEval.eval({
-        name: 'filterResponsesByIncludesKey', data: [
+        name: 'filterResponsesByIncludesKeys', data: [
             { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
             { str: '1.1.2' },
@@ -574,10 +575,130 @@ test('testing expression: filterResponsesByIncludesKey', () => {
     }, undefined, context)).toHaveLength(1);
 
     expect(expEval.eval({
-        name: 'filterResponsesByIncludesKey', data: [
+        name: 'filterResponsesByIncludesKeys', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
+            { str: '1.1' },
+            { str: '1.1.1' },
+            { str: '1.1.2' },
+        ]
+    }, undefined, context)).toHaveLength(1);
+
+    expect(expEval.eval({
+        name: 'filterResponsesByIncludesKeys', data: [
             { exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
             { str: '1.1.3' },
         ]
     }, undefined, context)).toHaveLength(0);
+})
+
+test('testing expression: filterResponsesByValue', () => {
+    const context: SurveyContext = {
+        previousResponses: [
+            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            {
+                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                    { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
+                    {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
+                            key: '1', items: [
+                                { key: '1.1', value: 'test1' }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                    { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test3' } },
+                    {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
+                            key: '1', items: [
+                                { key: '1.1', value: 'test2' }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+    const expEval = new ExpressionEval();
+    expect(expEval.eval({
+        name: 'filterResponsesByValue', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
+            { str: '1.1' },
+            { str: 'test1' },
+        ]
+    })).toHaveLength(0);
+
+    expect(expEval.eval({
+        name: 'filterResponsesByValue', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
+            { str: '1.1' },
+            { str: 'test1' },
+        ]
+    }, undefined, context)).toHaveLength(1);
+
+    expect(expEval.eval({
+        name: 'filterResponsesByValue', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
+            { str: '1.1' },
+            { str: 'test2' },
+        ]
+    }, undefined, context)).toHaveLength(1);
+
+    expect(expEval.eval({
+        name: 'filterResponsesByValue', data: [
+            { exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
+            { str: '1.1' },
+            { str: 'test3' },
+        ]
+    }, undefined, context)).toHaveLength(0);
+})
+
+
+test('testing expression: getLastFromSurveyItemResponses', () => {
+    const context: SurveyContext = {
+        previousResponses: [
+            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            {
+                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                    { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
+                    {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
+                            key: '1', items: [
+                                { key: '1.1', value: 'test1' }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                    { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: { key: '1', value: 'test3' } },
+                    {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: {
+                            key: '1', items: [
+                                { key: '1.1', value: 'test2' }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+    const expEval = new ExpressionEval();
+    expect(expEval.eval({
+        name: 'getLastFromSurveyItemResponses', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } }
+        ]
+    })).toBeUndefined();
+
+    expect(expEval.eval({
+        name: 'getLastFromSurveyItemResponses', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
+        ]
+    }, undefined, context).response.items[0].value).toEqual('test2');
 })

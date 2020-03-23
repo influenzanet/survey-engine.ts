@@ -74,20 +74,12 @@ export class ExpressionEval {
                 return this.getLastFromSurveyResponses(expression);
             case 'getPreviousResponses':
                 return this.getPreviousResponses(expression);
-            case 'filterResponsesByIncludesKey':
-                return this.filterResponsesByIncludesKey(expression);
-            /*
-            case 'getLatestFromSurveyItemResponses':
-                return this.getLatestFromSurveyItemResponses(expression);
-
-
             case 'filterResponsesByIncludesKeys':
                 return this.filterResponsesByIncludesKeys(expression);
-            case 'filterResponsesByHasValue':
-                return this.filterResponsesByHasValue(expression);
-            */
-
-
+            case 'filterResponsesByValue':
+                return this.filterResponsesByValue(expression);
+            case 'getLastFromSurveyItemResponses':
+                return this.getLastFromSurveyItemResponses(expression);
 
             // shortcut methods:
             case 'getResponseItem':
@@ -515,9 +507,9 @@ export class ExpressionEval {
         return resps;
     }
 
-    private filterResponsesByIncludesKey(exp: Expression): SurveySingleItemResponse[] {
-        if (!exp.data || exp.data.length !== 3 || !exp.data[1].str || !exp.data[2].str) {
-            console.warn('filterResponsesByIncludesKey: missing arguments');
+    private filterResponsesByIncludesKeys(exp: Expression): SurveySingleItemResponse[] {
+        if (!exp.data || exp.data.length < 3 || !exp.data[1].str || !exp.data[2].str) {
+            console.warn('filterResponsesByIncludesKeys: missing arguments');
             return [];
         }
 
@@ -526,7 +518,7 @@ export class ExpressionEval {
             return [];
         }
         const itemKey = expressionArgParser(exp.data[1]);
-        const searchKey = expressionArgParser(exp.data[2]);
+        const searchKeys = exp.data.slice(2, exp.data.length).map(expArg => expressionArgParser(expArg));
 
         const previousResponses = this.evalExpression(arg1);
         if (previousResponses.length < 1) {
@@ -534,13 +526,63 @@ export class ExpressionEval {
         }
 
         return previousResponses.filter((response: SurveySingleItemResponse) => {
-            console.log(response.response, itemKey);
             const rItem = this.retreiveObjectFromTree(response.response, itemKey) as ResponseItem;
-
-            if (!rItem || !rItem.items) { return false; }
-            if (!rItem.items.find(i => i.key === searchKey)) { return false; }
-            return true;
+            return searchKeys.every(sK => {
+                if (!rItem || !rItem.items) { return false; }
+                if (!rItem.items.find(i => i.key === sK)) {
+                    return false;
+                }
+                return true;
+            });
         });
+    }
+
+    private filterResponsesByValue(exp: Expression): SurveySingleItemResponse[] {
+        if (!exp.data || exp.data.length !== 3 || !exp.data[1].str || !exp.data[2].str) {
+            console.warn('filterResponsesByValue: missing arguments');
+            return [];
+        }
+
+        const arg1 = expressionArgParser(exp.data[0]);
+        if (!isExpression(arg1)) {
+            return [];
+        }
+        const itemKey = expressionArgParser(exp.data[1]);
+        const expectedValue = expressionArgParser(exp.data[2]);
+
+        const previousResponses = this.evalExpression(arg1);
+        if (previousResponses.length < 1) {
+            return [];
+        }
+
+        return previousResponses.filter((response: SurveySingleItemResponse) => {
+            const rItem = this.retreiveObjectFromTree(response.response, itemKey) as ResponseItem;
+            if (!rItem || !rItem.value) { return false; }
+            return rItem.value === expectedValue;
+        });
+    }
+
+    private getLastFromSurveyItemResponses(exp: Expression): SurveySingleItemResponse | undefined {
+        if (!exp.data || exp.data.length !== 1) {
+            console.warn('filterResponsesByValue: missing arguments');
+            return undefined;
+        }
+
+        const arg1 = expressionArgParser(exp.data[0]);
+        if (!isExpression(arg1)) {
+            return undefined;
+        }
+
+        const previousResponses = this.evalExpression(arg1);
+        if (previousResponses.length < 1) {
+            return undefined;
+        }
+        const sorted = previousResponses.sort((a: SurveySingleItemResponse, b: SurveySingleItemResponse) => {
+            const aTs = Math.max(...a.meta.responded);
+            const bTs = Math.max(...b.meta.responded);
+            return bTs - aTs;
+        });
+        return sorted[0];
     }
 
 
