@@ -1,4 +1,4 @@
-import { Expression, expressionArgParser, isExpression, ResponseItem, SurveyContext, SurveyGroupItem, SurveyGroupItemResponse, SurveyItem, SurveyItemResponse, SurveySingleItem } from "./data_types";
+import { Expression, expressionArgParser, isExpression, ResponseItem, SurveyContext, SurveyGroupItem, SurveyGroupItemResponse, SurveyItem, SurveyItemResponse, SurveySingleItem, SurveyResponse, SurveySingleItemResponse } from "./data_types";
 
 
 export class ExpressionEval {
@@ -67,6 +67,28 @@ export class ExpressionEval {
                 return this.getArrayItemByKey(expression);
             case 'getObjByHierarchicalKey':
                 return this.getObjByHierarchicalKey(expression);
+            // query methods:
+            case 'findPreviousSurveyResponsesByKey':
+                return this.findPreviousSurveyResponsesByKey(expression);
+            case 'getLastFromSurveyResponses':
+                return this.getLastFromSurveyResponses(expression);
+            case 'getPreviousResponses':
+                return this.getPreviousResponses(expression);
+            case 'filterResponsesByIncludesKey':
+                return this.filterResponsesByIncludesKey(expression);
+            /*
+            case 'getLatestFromSurveyItemResponses':
+                return this.getLatestFromSurveyItemResponses(expression);
+
+
+            case 'filterResponsesByIncludesKeys':
+                return this.filterResponsesByIncludesKeys(expression);
+            case 'filterResponsesByHasValue':
+                return this.filterResponsesByHasValue(expression);
+            */
+
+
+
             // shortcut methods:
             case 'getResponseItem':
                 return this.getResponseItem(expression);
@@ -341,6 +363,14 @@ export class ExpressionEval {
             return null;
         }
 
+        const obj = this.retreiveObjectFromTree(root, key);
+        if (exp.returnType) {
+            return this.typeConvert(obj, exp.returnType);
+        }
+        return obj;
+    }
+
+    private retreiveObjectFromTree(root: any, key: string): any {
         const ids = key.split('.');
         let obj: SurveyItem | SurveyItemResponse | ResponseItem | undefined;
         let compID = '';
@@ -351,7 +381,7 @@ export class ExpressionEval {
 
             if (!obj) {
                 if (root.key !== id) {
-                    console.warn('getObjByHierarchicalKey: cannot find root object for: ' + id);
+                    // console.warn('getObjByHierarchicalKey: cannot find root object for: ' + id);
                     return;
                 }
                 obj = root;
@@ -360,16 +390,14 @@ export class ExpressionEval {
             }
 
             compID += '.' + id;
+            if (!(obj as { items: any[] }).items) { return undefined };
+
             const ind = (obj as { items: any[] }).items.findIndex(item => item.key === compID);
             if (ind < 0) {
-                console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
+                // console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
                 return null;
             }
             obj = (obj as { items: any[] }).items[ind];
-        }
-
-        if (exp.returnType) {
-            return this.typeConvert(obj, exp.returnType);
         }
         return obj;
     }
@@ -436,6 +464,83 @@ export class ExpressionEval {
             return true;
         }
         return currentVal.rule as boolean;
+    }
+
+    // ---------- QUERY METHODS ----------------
+    private findPreviousSurveyResponsesByKey(exp: Expression): SurveyResponse[] {
+        if (!exp.data || exp.data.length !== 1 || !exp.data[0].str) {
+            console.warn('findPreviousSurveyResponsesByKey: key argument is missing');
+            return [];
+        }
+        const key = exp.data[0].str;
+        if (!this.context || !this.context.previousResponses) {
+            return [];
+        }
+        return this.context.previousResponses.filter(resp => resp.key === key);
+    }
+
+    private getLastFromSurveyResponses(exp: Expression): SurveyResponse | undefined {
+        if (!exp.data || exp.data.length !== 1 || !exp.data[0].str) {
+            console.warn('getLastFromSurveyResponses: missing argument');
+            return undefined;
+        }
+        const previousResponses = this.findPreviousSurveyResponsesByKey(exp);
+        if (previousResponses.length < 1) {
+            return undefined;
+        }
+        const sorted = previousResponses.sort((a, b) => b.submittedAt - a.submittedAt);
+        return sorted[0];
+    }
+
+    private getPreviousResponses(exp: Expression): SurveySingleItemResponse[] {
+        if (!exp.data || exp.data.length !== 1 || !exp.data[0].str) {
+            console.warn('getPreviousResponses: missing argument');
+            return [];
+        }
+
+        const key = exp.data[0].str;
+        const surveyKey = key.split('.')[0];
+        if (!this.context || !this.context.previousResponses) {
+            return [];
+        }
+        const previousSurveys = this.context.previousResponses.filter(resp => resp.key === surveyKey);
+
+        const resps: SurveySingleItemResponse[] = [];
+        previousSurveys.forEach(survey => {
+            const iR = survey.responses.find(item => item.key === key);
+            if (iR) {
+                resps.push(iR);
+            }
+        });
+        return resps;
+    }
+
+    private filterResponsesByIncludesKey(exp: Expression): SurveySingleItemResponse[] {
+        if (!exp.data || exp.data.length !== 3 || !exp.data[1].str || !exp.data[2].str) {
+            console.warn('filterResponsesByIncludesKey: missing arguments');
+            return [];
+        }
+
+        const arg1 = expressionArgParser(exp.data[0]);
+        if (!isExpression(arg1)) {
+            return [];
+        }
+        const itemKey = expressionArgParser(exp.data[1]);
+        const searchKey = expressionArgParser(exp.data[2]);
+
+        const previousResponses = this.evalExpression(arg1);
+        if (previousResponses.length < 1) {
+            return [];
+        }
+
+        return previousResponses.filter((response: SurveySingleItemResponse) => {
+            console.log(response.response, itemKey);
+            const rItem = this.retreiveObjectFromTree(response.response, itemKey) as ResponseItem;
+
+            if (!rItem || !rItem.items) { return false; }
+            if (!rItem.items.find(i => i.key === searchKey)) { return false; }
+            return true;
+        });
     }
 
 
