@@ -578,6 +578,9 @@ export class ExpressionEval {
             return undefined;
         }
         const sorted = previousResponses.sort((a: SurveySingleItemResponse, b: SurveySingleItemResponse) => {
+            if (!a.meta || !b.meta) {
+                return 0;
+            }
             const aTs = Math.max(...a.meta.responded);
             const bTs = Math.max(...b.meta.responded);
             return bTs - aTs;

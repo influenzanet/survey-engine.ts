@@ -16,7 +16,6 @@ import {
     isItemGroupComponent,
     LocalizedString,
     LocalizedObject,
-    LocalizedObjectBase,
     ComponentProperties,
     ExpressionArg,
     isExpression,
@@ -28,6 +27,14 @@ import {
 import { ExpressionEval } from "./expression-eval";
 import { SelectionMethod } from "./selection-method";
 
+const initMeta = {
+    rendered: [],
+    displayed: [],
+    responded: [],
+    position: -1,
+    localeCode: '',
+    version: -1,
+}
 
 export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private surveyDef: SurveyGroupItem;
@@ -85,8 +92,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         };
     };
 
-    questionDisplayed(itemKey: string) {
-        this.setTimestampFor('displayed', itemKey);
+    questionDisplayed(itemKey: string, localeCode?: string) {
+        this.setTimestampFor('displayed', itemKey, localeCode);
     }
 
     getResponses(): SurveySingleItemResponse[] {
@@ -97,6 +104,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             const obj = this.findResponseItem(item.key);
             if (!obj) {
                 return;
+            }
+            if (!obj.meta) {
+                obj.meta = { ...initMeta };
             }
             obj.meta.position = index;
             responses.push({ ...obj });
@@ -385,10 +395,16 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return resolvedProps;
     }
 
-    private setTimestampFor(type: TimestampType, itemID: string) {
+    private setTimestampFor(type: TimestampType, itemID: string, localeCode?: string) {
         const obj = this.findResponseItem(itemID);
         if (!obj) {
             return;
+        }
+        if (!obj.meta) {
+            obj.meta = { ...initMeta };
+        }
+        if (localeCode) {
+            obj.meta.localeCode = localeCode;
         }
 
         switch (type) {

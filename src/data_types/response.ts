@@ -12,7 +12,7 @@ export type SurveyItemResponse = SurveySingleItemResponse | SurveyGroupItemRespo
 
 interface SurveyItemResponseBase {
     key: string;
-    meta: ResponseMeta;
+    meta?: ResponseMeta;
 }
 
 export interface SurveySingleItemResponse extends SurveyItemResponseBase {
