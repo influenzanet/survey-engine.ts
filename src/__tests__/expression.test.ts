@@ -1,4 +1,4 @@
-import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext } from '../data_types';
+import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
 
 
@@ -701,4 +701,97 @@ test('testing expression: getLastFromSurveyItemResponses', () => {
             { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
         ]
     }, undefined, context).response.items[0].value).toEqual('test2');
+})
+
+test('testing expression: getSecondsSince', () => {
+    const context: SurveyContext = {
+        previousResponses: [
+            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            {
+                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                    { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
+                    {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
+                            key: '1', items: [
+                                { key: '1.1', value: 'test1' }
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                    { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: { key: '1', value: 'test3' } },
+                    {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [Date.now() - 100], displayed: [10] }, response: {
+                            key: '1', items: [
+                                { key: '1.1', value: 'test2' }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+    const expEval = new ExpressionEval();
+    expect(expEval.eval({
+        name: 'getSecondsSince', data: [
+            { dtype: 'num', num: Date.now() - 10 }
+        ]
+    })).toBeGreaterThanOrEqual(10);
+    expect(expEval.eval({
+        name: 'getSecondsSince', data: [
+            { dtype: 'num', num: Date.now() - 10 }
+        ]
+    })).toBeLessThan(30);
+
+
+    // result is not a number
+    expect(expEval.eval({
+        name: 'getSecondsSince', data: [
+            { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } }
+        ]
+    })).toBeUndefined();
+
+    const getLastResp: ExpressionArg = {
+        dtype: 'exp', exp: {
+            name: 'getLastFromSurveyItemResponses', data: [
+                { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } }
+            ]
+        }
+    };
+
+    const getMeta: ExpressionArg = {
+        dtype: 'exp', exp: {
+            name: 'getAttribute', data: [
+                getLastResp,
+                { str: 'meta' }
+            ]
+        }
+    };
+
+    const getResponded: ExpressionArg = {
+        dtype: 'exp', exp: {
+            name: 'getAttribute', data: [
+                getMeta,
+                { str: 'responded' }
+            ]
+        }
+    };
+
+    const expRes = expEval.eval({
+        name: 'getSecondsSince', data: [
+            {
+                dtype: 'exp', exp: {
+                    name: 'getArrayItemAtIndex', data: [
+                        getResponded,
+                        { dtype: 'num', num: 0 }
+                    ]
+                }
+            },
+        ]
+    }, undefined, context);
+    expect(expRes).toBeGreaterThan(90);
+    expect(expRes).toBeLessThan(190);
 })

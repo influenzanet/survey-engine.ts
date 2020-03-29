@@ -80,6 +80,8 @@ export class ExpressionEval {
                 return this.filterResponsesByValue(expression);
             case 'getLastFromSurveyItemResponses':
                 return this.getLastFromSurveyItemResponses(expression);
+            case 'getSecondsSince':
+                return this.getSecondsSince(expression);
 
             // shortcut methods:
             case 'getResponseItem':
@@ -586,6 +588,19 @@ export class ExpressionEval {
             return bTs - aTs;
         });
         return sorted[0];
+    }
+
+    private getSecondsSince(exp: Expression): number | undefined {
+        if (!exp.data || exp.data.length !== 1) {
+            console.warn('getSecondsSince: missing argument');
+            return undefined;
+        }
+        const arg1 = expressionArgParser(exp.data[0]);
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        if (!a || typeof (a) !== 'number') { return undefined; }
+        console.log(a);
+        const now = Date.now();
+        return now - a;
     }
 
 
