@@ -1,4 +1,5 @@
 export * from './expression';
+export * from './survey';
 export * from './survey-item';
 export * from './survey-item-component';
 export * from './context';
