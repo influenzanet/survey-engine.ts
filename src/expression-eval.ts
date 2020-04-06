@@ -67,6 +67,8 @@ export class ExpressionEval {
                 return this.getArrayItemByKey(expression);
             case 'getObjByHierarchicalKey':
                 return this.getObjByHierarchicalKey(expression);
+            case 'getNestedObjectByKey':
+                return this.getNestedObjectByKey(expression);
             // query methods:
             case 'findPreviousSurveyResponsesByKey':
                 return this.findPreviousSurveyResponsesByKey(expression);
@@ -357,14 +359,14 @@ export class ExpressionEval {
             return null;
         }
 
-        const obj = this.retreiveObjectFromTree(root, key);
+        const obj = this.retreiveObjectFromTreeHierarchicalKey(root, key);
         if (exp.returnType) {
             return this.typeConvert(obj, exp.returnType);
         }
         return obj;
     }
 
-    private retreiveObjectFromTree(root: any, key: string): any {
+    private retreiveObjectFromTreeHierarchicalKey(root: any, key: string): any {
         const ids = key.split('.');
         let obj: SurveyItem | SurveyItemResponse | ResponseItem | undefined;
         let compID = '';
@@ -384,6 +386,71 @@ export class ExpressionEval {
             }
 
             compID += '.' + id;
+            if (!(obj as { items: any[] }).items) { return undefined };
+
+            const ind = (obj as { items: any[] }).items.findIndex(item => item.key === compID);
+            if (ind < 0) {
+                // console.warn('getObjByHierarchicalKey: cannot find object for : ' + compID);
+                return null;
+            }
+            obj = (obj as { items: any[] }).items[ind];
+        }
+        return obj;
+    }
+
+    private getNestedObjectByKey(exp: Expression): any {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('getNestedObjectByKey: data attribute is missing or wrong: ' + exp.data);
+            return null;
+        }
+
+        const arg1 = expressionArgParser(exp.data[0]);
+        const key = expressionArgParser(exp.data[1]);
+        if (!isExpression(arg1)) {
+            console.warn('first argument is not a valid expression');
+            return null;
+        }
+        if (!key || typeof (key) !== 'string') {
+            console.warn('second argument is not a valid string');
+            return null;
+        }
+
+        // find root:
+        let root = this.evalExpression(arg1);
+        if (!root) {
+            return null;
+        }
+        if ((!root.items || root.items.length < 1) && root.key !== key) {
+            console.warn('getNestedObjectByKey: root is not a group: ' + root);
+            return null;
+        }
+
+        const obj = this.retreiveObjectFromTreeBySimpleKey(root, key);
+        if (exp.returnType) {
+            return this.typeConvert(obj, exp.returnType);
+        }
+        return obj;
+    }
+
+    private retreiveObjectFromTreeBySimpleKey(root: any, key: string): any {
+        const ids = key.split('.');
+        let obj: SurveyItem | SurveyItemResponse | ResponseItem | undefined;
+        let compID = '';
+
+
+        for (let i = 0; i < ids.length; i++) {
+            const id = ids[i];
+
+            if (!obj) {
+                if (root.key !== id) {
+                    return;
+                }
+                obj = root;
+                compID = id;
+                continue;
+            }
+
+            compID = id;
             if (!(obj as { items: any[] }).items) { return undefined };
 
             const ind = (obj as { items: any[] }).items.findIndex(item => item.key === compID);
@@ -419,7 +486,7 @@ export class ExpressionEval {
         }
 
         const getResponseItemExp: Expression = {
-            name: 'getObjByHierarchicalKey', data: [
+            name: 'getNestedObjectByKey', data: [
                 { dtype: 'exp', exp: getResponseRootExp },
                 { str: respItemRef }
             ]
@@ -430,7 +497,7 @@ export class ExpressionEval {
 
     private getSurveyItemValidation(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.warn('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            console.warn('getSurveyItemValidation: data attribute is missing or wrong: ' + exp.data);
             return true;
         }
         const itemRef = expressionArgParser(exp.data[0]);
@@ -528,7 +595,7 @@ export class ExpressionEval {
         }
 
         return previousResponses.filter((response: SurveySingleItemResponse) => {
-            const rItem = this.retreiveObjectFromTree(response.response, itemKey) as ResponseItem;
+            const rItem = this.retreiveObjectFromTreeBySimpleKey(response.response, itemKey) as ResponseItem;
             return searchKeys.every(sK => {
                 if (!rItem || !rItem.items) { return false; }
                 if (!rItem.items.find(i => i.key === sK)) {
@@ -558,7 +625,7 @@ export class ExpressionEval {
         }
 
         return previousResponses.filter((response: SurveySingleItemResponse) => {
-            const rItem = this.retreiveObjectFromTree(response.response, itemKey) as ResponseItem;
+            const rItem = this.retreiveObjectFromTreeBySimpleKey(response.response, itemKey) as ResponseItem;
             if (!rItem || !rItem.value) { return false; }
             return rItem.value === expectedValue;
         });
@@ -598,7 +665,6 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
         if (!a || typeof (a) !== 'number') { return undefined; }
-        console.log(a);
         const now = Date.now();
         return now - a;
     }

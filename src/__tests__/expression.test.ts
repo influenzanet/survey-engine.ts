@@ -393,7 +393,7 @@ test('testing expression: getResponseItem', () => {
                 response: {
                     key: 'RG1',
                     items: [
-                        { key: 'RG1.R1', value: 'testvalue' }
+                        { key: 'R1', value: 'testvalue' }
                     ]
                 }
             }
@@ -536,7 +536,7 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', items: [{ key: '1.1.1' }] }
+                                { key: '1', items: [{ key: '1' }] }
                             ]
                         }
                     }
@@ -548,7 +548,7 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', items: [{ key: '1.1.1' }, { key: '1.1.2' }] }
+                                { key: '1', items: [{ key: '1' }, { key: '2' }] }
                             ]
                         }
                     }
@@ -562,7 +562,7 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
         name: 'filterResponsesByIncludesKeys', data: [
             { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
-            { str: '1.1.2' },
+            { str: '2' },
         ]
     })).toHaveLength(0);
 
@@ -570,7 +570,7 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
         name: 'filterResponsesByIncludesKeys', data: [
             { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
-            { str: '1.1.2' },
+            { str: '2' },
         ]
     }, undefined, context)).toHaveLength(1);
 
@@ -578,8 +578,8 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
         name: 'filterResponsesByIncludesKeys', data: [
             { dtype: 'exp', exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
-            { str: '1.1.1' },
-            { str: '1.1.2' },
+            { str: '1' },
+            { str: '2' },
         ]
     }, undefined, context)).toHaveLength(1);
 
@@ -587,7 +587,7 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
         name: 'filterResponsesByIncludesKeys', data: [
             { exp: { name: 'getPreviousResponses', data: [{ str: 'weekly.q2' }] } },
             { str: '1.1' },
-            { str: '1.1.3' },
+            { str: '3' },
         ]
     }, undefined, context)).toHaveLength(0);
 })
@@ -602,7 +602,7 @@ test('testing expression: filterResponsesByValue', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', value: 'test1' }
+                                { key: '1', value: 'test1' }
                             ]
                         }
                     }
@@ -614,7 +614,7 @@ test('testing expression: filterResponsesByValue', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', value: 'test2' }
+                                { key: '1', value: 'test2' }
                             ]
                         }
                     }
@@ -668,7 +668,7 @@ test('testing expression: getLastFromSurveyItemResponses', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', value: 'test1' }
+                                { key: '1', value: 'test1' }
                             ]
                         }
                     }
@@ -680,7 +680,7 @@ test('testing expression: getLastFromSurveyItemResponses', () => {
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: {
                             key: '1', items: [
-                                { key: '1.1', value: 'test2' }
+                                { key: '1', value: 'test2' }
                             ]
                         }
                     }

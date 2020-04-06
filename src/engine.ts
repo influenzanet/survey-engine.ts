@@ -48,7 +48,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         definitions: SurveyGroupItem,
         context?: SurveyContext
     ) {
-        console.log('core engine')
+        // console.log('core engine')
         this.evalEngine = new ExpressionEval();
 
         this.surveyDef = definitions;
