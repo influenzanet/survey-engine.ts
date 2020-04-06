@@ -2,10 +2,11 @@ export type TimestampType = 'rendered' | 'displayed' | 'responded';
 
 export interface SurveyResponse {
     key: string;
-    submittedBy: string;
+    submittedBy?: string;
     submittedFor: string;
     submittedAt: number;
     responses: SurveySingleItemResponse[];
+    context?: any; // key value pairs of data
 }
 
 export type SurveyItemResponse = SurveySingleItemResponse | SurveyGroupItemResponse;
