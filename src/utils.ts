@@ -22,6 +22,7 @@ export const printSurveyItem = (surveyItem: SurveyItem, prefix: string) => {
             printSurveyItem(i, prefix + '\t');
         })
     } else {
+        if (!surveyItem.components) { return; }
         console.log(surveyItem.components.items.map(c => {
             const content = c.content ? c.content[0] : { parts: [] };
             return prefix + (content as LocalizedString).parts.join('');

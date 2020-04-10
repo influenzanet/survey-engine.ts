@@ -20,6 +20,8 @@ import {
     ExpressionArg,
     isExpression,
     expressionArgParser,
+    Survey,
+    ScreenSize,
 } from "./data_types";
 import {
     removeItemByKey, flattenSurveyItemTree
@@ -37,7 +39,7 @@ const initMeta = {
 }
 
 export class SurveyEngineCore implements SurveyEngineCoreInterface {
-    private surveyDef: SurveyGroupItem;
+    private surveyDef: Survey;
     private renderedSurvey: SurveyGroupItem;
     private responses: SurveyGroupItemResponse;
     private context: SurveyContext;
@@ -45,22 +47,22 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private evalEngine: ExpressionEval;
 
     constructor(
-        definitions: SurveyGroupItem,
-        context?: SurveyContext
+        survey: Survey,
+        context?: SurveyContext,
     ) {
         // console.log('core engine')
         this.evalEngine = new ExpressionEval();
 
-        this.surveyDef = definitions;
+        this.surveyDef = survey;
         this.context = context ? context : {};
-        this.responses = this.initResponseObject(this.surveyDef);
+        this.responses = this.initResponseObject(this.surveyDef.current.surveyDefinition);
         this.renderedSurvey = {
-            key: definitions.key,
-            version: definitions.version,
+            key: survey.current.surveyDefinition.key,
+            version: survey.current.surveyDefinition.version,
             items: []
         };
-        this.setTimestampFor('rendered', definitions.key);
-        this.initRenderedGroup(definitions, definitions.key);
+        this.setTimestampFor('rendered', survey.current.surveyDefinition.key);
+        this.initRenderedGroup(survey.current.surveyDefinition, survey.current.surveyDefinition.key);
     }
 
     // PUBLIC METHODS
@@ -91,6 +93,50 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             items: this.renderedSurvey.items.slice()
         };
     };
+
+    getSurveyPages(size?: ScreenSize): SurveySingleItem[][] {
+        const renderedSurvey = flattenSurveyItemTree(this.getRenderedSurvey());
+        const pages = new Array<SurveySingleItem[]>();
+
+        if (!size) {
+            size = 'large';
+        }
+
+        let currentPage: SurveySingleItem[] = [];
+
+        renderedSurvey.forEach(item => {
+            if (item.type === 'pageBreak') {
+                if (currentPage.length > 0) {
+                    pages.push([...currentPage]);
+                    currentPage = [];
+                }
+                return;
+            }
+            currentPage.push(item);
+
+            if (!this.surveyDef.maxItemsPerPage) {
+                return;
+            }
+            let max = 0;
+            switch (size) {
+                case 'large':
+                    max = this.surveyDef.maxItemsPerPage.large;
+                    break;
+                case 'small':
+                    max = this.surveyDef.maxItemsPerPage.small;
+                    break
+            }
+
+            if (currentPage.length >= max) {
+                pages.push([...currentPage]);
+                currentPage = [];
+            }
+        });
+        if (currentPage.length > 0) {
+            pages.push([...currentPage]);
+        }
+        return pages;
+    }
 
     questionDisplayed(itemKey: string, localeCode?: string) {
         this.setTimestampFor('displayed', itemKey, localeCode);
@@ -206,14 +252,14 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 // Remove item if condition not true
                 if (!itemDef || !this.evalConditions(itemDef.condition)) {
                     renderedGroup.items = removeItemByKey(renderedGroup.items, item.key);
-                    console.log('removed item: ' + item.key);
+                    // console.log('removed item: ' + item.key);
                     return;
                 }
 
                 // Add direct follow ups
                 currentIndex = renderedGroup.items.findIndex(ci => ci.key === item.key);
                 if (currentIndex < 0) {
-                    console.warn('reRenderGroup: index to insert items not found');
+                    // console.warn('reRenderGroup: index to insert items not found');
                     return;
                 }
 
@@ -303,10 +349,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     }
 
     private renderSingleSurveyItem(item: SurveySingleItem, rerender?: boolean): SurveySingleItem {
-        if (rerender) {
-            console.log("RERENDER SURVEY ITEM: " + item.key)
-        }
-
         const renderedItem = {
             ...item,
         }
@@ -320,12 +362,16 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             });
         }
 
-        renderedItem.components = this.resolveComponentGroup(item.components, renderedItem, rerender);
+        renderedItem.components = this.resolveComponentGroup(renderedItem, item.components, rerender);
 
         return renderedItem;
     }
 
-    private resolveComponentGroup(group: ItemGroupComponent, parentItem: SurveySingleItem, rerender?: boolean): ItemGroupComponent {
+    private resolveComponentGroup(parentItem: SurveySingleItem, group?: ItemGroupComponent, rerender?: boolean): ItemGroupComponent {
+        if (!group) {
+            return { role: '', items: [] }
+        }
+
         if (!group.order || group.order.name === 'sequential') {
             return {
                 ...group,
@@ -333,7 +379,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 description: this.resolveContent(group.description),
                 items: group.items.map(comp => {
                     if (isItemGroupComponent(comp)) {
-                        return this.resolveComponentGroup(comp, parentItem);
+                        return this.resolveComponentGroup(parentItem, comp);
                     }
                     return {
                         ...comp,
@@ -431,8 +477,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 compID += '.' + id;
             }
             if (!obj) {
-                if (compID === this.surveyDef.key) {
-                    obj = this.surveyDef;
+                if (compID === this.surveyDef.current.surveyDefinition.key) {
+                    obj = this.surveyDef.current.surveyDefinition;
                 }
                 return;
             }

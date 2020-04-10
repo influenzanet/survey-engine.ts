@@ -1,4 +1,4 @@
-import { SurveySingleItem, SurveyGroupItem, SurveyContext, ItemComponent, LocalizedString } from '../data_types';
+import { SurveySingleItem, SurveyGroupItem, SurveyContext, ItemComponent, LocalizedString, Survey } from '../data_types';
 import { SurveyEngineCore } from '../engine';
 
 // ---------- Create a test survey definition ----------------
@@ -146,12 +146,16 @@ const testItem: SurveySingleItem = {
     }
 }
 
-const testSurvey: SurveyGroupItem = {
-    key: '0',
-    version: 0,
-    items: [
-        testItem
-    ]
+const testSurvey: Survey = {
+    current: {
+        surveyDefinition: {
+            key: '0',
+            version: 0,
+            items: [
+                testItem
+            ]
+        }
+    }
 }
 
 test('testing item component disabled', () => {

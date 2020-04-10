@@ -430,7 +430,7 @@ test('testing expression: getSurveyItemValidation', () => {
     const testRenderedSurveyItem: SurveySingleItem = {
         key: 'TS',
         version: 1,
-        type: 'basic.static.title',
+        type: 'test',
         components: {
             role: 'root',
             items: []

@@ -1,5 +1,5 @@
 import { SurveyEngineCore } from '../engine';
-import { SurveyContext, SurveyGroupItem, ResponseItem } from '../data_types';
+import { SurveyContext, SurveyGroupItem, ResponseItem, Survey } from '../data_types';
 
 import simpleSurvey1 from './test-surveys/simple-survey-1.json'
 import qg4 from './test-surveys/qg4.json'
@@ -9,12 +9,17 @@ test('Op Test', () => {
     // console.log(simpleSurvey1);
     // const surveyDef: SurveyGroupItem = simpleSurvey1 as SurveyGroupItem;
     const surveyDef: SurveyGroupItem = qg4 as SurveyGroupItem;
+    const testSurvey: Survey = {
+        current: {
+            surveyDefinition: surveyDef
+        }
 
+    }
     const context: SurveyContext = {
         mode: 'test'
     };
     const surveyE = new SurveyEngineCore(
-        surveyDef,
+        testSurvey,
         context
     );
 
