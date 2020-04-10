@@ -25,20 +25,15 @@ export const isSurveyGroupItem = (item: SurveyItem): item is SurveyGroupItem => 
 }
 
 // ----------------------------------------------------------------------
-// Single Survey Items: (Questions, Titles etc.)
+// Single Survey Items:
 export type SurveyItemTypes =
-    'basic.static.title' |
-    'basic.static.description' |
-    'basic.input.numeric' |
-    'basic.input.single-choice' |
-    'basic.input.multiple-choice' |
-    'concepts.v1.age.simple-age'
+    'pageBreak' | 'test'
     ;
 
 export interface SurveySingleItem extends SurveyItemBase {
     type?: SurveyItemTypes;
-    components: ItemGroupComponent; // any sub-type of ItemComponent
-    validations: Array<Validation>;
+    components?: ItemGroupComponent; // any sub-type of ItemComponent
+    validations?: Array<Validation>;
 }
 
 export interface Validation {
