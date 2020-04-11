@@ -8,7 +8,7 @@ test('testing survey initialized with prefills', () => {
                 key: "root",
                 version: 0,
                 items: [
-                    { key: 'root.1', version: 1 },
+                    { key: 'root.1', version: 1, follows: ['root'] },
                     { key: 'root.2', version: 1, follows: ['root.1'] },
                     {
                         key: 'root.G1', version: 1, items: [

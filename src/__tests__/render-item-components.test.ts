@@ -168,11 +168,11 @@ test('testing item component disabled', () => {
     );
 
     const renderedSurvey = surveyE.getRenderedSurvey();
-    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '2');
+    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '2');
     if (!testComponent) {
         throw Error('object is undefined')
     }
-    const testComponent2 = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '3');
+    const testComponent2 = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '3');
     if (!testComponent2) {
         throw Error('object is undefined')
     }
@@ -191,11 +191,11 @@ test('testing item component displayCondition', () => {
     );
 
     const renderedSurvey = surveyE.getRenderedSurvey();
-    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '2');
+    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '2');
     if (!testComponent) {
         throw Error('object is undefined')
     }
-    const testComponent2 = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '3');
+    const testComponent2 = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '3');
     if (!testComponent2) {
         throw Error('object is undefined')
     }
@@ -214,7 +214,7 @@ test('testing item component properties', () => {
     );
 
     const renderedSurvey = surveyE.getRenderedSurvey();
-    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '4');
+    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '4');
     if (!testComponent || !testComponent.properties) {
         throw Error('object is undefined')
     }
@@ -234,7 +234,7 @@ test('testing item component content', () => {
     );
 
     const renderedSurvey = surveyE.getRenderedSurvey();
-    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '1');
+    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '1');
     if (!testComponent || !testComponent.content || !testComponent.content[0]) {
         throw Error('object is undefined')
     }
@@ -252,7 +252,7 @@ test('testing item component description', () => {
     );
 
     const renderedSurvey = surveyE.getRenderedSurvey();
-    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components.items.find(comp => comp.key === '1');
+    const testComponent = (renderedSurvey.items[0] as SurveySingleItem).components?.items.find(comp => comp.key === '1');
     if (!testComponent || !testComponent.description || !testComponent.description[0]) {
         throw Error('object is undefined')
     }
