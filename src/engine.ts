@@ -43,18 +43,21 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private renderedSurvey: SurveyGroupItem;
     private responses: SurveyGroupItemResponse;
     private context: SurveyContext;
+    private prefills: SurveySingleItemResponse[];
 
     private evalEngine: ExpressionEval;
 
     constructor(
         survey: Survey,
         context?: SurveyContext,
+        prefills?: SurveySingleItemResponse[],
     ) {
         // console.log('core engine')
         this.evalEngine = new ExpressionEval();
 
         this.surveyDef = survey;
         this.context = context ? context : {};
+        this.prefills = prefills ? prefills : [];
         this.responses = this.initResponseObject(this.surveyDef.current.surveyDefinition);
         this.renderedSurvey = {
             key: survey.current.surveyDefinition.key,
@@ -179,6 +182,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             if (isSurveyGroupItem(item)) {
                 respGroup.items.push(this.initResponseObject(item));
             } else {
+                const prefill = this.prefills.find(ri => ri.key === item.key);
+
                 const itemResp: SurveySingleItemResponse = {
                     key: item.key,
                     meta: {
@@ -189,7 +194,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                         localeCode: '',
                         version: item.version,
                     },
-                    response: undefined,
+                    response: prefill ? prefill.response : undefined,
                 };
                 respGroup.items.push(itemResp);
             }

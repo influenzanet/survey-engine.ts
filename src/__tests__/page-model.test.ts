@@ -127,7 +127,6 @@ describe('testing pageBreak items', () => {
             testSurvey,
         );
         const pages = surveyE.getSurveyPages()
-        console.log(pages);
         expect(pages).toHaveLength(3);
     })
 })
