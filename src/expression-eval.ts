@@ -421,7 +421,7 @@ export class ExpressionEval {
             return null;
         }
         if ((!root.items || root.items.length < 1) && root.key !== key) {
-            console.warn('getNestedObjectByKey: root is not a group: ' + root);
+            console.warn('getNestedObjectByKey: root is not a group: ', JSON.stringify(root));
             return null;
         }
 

@@ -1,4 +1,4 @@
-import { Survey, SurveyItemResponse, SurveySingleItemResponse } from "../data_types";
+import { Survey, SurveySingleItemResponse } from "../data_types";
 import { SurveyEngineCore } from "../engine";
 
 test('testing survey initialized with prefills', () => {

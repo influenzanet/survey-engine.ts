@@ -203,12 +203,46 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         return respGroup;
     }
 
+    private sequentialRender(groupDef: SurveyGroupItem, parent: SurveyGroupItem, rerender?: boolean) {
+        let currentIndex = 0;
+        groupDef.items.forEach(itemDef => {
+            const itemCond = this.evalConditions(itemDef.condition);
+            const ind = parent.items.findIndex(rItem => rItem.key === itemDef.key);
+            if (ind < 0) {
+                if (itemCond) {
+                    if (isSurveyGroupItem(itemDef)) {
+                        this.addRenderedItem(itemDef, parent, currentIndex);
+                        this.initRenderedGroup(itemDef, itemDef.key);
+                    } else {
+                        this.addRenderedItem(itemDef, parent, currentIndex);
+                    }
+                }
+            } else {
+                if (!itemCond) {
+                    parent.items = removeItemByKey(parent.items, itemDef.key);
+                    return
+                }
+                if (rerender) {
+                    if (isSurveyGroupItem(itemDef)) {
+                        this.reRenderGroup(itemDef.key);
+                    }
+                }
+            }
+            currentIndex += 1;
+        })
+    }
 
     private initRenderedGroup(groupDef: SurveyGroupItem, parentKey: string) {
         const parent = this.findRenderedItem(parentKey) as SurveyGroupItem;
         if (!parent) {
             console.warn('initRenderedGroup: parent not found: ' + parentKey);
             return;
+        }
+
+        if (groupDef.selectionMethod && groupDef.selectionMethod.name === 'sequential') {
+            // simplified workflow:
+            this.sequentialRender(groupDef, parent);
+            return
         }
 
         let nextItem = this.getNextItem(groupDef, parent, parent.key, false);
@@ -234,6 +268,12 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         if (!groupDef || !isSurveyGroupItem(groupDef)) {
             console.warn('reRenderGroup: groupDef not found or not a group: ' + groupKey);
             return;
+        }
+
+        if (groupDef.selectionMethod && groupDef.selectionMethod.name === 'sequential') {
+            // simplified workflow:
+            this.sequentialRender(groupDef, renderedGroup, true);
+            return
         }
 
         // Add items to the front

@@ -1,4 +1,7 @@
 import { SelectionMethod } from "../selection-method";
+import { Survey } from "../data_types";
+import { SurveyEngineCore } from "../engine";
+import { flattenSurveyItemTree } from "../utils";
 
 describe('testing selection methods', () => {
     test('without method definition', () => {
@@ -90,3 +93,110 @@ describe('testing selection methods', () => {
     });
 });
 
+test('without sequential selection (spec. use case)', () => {
+    const testSurvey: Survey = {
+        current: {
+            surveyDefinition: {
+                key: "root",
+                version: 0,
+                selectionMethod: { name: 'sequential' },
+                items: [
+                    { key: 'root.1', version: 1 },
+                    {
+                        key: 'root.2', version: 1, condition: {
+                            name: 'isDefined',
+                            data: [
+                                {
+                                    dtype: 'exp',
+                                    exp: {
+                                        name: 'getResponseItem',
+                                        data: [
+                                            {
+                                                str: 'root.1'
+                                            },
+                                            {
+                                                str: '1'
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                    },
+                    {
+                        key: 'root.G1', version: 1,
+                        selectionMethod: { name: 'sequential' },
+                        items: [
+                            { key: 'root.G1.3', version: 1 },
+                            {
+                                key: 'root.G1.G2', version: 1,
+                                condition: {
+                                    name: 'isDefined',
+                                    data: [
+                                        {
+                                            dtype: 'exp',
+                                            exp: {
+                                                name: 'getResponseItem',
+                                                data: [
+                                                    {
+                                                        str: 'root.G1.3'
+                                                    },
+                                                    {
+                                                        str: '1'
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ]
+                                },
+                                selectionMethod: { name: 'sequential' },
+                                items: [
+                                    { key: 'root.G1.G2.1', version: 1 },
+                                    { key: 'root.G1.G2.2', version: 1 },
+                                ]
+                            },
+                            { key: 'root.G1.5', version: 1 },
+                        ]
+                    },
+                ],
+            }
+        },
+    };
+
+    const surveyE = new SurveyEngineCore(
+        testSurvey,
+    );
+
+    const renderedItems = flattenSurveyItemTree(surveyE.getRenderedSurvey());
+
+    surveyE.setResponse('root.1', { key: '1' });
+    surveyE.setResponse('root.G1.3', { key: '1' });
+    const renderedItems2 = flattenSurveyItemTree(surveyE.getRenderedSurvey());
+
+    surveyE.setResponse('root.1', { key: '2' });
+    surveyE.setResponse('root.G1.3', { key: '2' });
+    const renderedItems3 = flattenSurveyItemTree(surveyE.getRenderedSurvey());
+
+    console.log(renderedItems);
+    console.log(renderedItems2);
+    console.log(renderedItems3);
+
+    expect(renderedItems).toHaveLength(3);
+    expect(renderedItems2).toHaveLength(6);
+    expect(renderedItems3).toHaveLength(3);
+
+    expect(renderedItems[0].key).toEqual('root.1');
+    expect(renderedItems[1].key).toEqual('root.G1.3');
+    expect(renderedItems[2].key).toEqual('root.G1.5');
+
+    expect(renderedItems2[0].key).toEqual('root.1');
+    expect(renderedItems2[1].key).toEqual('root.2');
+    expect(renderedItems2[2].key).toEqual('root.G1.3');
+    expect(renderedItems2[3].key).toEqual('root.G1.G2.1');
+    expect(renderedItems2[4].key).toEqual('root.G1.G2.2');
+    expect(renderedItems2[5].key).toEqual('root.G1.5');
+
+    expect(renderedItems3[0].key).toEqual('root.1');
+    expect(renderedItems3[1].key).toEqual('root.G1.3');
+    expect(renderedItems3[2].key).toEqual('root.G1.5');
+})
