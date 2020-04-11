@@ -100,6 +100,8 @@ describe('testing pageBreak items', () => {
         );
         const pages = surveyE.getSurveyPages()
         expect(pages).toHaveLength(0);
+
+        expect(surveyE.getResponses()).toHaveLength(0);
     })
 
     test('test page break item typical usecase', () => {
@@ -128,6 +130,8 @@ describe('testing pageBreak items', () => {
         );
         const pages = surveyE.getSurveyPages()
         expect(pages).toHaveLength(3);
+
+        expect(surveyE.getResponses()).toHaveLength(8);
     })
 })
 
@@ -162,6 +166,7 @@ describe('testing max item per page together with page break', () => {
 
         const pages = surveyE.getSurveyPages()
         expect(pages).toHaveLength(8);
+        expect(surveyE.getResponses()).toHaveLength(8);
     })
 
     test('max four items per page together with pagebreak', () => {

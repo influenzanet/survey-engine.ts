@@ -148,8 +148,10 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     getResponses(): SurveySingleItemResponse[] {
         const itemsInOrder = flattenSurveyItemTree(this.renderedSurvey);
         const responses: SurveySingleItemResponse[] = [];
-
         itemsInOrder.forEach((item, index) => {
+            if (item.type === 'pageBreak') {
+                return;
+            }
             const obj = this.findResponseItem(item.key);
             if (!obj) {
                 return;
@@ -182,6 +184,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             if (isSurveyGroupItem(item)) {
                 respGroup.items.push(this.initResponseObject(item));
             } else {
+                if (item.type === 'pageBreak') {
+                    return;
+                }
                 const prefill = this.prefills.find(ri => ri.key === item.key);
 
                 const itemResp: SurveySingleItemResponse = {
@@ -594,7 +599,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             }
             const ind = obj.items.findIndex(item => item.key === compID);
             if (ind < 0) {
-                console.warn('findResponseItem: cannot find object for : ' + compID);
+                // console.warn('findResponseItem: cannot find object for : ' + compID);
                 obj = undefined;
                 return;
             }

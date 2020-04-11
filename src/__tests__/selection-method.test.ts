@@ -177,10 +177,6 @@ test('without sequential selection (spec. use case)', () => {
     surveyE.setResponse('root.G1.3', { key: '2' });
     const renderedItems3 = flattenSurveyItemTree(surveyE.getRenderedSurvey());
 
-    console.log(renderedItems);
-    console.log(renderedItems2);
-    console.log(renderedItems3);
-
     expect(renderedItems).toHaveLength(3);
     expect(renderedItems2).toHaveLength(6);
     expect(renderedItems3).toHaveLength(3);
