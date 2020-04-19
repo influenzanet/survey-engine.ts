@@ -478,9 +478,9 @@ test('testing expression: getSurveyItemValidation', () => {
 test('testing expression: findPreviousSurveyResponsesByKey', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
-            { key: 'weekly', submittedAt: 1200000, submittedBy: 'test', submittedFor: 'test', responses: [] },
-            { key: 'weekly', submittedAt: 1300000, submittedBy: 'test', submittedFor: 'test', responses: [] }
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
+            { key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [] },
+            { key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [] }
         ]
     }
     const expEval = new ExpressionEval();
@@ -491,29 +491,29 @@ test('testing expression: findPreviousSurveyResponsesByKey', () => {
 test('testing expression: getLastFromSurveyResponses', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
-            { key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [] },
-            { key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [] }
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
+            { key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [] },
+            { key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [] }
         ]
     }
 
     const expEval = new ExpressionEval();
     expect(expEval.eval({ name: 'getLastFromSurveyResponses', data: [{ str: 'weekly' }] })).toBeUndefined();
-    expect(expEval.eval({ name: 'getLastFromSurveyResponses', data: [{ str: 'weekly' }] }, undefined, context).submittedBy).toEqual('last');
+    expect(expEval.eval({ name: 'getLastFromSurveyResponses', data: [{ str: 'weekly' }] }, undefined, context).participantId).toEqual('test');
 })
 
 test('testing expression: getPreviousResponses', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
             {
-                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
                     { key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test2' } }
                 ]
             },
             {
-                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     { key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test4' } }
                 ]
@@ -529,9 +529,9 @@ test('testing expression: getPreviousResponses', () => {
 test('testing expression: filterResponsesByIncludesKeys', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
             {
-                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
@@ -543,7 +543,7 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
                 ]
             },
             {
-                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
@@ -595,9 +595,9 @@ test('testing expression: filterResponsesByIncludesKeys', () => {
 test('testing expression: filterResponsesByValue', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
             {
-                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
@@ -609,7 +609,7 @@ test('testing expression: filterResponsesByValue', () => {
                 ]
             },
             {
-                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
@@ -661,9 +661,9 @@ test('testing expression: filterResponsesByValue', () => {
 test('testing expression: getLastFromSurveyItemResponses', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
             {
-                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
@@ -675,7 +675,7 @@ test('testing expression: getLastFromSurveyItemResponses', () => {
                 ]
             },
             {
-                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: {
@@ -706,9 +706,9 @@ test('testing expression: getLastFromSurveyItemResponses', () => {
 test('testing expression: getSecondsSince', () => {
     const context: SurveyContext = {
         previousResponses: [
-            { key: 'intake', submittedAt: 1000000, submittedBy: 'test', submittedFor: 'test', responses: [] },
+            { key: 'intake', submittedAt: 1000000, participantId: 'test', responses: [] },
             {
-                key: 'weekly', submittedAt: 1200000, submittedBy: 'first', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1200000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: { key: '1', value: 'test1' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [10], displayed: [10] }, response: {
@@ -720,7 +720,7 @@ test('testing expression: getSecondsSince', () => {
                 ]
             },
             {
-                key: 'weekly', submittedAt: 1300000, submittedBy: 'last', submittedFor: 'test', responses: [
+                key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     {
                         key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [Date.now() - 100], displayed: [10] }, response: {
