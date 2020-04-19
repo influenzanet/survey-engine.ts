@@ -230,6 +230,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 if (rerender) {
                     if (isSurveyGroupItem(itemDef)) {
                         this.reRenderGroup(itemDef.key);
+                    } else {
+                        parent.items[ind] = this.renderSingleSurveyItem(itemDef as SurveySingleItem, true);
                     }
                 }
             }
