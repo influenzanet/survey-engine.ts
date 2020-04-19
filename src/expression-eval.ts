@@ -88,6 +88,10 @@ export class ExpressionEval {
             // shortcut methods:
             case 'getResponseItem':
                 return this.getResponseItem(expression);
+            case 'responseHasKeysAny':
+                return this.responseHasKeysAny(expression);
+            case 'responseHasKeysAll':
+                return this.responseHasKeysAll(expression);
             case 'getSurveyItemValidation':
                 return this.getSurveyItemValidation(expression);
             default:
@@ -525,6 +529,79 @@ export class ExpressionEval {
             return true;
         }
         return currentVal.rule as boolean;
+    }
+
+    private responseHasKeysAny(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length < 3) {
+            console.warn('responseHasKeysAny: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        const itemRef = expressionArgParser(exp.data[0]);
+        const respItemRef = expressionArgParser(exp.data[1]);
+
+        const getSurveyItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: { name: 'getResponses' } },
+                { str: itemRef }
+            ]
+        }
+
+        const getResponseRootExp: Expression = {
+            name: 'getAttribute', data: [
+                { dtype: 'exp', exp: getSurveyItemExp },
+                { str: 'response' }
+            ]
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getNestedObjectByKey', data: [
+                { dtype: 'exp', exp: getResponseRootExp },
+                { str: respItemRef }
+            ]
+        }
+
+        const keys = exp.data.slice(2, exp.data.length).map(arg => expressionArgParser(arg));
+        const responseItem = this.evalExpression(getResponseItemExp) as ResponseItem | undefined;
+        if (!responseItem || !responseItem.items) { return false; }
+        console.log(responseItem)
+        console.log(keys)
+        return responseItem.items.some(it => keys.includes(it.key));
+    }
+
+    private responseHasKeysAll(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length < 3) {
+            console.warn('responseHasKeysAll: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        const itemRef = expressionArgParser(exp.data[0]);
+        const respItemRef = expressionArgParser(exp.data[1]);
+
+        const getSurveyItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: { name: 'getResponses' } },
+                { str: itemRef }
+            ]
+        }
+
+        const getResponseRootExp: Expression = {
+            name: 'getAttribute', data: [
+                { dtype: 'exp', exp: getSurveyItemExp },
+                { str: 'response' }
+            ]
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getNestedObjectByKey', data: [
+                { dtype: 'exp', exp: getResponseRootExp },
+                { str: respItemRef }
+            ]
+        }
+
+        const keys = exp.data.slice(2, exp.data.length).map(arg => expressionArgParser(arg));
+        const responseItem = this.evalExpression(getResponseItemExp) as ResponseItem | undefined;
+        if (!responseItem || !responseItem.items) { return false; }
+
+        return responseItem.items.every(it => keys.includes(it.key));
     }
 
     // ---------- QUERY METHODS ----------------

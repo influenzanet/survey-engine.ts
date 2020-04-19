@@ -1,4 +1,4 @@
-import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType } from '../data_types';
+import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType, SurveyGroupItemResponse } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
 
 
@@ -795,3 +795,128 @@ test('testing expression: getSecondsSince', () => {
     expect(expRes).toBeGreaterThan(90);
     expect(expRes).toBeLessThan(190);
 })
+
+test('testing expression: responseHasKeysAny', () => {
+    const expEval = new ExpressionEval();
+    const testResp: SurveyGroupItemResponse = {
+        key: '1',
+        items: [
+            {
+                key: '1.1', response: {
+                    key: '1',
+                    items: [{
+                        key: '1',
+                        items: [{
+                            key: '1',
+                            items: [
+                                { key: '1' },
+                                { key: '2' },
+                                { key: '3' },
+                            ]
+                        }]
+                    }]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAny', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '4' }, { str: '3' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeTruthy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAny', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '2' }, { str: '3' }, { str: '1' }
+            ]
+        }, undefined, undefined, testResp
+    )).toBeTruthy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAny', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAny', data: [
+                { str: '1.1' }, { str: '1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAny', data: [
+                { str: '1' }, { str: '1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+
+
+});
+
+test('testing expression: responseHasKeysAll', () => {
+    const expEval = new ExpressionEval();
+    const testResp: SurveyGroupItemResponse = {
+        key: '1',
+        items: [
+            {
+                key: '1.1', response: {
+                    key: '1',
+                    items: [{
+                        key: '1',
+                        items: [{
+                            key: '1',
+                            items: [
+                                { key: '1' },
+                                { key: '2' },
+                                { key: '3' },
+                            ]
+                        }]
+                    }]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAll', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '4' }, { str: '3' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAll', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '2' }, { str: '3' }, { str: '1' }
+            ]
+        }, undefined, undefined, testResp
+    )).toBeTruthy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAll', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '1' }, { str: '2' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAll', data: [
+                { str: '1.1' }, { str: '1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasKeysAll', data: [
+                { str: '1' }, { str: '1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+
+});
