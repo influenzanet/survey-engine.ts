@@ -427,6 +427,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                 ...group,
                 content: this.resolveContent(group.content),
                 description: this.resolveContent(group.description),
+                displayCondition: group.displayCondition ? this.evalConditions(group.displayCondition as Expression, parentItem) : undefined,
                 items: group.items.map(comp => {
                     if (isItemGroupComponent(comp)) {
                         return this.resolveComponentGroup(parentItem, comp);
