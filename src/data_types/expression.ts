@@ -1,5 +1,27 @@
+
+export type SelectionMethodNames = 'sequential' | 'uniform' | 'highestPriority' | 'exponential';
+export type StudyActionNames = 'IFTHEN' | 'UPDATE_STUDY_STATUS' | 'UPDATE_FLAG' | 'REMOVE_FLAG' | 'ADD_NEW_SURVEY' | 'REMOVE_ALL_SURVEYS' | 'REMOVE_SURVEY_BY_KEY' | 'REMOVE_SURVEYS_BY_KEY' | 'ADD_REPORT' | 'REMOVE_ALL_REPORTS' | 'REMOVE_REPORT_BY_KEY' | 'REMOVE_REPORTS_BY_KEY';
+export type ExpressionName =
+    // logic expression:
+    'or' | 'and' | 'not' |
+    // comparision methods:
+    'eq' | 'lt' | 'lte' | 'gt' | 'gte' |
+    'isDefined' | 'regex' |
+    // client reference methods:
+    'getContext' | 'getResponses' | 'getRenderedItems' |
+    // client side object access methods:
+    'getAttribute' | 'getArrayItemAtIndex' | 'getArrayItemByKey' | 'getObjByHierarchicalKey' | 'getNestedObjectByKey' |
+    // query methods for previous names:
+    'findPreviousSurveyResponsesByKey' | 'getLastFromSurveyResponses' | 'getPreviousResponses' | 'filterResponsesByIncludesKeys' | 'filterResponsesByValue' | 'getLastFromSurveyItemResponses' |
+    'getSecondsSince' |
+    // client side shortcut methods:
+    'getResponseItem' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'getSurveyItemValidation' |
+    SelectionMethodNames |
+    StudyActionNames;
+
+
 export interface Expression {
-    name: string;
+    name: ExpressionName;
     returnType?: string;
     data?: ExpressionArg[];
 }
