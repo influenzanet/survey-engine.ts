@@ -563,8 +563,6 @@ export class ExpressionEval {
         const keys = exp.data.slice(2, exp.data.length).map(arg => expressionArgParser(arg));
         const responseItem = this.evalExpression(getResponseItemExp) as ResponseItem | undefined;
         if (!responseItem || !responseItem.items) { return false; }
-        console.log(responseItem)
-        console.log(keys)
         return responseItem.items.some(it => keys.includes(it.key));
     }
 

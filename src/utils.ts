@@ -1,4 +1,4 @@
-import { SurveyItemResponse, isSurveyGroupItemResponse, SurveyItem, isSurveyGroupItem, LocalizedString, SurveyGroupItem, SurveySingleItem, SurveySingleItemResponse } from "./data_types";
+import { SurveyItem, isSurveyGroupItem, LocalizedString, SurveyGroupItem, SurveySingleItem, SurveySingleItemResponse } from "./data_types";
 
 export const pickRandomListItem = (items: Array<any>): any => {
     return items[Math.floor(Math.random() * items.length)];
