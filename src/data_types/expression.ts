@@ -15,7 +15,7 @@ export type ExpressionName =
     'findPreviousSurveyResponsesByKey' | 'getLastFromSurveyResponses' | 'getPreviousResponses' | 'filterResponsesByIncludesKeys' | 'filterResponsesByValue' | 'getLastFromSurveyItemResponses' |
     'getSecondsSince' |
     // client side shortcut methods:
-    'getResponseItem' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'getSurveyItemValidation' |
+    'getResponseItem' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
     SelectionMethodNames |
     StudyActionNames;
 

@@ -920,3 +920,64 @@ test('testing expression: responseHasKeysAll', () => {
     )).toBeFalsy();
 
 });
+
+test('testing expression: responseHasOnlyKeysOtherThan', () => {
+    const expEval = new ExpressionEval();
+    const testResp: SurveyGroupItemResponse = {
+        key: '1',
+        items: [
+            {
+                key: '1.1', response: {
+                    key: '1',
+                    items: [{
+                        key: '1',
+                        items: [{
+                            key: '1',
+                            items: [
+                                { key: '1' },
+                                { key: '2' },
+                                { key: '3' },
+                            ]
+                        }]
+                    }]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval(
+        {
+            name: 'responseHasOnlyKeysOtherThan', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '4' }, { str: '3' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasOnlyKeysOtherThan', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '2' }, { str: '3' }, { str: '1' }
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasOnlyKeysOtherThan', data: [
+                { str: '1.1' }, { str: '1.1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeTruthy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasOnlyKeysOtherThan', data: [
+                { str: '1.1' }, { str: '1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeTruthy();
+    expect(expEval.eval(
+        {
+            name: 'responseHasOnlyKeysOtherThan', data: [
+                { str: '1' }, { str: '1.1' }, { str: '4' }, { str: '5' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+});
