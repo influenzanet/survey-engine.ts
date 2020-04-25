@@ -774,7 +774,7 @@ test('testing expression: getSecondsSince', () => {
                 key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     {
-                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [Date.now() - 100], displayed: [10] }, response: {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [Date.now() / 1000 - 100], displayed: [10] }, response: {
                             key: '1', items: [
                                 { key: '1.1', value: 'test2' }
                             ]
@@ -788,12 +788,12 @@ test('testing expression: getSecondsSince', () => {
     const expEval = new ExpressionEval();
     expect(expEval.eval({
         name: 'getSecondsSince', data: [
-            { dtype: 'num', num: Date.now() - 10 }
+            { dtype: 'num', num: Date.now() / 1000 - 10 }
         ]
     })).toBeGreaterThanOrEqual(10);
     expect(expEval.eval({
         name: 'getSecondsSince', data: [
-            { dtype: 'num', num: Date.now() - 10 }
+            { dtype: 'num', num: Date.now() / 1000 - 10 }
         ]
     })).toBeLessThan(30);
 

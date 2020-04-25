@@ -815,7 +815,7 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
         if (!a || typeof (a) !== 'number') { return undefined; }
-        const now = Date.now();
+        const now = Date.now() / 1000.0;
         return now - a;
     }
 
@@ -826,8 +826,8 @@ export class ExpressionEval {
         }
         const arg1 = expressionArgParser(exp.data[0]);
         const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
-        if (!a || typeof (a) !== 'number') { return undefined; }
-        const now = Date.now();
+        if (a === undefined || typeof (a) !== 'number') { return undefined; }
+        const now = Date.now() / 1000.0;
         return now + a;
     }
 
