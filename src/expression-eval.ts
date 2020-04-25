@@ -95,6 +95,9 @@ export class ExpressionEval {
                 return this.responseHasOnlyKeysOtherThan(expression);
             case 'getSurveyItemValidation':
                 return this.getSurveyItemValidation(expression);
+
+            case 'timestampWithOffset':
+                return this.timestampWithOffset(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -814,6 +817,18 @@ export class ExpressionEval {
         if (!a || typeof (a) !== 'number') { return undefined; }
         const now = Date.now();
         return now - a;
+    }
+
+    private timestampWithOffset(exp: Expression): number | undefined {
+        if (!exp.data || exp.data.length !== 1) {
+            console.warn('timestampWithOffset: missing argument');
+            return undefined;
+        }
+        const arg1 = expressionArgParser(exp.data[0]);
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        if (!a || typeof (a) !== 'number') { return undefined; }
+        const now = Date.now();
+        return now + a;
     }
 
 
