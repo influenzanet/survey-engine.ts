@@ -49,9 +49,6 @@ export class ExpressionEval {
                 return this.gte(expression);
             case 'isDefined':
                 return this.isDefined(expression);
-            case 'regex':
-                console.warn('regex not implemented');
-                return;
             // reference methods to access variables and their items/attributes -->
             case 'getContext':
                 return this.getContext();
@@ -88,6 +85,8 @@ export class ExpressionEval {
             // shortcut methods:
             case 'getResponseItem':
                 return this.getResponseItem(expression);
+            case 'checkResponseValueWithRegex':
+                return this.checkResponseValueWithRegex(expression);
             case 'responseHasKeysAny':
                 return this.responseHasKeysAny(expression);
             case 'responseHasKeysAll':
@@ -499,6 +498,31 @@ export class ExpressionEval {
         }
 
         return this.evalExpression(getResponseItemExp);
+    }
+
+    private checkResponseValueWithRegex(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 3) {
+            console.warn('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        const pattern = expressionArgParser(exp.data[2]);
+        if (typeof (pattern) !== 'string') {
+            console.warn('regexp wrong data type in the argument');
+            return false;
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getResponseItem', data: [
+                exp.data[0],
+                exp.data[1],
+            ]
+        }
+        const respItem = this.evalExpression(getResponseItemExp) as ResponseItem;
+        console.log(respItem);
+        if (!respItem || !respItem.value) {
+            return false;
+        }
+        return new RegExp(pattern).test(respItem.value);
     }
 
     private getSurveyItemValidation(exp: Expression): boolean {

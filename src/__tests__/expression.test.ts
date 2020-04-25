@@ -139,6 +139,57 @@ test('testing expression: isDefined', () => {
     }, undefined, undefined, testSurveyResponses)).toBeFalsy();
 })
 
+test('testing expression: regexp', () => {
+    const expEval = new ExpressionEval();
+    const testSurveyResponses: SurveyItemResponse = {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I1',
+                response: {
+                    key: 'R1',
+                }
+            },
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'R1',
+                    value: 'test'
+                }
+            }
+        ]
+    }
+
+    const regex1Exp: Expression = {
+        name: 'checkResponseValueWithRegex', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1' },
+            { dtype: 'str', str: '.*\\S.*' },
+        ]
+    };
+
+    const regex2Exp: Expression = {
+        name: 'checkResponseValueWithRegex', data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'R1' },
+            { dtype: 'str', str: '.*\\S.*' },
+        ]
+    };
+
+    const regex3Exp: Expression = {
+        name: 'checkResponseValueWithRegex', data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'R1' },
+            { dtype: 'str', str: '\\d' },
+        ]
+    };
+
+
+    expect(expEval.eval(regex1Exp, undefined, undefined, testSurveyResponses)).toBeFalsy();
+    expect(expEval.eval(regex2Exp, undefined, undefined, testSurveyResponses)).toBeTruthy();
+    expect(expEval.eval(regex3Exp, undefined, undefined, testSurveyResponses)).toBeFalsy();
+})
+
 // ---------- ROOT REFERENCES ----------------
 test('testing expression: getContext', () => {
     const expEval = new ExpressionEval();

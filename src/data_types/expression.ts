@@ -6,7 +6,7 @@ export type ExpressionName =
     'or' | 'and' | 'not' |
     // comparision methods:
     'eq' | 'lt' | 'lte' | 'gt' | 'gte' |
-    'isDefined' | 'regex' |
+    'isDefined' |
     // client reference methods:
     'getContext' | 'getResponses' | 'getRenderedItems' |
     // client side object access methods:
@@ -15,7 +15,7 @@ export type ExpressionName =
     'findPreviousSurveyResponsesByKey' | 'getLastFromSurveyResponses' | 'getPreviousResponses' | 'filterResponsesByIncludesKeys' | 'filterResponsesByValue' | 'getLastFromSurveyItemResponses' |
     'getSecondsSince' |
     // client side shortcut methods:
-    'getResponseItem' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
+    'getResponseItem' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
     SelectionMethodNames |
     StudyActionNames;
 
