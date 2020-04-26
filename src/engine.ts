@@ -221,6 +221,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                     } else {
                         this.addRenderedItem(itemDef, parent, currentIndex);
                     }
+                } else {
+                    return;
                 }
             } else {
                 if (!itemCond) {

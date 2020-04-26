@@ -347,11 +347,11 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const key = expressionArgParser(exp.data[1]);
         if (!isExpression(arg1)) {
-            console.warn('first argument is not a valid expression');
+            console.warn('getObjByHierarchicalKey: first argument is not a valid expression');
             return null;
         }
         if (!key || typeof (key) !== 'string') {
-            console.warn('second argument is not a valid string');
+            console.warn('getObjByHierarchicalKey: second argument is not a valid string');
             return null;
         }
 
@@ -521,7 +521,7 @@ export class ExpressionEval {
             ]
         }
         const respItem = this.evalExpression(getResponseItemExp) as ResponseItem;
-        console.log(respItem);
+
         if (!respItem || !respItem.value) {
             return false;
         }
