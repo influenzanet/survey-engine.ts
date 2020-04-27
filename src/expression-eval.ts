@@ -250,7 +250,7 @@ export class ExpressionEval {
         }
 
         if (!attributeRef.data[1].str) {
-            console.warn('second argument is not a valid string');
+            console.warn(`getAttribute: second argument is not a valid string - ${JSON.stringify(attributeRef.data[1])}`);
             return null;
         }
 
@@ -258,7 +258,7 @@ export class ExpressionEval {
         let root: any;
         if (!isExpression(itemRef)) {
             if (!this.temporaryItem) {
-                console.warn('first argument is not a valid expression or temporary object not set');
+                console.warn(`getAttribute: first argument is not a valid expression or temporary object not set - ${JSON.stringify(attributeRef.data[0])}`);
                 return null;
             }
             if (itemRef === 'this') {
@@ -287,11 +287,11 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(itemRef.data[0]);
         const arg2 = expressionArgParser(itemRef.data[1]);
         if (!isExpression(arg1)) {
-            console.warn('first argument is not a valid expression');
+            console.warn(`getArrayItem: first argument is not a valid expression - ${JSON.stringify(itemRef.data[0])}`);
             return null;
         }
         if (typeof (arg2) !== 'number') {
-            console.warn('second argument is not a valid number', arg2);
+            console.warn(`getArrayItem: first argument is not a valid number - ${JSON.stringify(itemRef.data[0])}`);
             return null;
         }
 
@@ -309,16 +309,16 @@ export class ExpressionEval {
 
     private getArrayItemByKey(exp: Expression): any {
         if (!exp.data || !Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.warn('getArrayItem: data attribute is missing or wrong: ' + exp.data);
+            console.warn('getArrayItemByKey: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
 
         if (!isExpression(exp.data[0].exp)) {
-            console.warn('first argument is not a valid expression');
+            console.warn(`getArrayItemByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
             return null;
         }
         if (!exp.data[1].str) {
-            console.warn('second argument is not a valid string');
+            console.warn(`getArrayItemByKey: second argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
             return null;
         }
         const key = exp.data[1].str;
@@ -415,11 +415,11 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const key = expressionArgParser(exp.data[1]);
         if (!isExpression(arg1)) {
-            console.warn('first argument is not a valid expression');
+            console.warn(`getNestedObjectByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
             return null;
         }
         if (!key || typeof (key) !== 'string') {
-            console.warn('second argument is not a valid string');
+            console.warn(`getNestedObjectByKey: first argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
             return null;
         }
 

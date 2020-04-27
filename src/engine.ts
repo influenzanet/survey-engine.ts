@@ -427,6 +427,15 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
 
         if (!group.order || group.order.name === 'sequential') {
+            if (!group.items) {
+                console.warn(`this should not be a component group, items is missing or empty: ${parentItem.key} -> ${group.key}/${group.role} `);
+                return {
+                    ...group,
+                    content: this.resolveContent(group.content),
+                    description: this.resolveContent(group.description),
+                    displayCondition: group.displayCondition ? this.evalConditions(group.displayCondition as Expression, parentItem) : undefined,
+                }
+            }
             return {
                 ...group,
                 content: this.resolveContent(group.content),
