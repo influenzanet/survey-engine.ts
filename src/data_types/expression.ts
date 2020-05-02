@@ -16,7 +16,7 @@ export type ExpressionName =
     'getSecondsSince' |
     // client side shortcut methods:
     'getResponseItem' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
-    'timestampWithOffset' |
+    'timestampWithOffset' | 'dateResponseDiffFromNow' |
     SelectionMethodNames |
     StudyActionNames;
 

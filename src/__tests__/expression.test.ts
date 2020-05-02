@@ -1,5 +1,6 @@
 import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType, SurveyGroupItemResponse } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
+import moment from 'moment';
 
 
 // ---------- LOGIC OPERATORS ----------------
@@ -1031,4 +1032,85 @@ test('testing expression: responseHasOnlyKeysOtherThan', () => {
             ]
         }, undefined, undefined, testResp
     )).toBeFalsy();
+});
+
+test('testing expression: dateResponseDiffFromNow', () => {
+    const expEval = new ExpressionEval();
+    const testResp: SurveyGroupItemResponse = {
+        key: '1',
+        items: [
+            {
+                key: '1.1', response: {
+                    key: '1',
+                    items: [{
+                        key: '1',
+                        items: [{
+                            key: '1',
+                            items: [
+                                { key: '1', dtype: 'date', value: (moment().subtract(2, 'years').unix()).toString() },
+                                { key: '2', dtype: 'date', value: (moment().add(18, 'months').unix()).toString() },
+                                { key: '3', value: '15323422332' },
+                            ]
+                        }]
+                    }]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.2' }, { str: '1.1.1.1' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeUndefined();
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.no' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeUndefined();
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.3' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeUndefined();
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.1' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(2);
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.1' }, { str: 'months' },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(-24);
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.2' }, { str: 'months' },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(17);
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.2' }, { str: 'years' },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(1);
 });

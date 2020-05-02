@@ -1,5 +1,5 @@
 import { Expression, expressionArgParser, isExpression, ResponseItem, SurveyContext, SurveyGroupItem, SurveyGroupItemResponse, SurveyItem, SurveyItemResponse, SurveySingleItem, SurveyResponse, SurveySingleItemResponse } from "./data_types";
-
+import moment from 'moment';
 
 export class ExpressionEval {
     renderedSurvey?: SurveyGroupItem;
@@ -98,6 +98,8 @@ export class ExpressionEval {
 
             case 'timestampWithOffset':
                 return this.timestampWithOffset(expression);
+            case 'dateResponseDiffFromNow':
+                return this.dateResponseDiffFromNow(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -831,6 +833,37 @@ export class ExpressionEval {
         return now + a;
     }
 
+    private dateResponseDiffFromNow(exp: Expression): number | undefined {
+        if (!exp.data || exp.data.length < 3) {
+            console.warn('dateResponseDiffFromNow: missing arguments');
+            return undefined;
+        }
+        const unit = expressionArgParser(exp.data[2]);
+        const ignoreSign = (exp.data.length === 4 && exp.data[3].num === 1) ? true : false;
+
+        const responseItem = this.getResponseItem({
+            name: 'getResponseItem',
+            data: [
+                exp.data[0],
+                exp.data[1],
+            ]
+        });
+
+        if (!responseItem || !responseItem.value) {
+            return;
+        }
+        if (responseItem.dtype !== 'date') {
+            console.warn(`dateResponseDiffFromNow should receive response type 'date', but got ${responseItem.dtype}`);
+            return;
+        }
+        const ts = moment.unix(parseFloat(responseItem.value));
+        const now = moment();
+        const diff = ts.diff(now, unit);
+        if (ignoreSign) {
+            return Math.abs(diff);
+        }
+        return diff;
+    }
 
     private typeConvert(value: any, dtype: string): any {
         switch (dtype) {
