@@ -520,12 +520,21 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         switch (type) {
             case 'rendered':
                 obj.meta.rendered.push(Date.now());
+                if (obj.meta.rendered.length > 20) {
+                    obj.meta.rendered.splice(0, 1);
+                }
                 break;
             case 'displayed':
                 obj.meta.displayed.push(Date.now());
+                if (obj.meta.displayed.length > 20) {
+                    obj.meta.displayed.splice(0, 1);
+                }
                 break;
             case 'responded':
                 obj.meta.responded.push(Date.now());
+                if (obj.meta.responded.length > 20) {
+                    obj.meta.responded.splice(0, 1);
+                }
                 break;
         }
     }
