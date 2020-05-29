@@ -1,7 +1,8 @@
 
 export type SelectionMethodNames = 'sequential' | 'uniform' | 'highestPriority' | 'exponential';
 export type StudyActionNames = 'IFTHEN' | 'UPDATE_STUDY_STATUS' | 'UPDATE_FLAG' | 'REMOVE_FLAG' | 'ADD_NEW_SURVEY' | 'REMOVE_ALL_SURVEYS' | 'REMOVE_SURVEY_BY_KEY' | 'REMOVE_SURVEYS_BY_KEY' | 'ADD_REPORT' | 'REMOVE_ALL_REPORTS' | 'REMOVE_REPORT_BY_KEY' | 'REMOVE_REPORTS_BY_KEY';
-export type ExpressionName =
+export type StudyEngineExpNames = 'checkEventType' | 'checkSurveyResponseKey' | 'hasStudyStatus' | 'lastSubmissionDateOlderThan' | 'timestampWithOffset' | 'eq' | 'lt' | 'lte' | 'gt' | 'gte' | 'or' | 'and' | 'not';
+export type ClientSideSurveyExpName =
     // logic expression:
     'or' | 'and' | 'not' |
     // comparision methods:
@@ -16,10 +17,13 @@ export type ExpressionName =
     'getSecondsSince' |
     // client side shortcut methods:
     'getResponseItem' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
-    'timestampWithOffset' | 'dateResponseDiffFromNow' |
-    SelectionMethodNames |
-    StudyActionNames;
+    'timestampWithOffset' | 'dateResponseDiffFromNow';
 
+export type ExpressionName =
+    ClientSideSurveyExpName |
+    SelectionMethodNames |
+    StudyEngineExpNames |
+    StudyActionNames;
 
 export interface Expression {
     name: ExpressionName;
