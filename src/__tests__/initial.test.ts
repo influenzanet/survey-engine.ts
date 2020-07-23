@@ -1,7 +1,6 @@
 import { SurveyEngineCore } from '../engine';
 import { SurveyContext, SurveyGroupItem, ResponseItem, Survey } from '../data_types';
 
-import simpleSurvey1 from './test-surveys/simple-survey-1.json'
 import qg4 from './test-surveys/qg4.json'
 import { printSurveyItem, printResponses } from '../utils';
 

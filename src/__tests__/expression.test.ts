@@ -1,5 +1,6 @@
 import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType, SurveyGroupItemResponse } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
+import moment from 'moment';
 
 
 // ---------- LOGIC OPERATORS ----------------
@@ -137,6 +138,57 @@ test('testing expression: isDefined', () => {
             }
         ]
     }, undefined, undefined, testSurveyResponses)).toBeFalsy();
+})
+
+test('testing expression: regexp', () => {
+    const expEval = new ExpressionEval();
+    const testSurveyResponses: SurveyItemResponse = {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I1',
+                response: {
+                    key: 'R1',
+                }
+            },
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'R1',
+                    value: 'test'
+                }
+            }
+        ]
+    }
+
+    const regex1Exp: Expression = {
+        name: 'checkResponseValueWithRegex', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1' },
+            { dtype: 'str', str: '.*\\S.*' },
+        ]
+    };
+
+    const regex2Exp: Expression = {
+        name: 'checkResponseValueWithRegex', data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'R1' },
+            { dtype: 'str', str: '.*\\S.*' },
+        ]
+    };
+
+    const regex3Exp: Expression = {
+        name: 'checkResponseValueWithRegex', data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'R1' },
+            { dtype: 'str', str: '\\d' },
+        ]
+    };
+
+
+    expect(expEval.eval(regex1Exp, undefined, undefined, testSurveyResponses)).toBeFalsy();
+    expect(expEval.eval(regex2Exp, undefined, undefined, testSurveyResponses)).toBeTruthy();
+    expect(expEval.eval(regex3Exp, undefined, undefined, testSurveyResponses)).toBeFalsy();
 })
 
 // ---------- ROOT REFERENCES ----------------
@@ -723,7 +775,7 @@ test('testing expression: getSecondsSince', () => {
                 key: 'weekly', submittedAt: 1300000, participantId: 'test', responses: [
                     { key: 'weekly.q1', meta: { position: 0, rendered: [10], responded: [20], displayed: [10] }, response: { key: '1', value: 'test3' } },
                     {
-                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [Date.now() - 100], displayed: [10] }, response: {
+                        key: 'weekly.q2', meta: { position: 0, rendered: [10], responded: [Date.now() / 1000 - 100], displayed: [10] }, response: {
                             key: '1', items: [
                                 { key: '1.1', value: 'test2' }
                             ]
@@ -737,12 +789,12 @@ test('testing expression: getSecondsSince', () => {
     const expEval = new ExpressionEval();
     expect(expEval.eval({
         name: 'getSecondsSince', data: [
-            { dtype: 'num', num: Date.now() - 10 }
+            { dtype: 'num', num: Date.now() / 1000 - 10 }
         ]
     })).toBeGreaterThanOrEqual(10);
     expect(expEval.eval({
         name: 'getSecondsSince', data: [
-            { dtype: 'num', num: Date.now() - 10 }
+            { dtype: 'num', num: Date.now() / 1000 - 10 }
         ]
     })).toBeLessThan(30);
 
@@ -980,4 +1032,85 @@ test('testing expression: responseHasOnlyKeysOtherThan', () => {
             ]
         }, undefined, undefined, testResp
     )).toBeFalsy();
+});
+
+test('testing expression: dateResponseDiffFromNow', () => {
+    const expEval = new ExpressionEval();
+    const testResp: SurveyGroupItemResponse = {
+        key: '1',
+        items: [
+            {
+                key: '1.1', response: {
+                    key: '1',
+                    items: [{
+                        key: '1',
+                        items: [{
+                            key: '1',
+                            items: [
+                                { key: '1', dtype: 'date', value: (moment().subtract(2, 'years').unix()).toString() },
+                                { key: '2', dtype: 'date', value: (moment().add(18, 'months').unix()).toString() },
+                                { key: '3', value: '15323422332' },
+                            ]
+                        }]
+                    }]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.2' }, { str: '1.1.1.1' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeUndefined();
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.no' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeUndefined();
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.3' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeUndefined();
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.1' }, { str: 'years' }, { num: 1 },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(2);
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.1' }, { str: 'months' },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(-24);
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.2' }, { str: 'months' },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(17);
+
+    expect(expEval.eval(
+        {
+            name: 'dateResponseDiffFromNow', data: [
+                { str: '1.1' }, { str: '1.1.1.2' }, { str: 'years' },
+            ]
+        }, undefined, undefined, testResp
+    )).toEqual(1);
 });

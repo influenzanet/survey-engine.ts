@@ -1,5 +1,5 @@
 import { Expression, expressionArgParser, isExpression, ResponseItem, SurveyContext, SurveyGroupItem, SurveyGroupItemResponse, SurveyItem, SurveyItemResponse, SurveySingleItem, SurveyResponse, SurveySingleItemResponse } from "./data_types";
-
+import moment from 'moment';
 
 export class ExpressionEval {
     renderedSurvey?: SurveyGroupItem;
@@ -49,9 +49,6 @@ export class ExpressionEval {
                 return this.gte(expression);
             case 'isDefined':
                 return this.isDefined(expression);
-            case 'regex':
-                console.warn('regex not implemented');
-                return;
             // reference methods to access variables and their items/attributes -->
             case 'getContext':
                 return this.getContext();
@@ -88,6 +85,8 @@ export class ExpressionEval {
             // shortcut methods:
             case 'getResponseItem':
                 return this.getResponseItem(expression);
+            case 'checkResponseValueWithRegex':
+                return this.checkResponseValueWithRegex(expression);
             case 'responseHasKeysAny':
                 return this.responseHasKeysAny(expression);
             case 'responseHasKeysAll':
@@ -96,6 +95,11 @@ export class ExpressionEval {
                 return this.responseHasOnlyKeysOtherThan(expression);
             case 'getSurveyItemValidation':
                 return this.getSurveyItemValidation(expression);
+
+            case 'timestampWithOffset':
+                return this.timestampWithOffset(expression);
+            case 'dateResponseDiffFromNow':
+                return this.dateResponseDiffFromNow(expression);
             default:
                 console.warn('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
@@ -248,7 +252,7 @@ export class ExpressionEval {
         }
 
         if (!attributeRef.data[1].str) {
-            console.warn('second argument is not a valid string');
+            console.warn(`getAttribute: second argument is not a valid string - ${JSON.stringify(attributeRef.data[1])}`);
             return null;
         }
 
@@ -256,7 +260,7 @@ export class ExpressionEval {
         let root: any;
         if (!isExpression(itemRef)) {
             if (!this.temporaryItem) {
-                console.warn('first argument is not a valid expression or temporary object not set');
+                console.warn(`getAttribute: first argument is not a valid expression or temporary object not set - ${JSON.stringify(attributeRef.data[0])}`);
                 return null;
             }
             if (itemRef === 'this') {
@@ -285,11 +289,11 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(itemRef.data[0]);
         const arg2 = expressionArgParser(itemRef.data[1]);
         if (!isExpression(arg1)) {
-            console.warn('first argument is not a valid expression');
+            console.warn(`getArrayItem: first argument is not a valid expression - ${JSON.stringify(itemRef.data[0])}`);
             return null;
         }
         if (typeof (arg2) !== 'number') {
-            console.warn('second argument is not a valid number', arg2);
+            console.warn(`getArrayItem: first argument is not a valid number - ${JSON.stringify(itemRef.data[0])}`);
             return null;
         }
 
@@ -307,16 +311,16 @@ export class ExpressionEval {
 
     private getArrayItemByKey(exp: Expression): any {
         if (!exp.data || !Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.warn('getArrayItem: data attribute is missing or wrong: ' + exp.data);
+            console.warn('getArrayItemByKey: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
 
         if (!isExpression(exp.data[0].exp)) {
-            console.warn('first argument is not a valid expression');
+            console.warn(`getArrayItemByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
             return null;
         }
         if (!exp.data[1].str) {
-            console.warn('second argument is not a valid string');
+            console.warn(`getArrayItemByKey: second argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
             return null;
         }
         const key = exp.data[1].str;
@@ -345,11 +349,11 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const key = expressionArgParser(exp.data[1]);
         if (!isExpression(arg1)) {
-            console.warn('first argument is not a valid expression');
+            console.warn('getObjByHierarchicalKey: first argument is not a valid expression');
             return null;
         }
         if (!key || typeof (key) !== 'string') {
-            console.warn('second argument is not a valid string');
+            console.warn('getObjByHierarchicalKey: second argument is not a valid string');
             return null;
         }
 
@@ -413,11 +417,11 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const key = expressionArgParser(exp.data[1]);
         if (!isExpression(arg1)) {
-            console.warn('first argument is not a valid expression');
+            console.warn(`getNestedObjectByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
             return null;
         }
         if (!key || typeof (key) !== 'string') {
-            console.warn('second argument is not a valid string');
+            console.warn(`getNestedObjectByKey: first argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
             return null;
         }
 
@@ -499,6 +503,31 @@ export class ExpressionEval {
         }
 
         return this.evalExpression(getResponseItemExp);
+    }
+
+    private checkResponseValueWithRegex(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 3) {
+            console.warn('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        const pattern = expressionArgParser(exp.data[2]);
+        if (typeof (pattern) !== 'string') {
+            console.warn('regexp wrong data type in the argument');
+            return false;
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getResponseItem', data: [
+                exp.data[0],
+                exp.data[1],
+            ]
+        }
+        const respItem = this.evalExpression(getResponseItemExp) as ResponseItem;
+
+        if (!respItem || !respItem.value) {
+            return false;
+        }
+        return new RegExp(pattern).test(respItem.value);
     }
 
     private getSurveyItemValidation(exp: Expression): boolean {
@@ -788,10 +817,53 @@ export class ExpressionEval {
         const arg1 = expressionArgParser(exp.data[0]);
         const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
         if (!a || typeof (a) !== 'number') { return undefined; }
-        const now = Date.now();
+        const now = Date.now() / 1000.0;
         return now - a;
     }
 
+    private timestampWithOffset(exp: Expression): number | undefined {
+        if (!exp.data || exp.data.length !== 1) {
+            console.warn('timestampWithOffset: missing argument');
+            return undefined;
+        }
+        const arg1 = expressionArgParser(exp.data[0]);
+        const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
+        if (a === undefined || typeof (a) !== 'number') { return undefined; }
+        const now = Date.now() / 1000.0;
+        return now + a;
+    }
+
+    private dateResponseDiffFromNow(exp: Expression): number | undefined {
+        if (!exp.data || exp.data.length < 3) {
+            console.warn('dateResponseDiffFromNow: missing arguments');
+            return undefined;
+        }
+        const unit = expressionArgParser(exp.data[2]);
+        const ignoreSign = (exp.data.length === 4 && exp.data[3].num === 1) ? true : false;
+
+        const responseItem = this.getResponseItem({
+            name: 'getResponseItem',
+            data: [
+                exp.data[0],
+                exp.data[1],
+            ]
+        });
+
+        if (!responseItem || !responseItem.value) {
+            return;
+        }
+        if (responseItem.dtype !== 'date') {
+            console.warn(`dateResponseDiffFromNow should receive response type 'date', but got ${responseItem.dtype}`);
+            return;
+        }
+        const ts = moment.unix(parseFloat(responseItem.value));
+        const now = moment();
+        const diff = ts.diff(now, unit);
+        if (ignoreSign) {
+            return Math.abs(diff);
+        }
+        return diff;
+    }
 
     private typeConvert(value: any, dtype: string): any {
         switch (dtype) {

@@ -221,6 +221,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
                     } else {
                         this.addRenderedItem(itemDef, parent, currentIndex);
                     }
+                } else {
+                    return;
                 }
             } else {
                 if (!itemCond) {
@@ -425,6 +427,15 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         }
 
         if (!group.order || group.order.name === 'sequential') {
+            if (!group.items) {
+                console.warn(`this should not be a component group, items is missing or empty: ${parentItem.key} -> ${group.key}/${group.role} `);
+                return {
+                    ...group,
+                    content: this.resolveContent(group.content),
+                    description: this.resolveContent(group.description),
+                    displayCondition: group.displayCondition ? this.evalConditions(group.displayCondition as Expression, parentItem) : undefined,
+                }
+            }
             return {
                 ...group,
                 content: this.resolveContent(group.content),
@@ -509,12 +520,21 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         switch (type) {
             case 'rendered':
                 obj.meta.rendered.push(Date.now());
+                if (obj.meta.rendered.length > 20) {
+                    obj.meta.rendered.splice(0, 1);
+                }
                 break;
             case 'displayed':
                 obj.meta.displayed.push(Date.now());
+                if (obj.meta.displayed.length > 20) {
+                    obj.meta.displayed.splice(0, 1);
+                }
                 break;
             case 'responded':
                 obj.meta.responded.push(Date.now());
+                if (obj.meta.responded.length > 20) {
+                    obj.meta.responded.splice(0, 1);
+                }
                 break;
         }
     }

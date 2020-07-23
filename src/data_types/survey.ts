@@ -1,4 +1,6 @@
 import { LocalizedObject, SurveyGroupItem } from ".";
+import { Expression } from "./expression";
+import { SurveyContextDef } from "./context";
 
 export interface Survey {
     id?: string;
@@ -6,6 +8,8 @@ export interface Survey {
     description?: LocalizedObject[];
     current: SurveyVersion;
     history?: SurveyVersion[];
+    prefillRules?: Expression[];
+    contextRules?: SurveyContextDef;
     maxItemsPerPage?: { large: number, small: number };
 }
 
