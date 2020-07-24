@@ -365,7 +365,7 @@ export class ExpressionEval {
             return null;
         }
         if ((!root.items || root.items.length < 1) && root.key !== key) {
-            console.warn('getObjByHierarchicalKey: root is not a group: ' + root);
+            console.warn('getObjByHierarchicalKey: root is not a group: ' + JSON.stringify(root));
             return null;
         }
 
