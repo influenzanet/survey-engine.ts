@@ -4,7 +4,7 @@ import { SurveyContextDef } from "./context";
 
 export interface Survey {
     id?: string;
-    props: SurveyProps;
+    props?: SurveyProps;
     current: SurveyVersion;
     history?: SurveyVersion[];
     prefillRules?: Expression[];
