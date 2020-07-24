@@ -1,6 +1,6 @@
 {
   "name": "survey-engine",
-  "version": "0.8.16",
+  "version": "0.8.17",
   "description": "Implementation of the survey engine to use in typescript/javascript projects.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
