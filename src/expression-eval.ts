@@ -507,7 +507,7 @@ export class ExpressionEval {
 
     private checkResponseValueWithRegex(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 3) {
-            console.warn('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            console.warn('checkResponseValueWithRegex: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const pattern = expressionArgParser(exp.data[2]);
@@ -785,7 +785,7 @@ export class ExpressionEval {
 
     private getLastFromSurveyItemResponses(exp: Expression): SurveySingleItemResponse | undefined {
         if (!exp.data || exp.data.length !== 1) {
-            console.warn('filterResponsesByValue: missing arguments');
+            console.warn('getLastFromSurveyItemResponses: missing arguments');
             return undefined;
         }
 
