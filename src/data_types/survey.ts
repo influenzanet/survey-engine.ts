@@ -4,8 +4,7 @@ import { SurveyContextDef } from "./context";
 
 export interface Survey {
     id?: string;
-    name?: LocalizedObject[];
-    description?: LocalizedObject[];
+    props: SurveyProps;
     current: SurveyVersion;
     history?: SurveyVersion[];
     prefillRules?: Expression[];
@@ -17,4 +16,10 @@ export interface SurveyVersion {
     surveyDefinition: SurveyGroupItem;
     published?: number;
     unpublished?: number;
+}
+
+export interface SurveyProps {
+    name?: LocalizedObject[];
+    description?: LocalizedObject[];
+    typicalDuration?: LocalizedObject[];
 }
