@@ -973,6 +973,53 @@ test('testing expression: responseHasKeysAll', () => {
 
 });
 
+test('testing expression: hasResponse', () => {
+    const expEval = new ExpressionEval();
+    const testResp: SurveyGroupItemResponse = {
+        key: '1',
+        items: [
+            {
+                key: '1.1', response: {
+                    key: '1',
+                    items: [{
+                        key: '1',
+                        items: [{
+                            key: '1',
+                            items: [
+                                { key: '1' },
+                                { key: '2' },
+                                { key: '3' },
+                            ]
+                        }]
+                    }]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval(
+        {
+            name: 'hasResponse', data: [
+                { str: '1.1' }, { str: '1.2' }
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'hasResponse', data: [
+                { str: '1.2' }, { str: '1.1' }
+            ]
+        }, undefined, undefined, testResp
+    )).toBeFalsy();
+    expect(expEval.eval(
+        {
+            name: 'hasResponse', data: [
+                { str: '1.1' }, { str: '1.1' },
+            ]
+        }, undefined, undefined, testResp
+    )).toBeTruthy();
+});
+
 test('testing expression: responseHasOnlyKeysOtherThan', () => {
     const expEval = new ExpressionEval();
     const testResp: SurveyGroupItemResponse = {

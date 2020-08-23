@@ -17,7 +17,7 @@ export type ClientSideSurveyExpName =
     'findPreviousSurveyResponsesByKey' | 'getLastFromSurveyResponses' | 'getPreviousResponses' | 'filterResponsesByIncludesKeys' | 'filterResponsesByValue' | 'getLastFromSurveyItemResponses' |
     'getSecondsSince' |
     // client side shortcut methods:
-    'getResponseItem' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
+    'hasResponse' | 'getResponseItem' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
     'timestampWithOffset' | 'dateResponseDiffFromNow';
 
 export type ExpressionName =

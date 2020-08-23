@@ -83,6 +83,8 @@ export class ExpressionEval {
                 return this.getSecondsSince(expression);
 
             // shortcut methods:
+            case 'hasResponse':
+                return this.hasResponse(expression);
             case 'getResponseItem':
                 return this.getResponseItem(expression);
             case 'checkResponseValueWithRegex':
@@ -503,6 +505,25 @@ export class ExpressionEval {
         }
 
         return this.evalExpression(getResponseItemExp);
+    }
+
+    private hasResponse(exp: Expression): boolean {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            console.warn('hasResponse: data attribute is missing or wrong: ' + exp.data);
+            return false;
+        }
+        const getResponseItemExp: Expression = {
+            name: 'getResponseItem', data: [
+                exp.data[0],
+                exp.data[1],
+            ]
+        }
+        const respItem = this.evalExpression(getResponseItemExp) as ResponseItem;
+
+        if (!respItem) {
+            return false;
+        }
+        return true;
     }
 
     private checkResponseValueWithRegex(exp: Expression): boolean {
