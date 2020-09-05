@@ -5,6 +5,7 @@ export interface SurveyContext {
     previousResponses?: Array<SurveyResponse>;
     profile?: any; // TODO: define
     mode?: string;
+    participantFlags?: any; // string key value pairs
     // TODO: have geolocation and other attributes
 }
 

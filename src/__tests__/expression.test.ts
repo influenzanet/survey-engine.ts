@@ -195,9 +195,40 @@ test('testing expression: regexp', () => {
 test('testing expression: getContext', () => {
     const expEval = new ExpressionEval();
     expect(expEval.eval({ name: 'getContext' })).toBeUndefined();
-    expect(expEval.eval({ name: 'getContext' }, undefined, {
+
+    const testContext = {
         mode: 'test',
-    })).toBeDefined();
+        participantFlags: {
+            prev: "1",
+        }
+    };
+    expect(expEval.eval({ name: 'getContext' }, undefined, testContext)).toBeDefined();
+
+    expect(expEval.eval(
+        {
+            name: 'eq', data: [
+                {
+                    dtype: 'exp', exp: {
+                        name: "getAttribute",
+                        data: [
+                            {
+                                dtype: 'exp', exp: {
+                                    name: "getAttribute",
+                                    data: [
+                                        { dtype: 'exp', exp: { name: 'getContext' } },
+                                        { dtype: 'str', str: 'participantFlags' }
+                                    ],
+                                }
+                            },
+                            { dtype: 'str', str: 'prev' }
+                        ]
+                    }
+                },
+                { dtype: 'str', str: '1' }
+            ]
+        }
+        , undefined, testContext
+    )).toBeTruthy();
 })
 
 test('testing expression: getResponses', () => {
