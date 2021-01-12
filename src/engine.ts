@@ -108,7 +108,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         let currentPage: SurveySingleItem[] = [];
 
         renderedSurvey.forEach(item => {
-            if (item.type === 'pageBreak') {
+            if (item.type === 'pageBreak' || item.type === 'surveyEnd') {
                 if (currentPage.length > 0) {
                     pages.push([...currentPage]);
                     currentPage = [];
@@ -149,7 +149,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         const itemsInOrder = flattenSurveyItemTree(this.renderedSurvey);
         const responses: SurveySingleItemResponse[] = [];
         itemsInOrder.forEach((item, index) => {
-            if (item.type === 'pageBreak') {
+            if (item.type === 'pageBreak' || item.type === 'surveyEnd') {
                 return;
             }
             const obj = this.findResponseItem(item.key);
@@ -184,7 +184,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             if (isSurveyGroupItem(item)) {
                 respGroup.items.push(this.initResponseObject(item));
             } else {
-                if (item.type === 'pageBreak') {
+                if (item.type === 'pageBreak' || item.type === 'surveyEnd') {
                     return;
                 }
                 const prefill = this.prefills.find(ri => ri.key === item.key);

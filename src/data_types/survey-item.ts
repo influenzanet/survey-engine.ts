@@ -27,7 +27,7 @@ export const isSurveyGroupItem = (item: SurveyItem): item is SurveyGroupItem => 
 // ----------------------------------------------------------------------
 // Single Survey Items:
 export type SurveyItemTypes =
-    'pageBreak' | 'test'
+    'pageBreak' | 'test' | 'surveyEnd'
     ;
 
 export interface SurveySingleItem extends SurveyItemBase {
