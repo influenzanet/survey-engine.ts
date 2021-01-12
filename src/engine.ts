@@ -108,7 +108,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         let currentPage: SurveySingleItem[] = [];
 
         renderedSurvey.forEach(item => {
-            if (item.type === 'pageBreak' || item.type === 'surveyEnd') {
+            if (item.type === 'pageBreak') {
                 if (currentPage.length > 0) {
                     pages.push([...currentPage]);
                     currentPage = [];
@@ -143,6 +143,11 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
     questionDisplayed(itemKey: string, localeCode?: string) {
         this.setTimestampFor('displayed', itemKey, localeCode);
+    }
+
+    getSurveyEndItem(): SurveySingleItem | undefined {
+        const renderedSurvey = flattenSurveyItemTree(this.getRenderedSurvey());
+        return renderedSurvey.find(item => item.type === 'surveyEnd');
     }
 
     getResponses(): SurveySingleItemResponse[] {

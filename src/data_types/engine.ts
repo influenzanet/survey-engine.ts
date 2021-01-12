@@ -11,6 +11,7 @@ export interface SurveyEngineCoreInterface {
     getRenderedSurvey: () => SurveyGroupItem;
     getSurveyPages: (size?: ScreenSize) => SurveySingleItem[][]
     questionDisplayed: (questionID: string) => void; // should be called by the client when displaying a question
+    getSurveyEndItem: () => SurveySingleItem | undefined;
 
     getResponses: () => SurveySingleItemResponse[];
 }
