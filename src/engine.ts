@@ -73,7 +73,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.context = context;
     }
 
-    setResponse(targetKey: string, response: ResponseItem) {
+    setResponse(targetKey: string, response?: ResponseItem) {
         const target = this.findResponseItem(targetKey);
         if (!target) {
             console.error('setResponse: cannot find target object for key: ' + targetKey);
