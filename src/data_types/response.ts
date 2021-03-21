@@ -4,6 +4,7 @@ export interface SurveyResponse {
     key: string;
     participantId?: string;
     submittedAt: number;
+    versionId: string;
     responses: SurveySingleItemResponse[];
     context?: any; // key value pairs of data
 }

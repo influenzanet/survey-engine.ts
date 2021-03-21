@@ -13,6 +13,7 @@ export interface Survey {
 }
 
 export interface SurveyVersion {
+    versionId: string;
     surveyDefinition: SurveyGroupItem;
     published?: number;
     unpublished?: number;
