@@ -10,6 +10,7 @@ test('Op Test', () => {
     const surveyDef: SurveyGroupItem = qg4 as SurveyGroupItem;
     const testSurvey: Survey = {
         current: {
+            versionId: 'wfdojsdfpo',
             surveyDefinition: surveyDef
         }
 

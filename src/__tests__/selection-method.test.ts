@@ -96,6 +96,7 @@ describe('testing selection methods', () => {
 test('without sequential selection (spec. use case)', () => {
     const testSurvey: Survey = {
         current: {
+            versionId: 'wfdojsdfpo',
             surveyDefinition: {
                 key: "root",
                 version: 0,

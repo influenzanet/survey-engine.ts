@@ -5,6 +5,7 @@ import { SurveyEngineCore } from "../engine";
 describe('testing max item per page', () => {
     const testSurvey: Survey = {
         current: {
+            versionId: 'wfdojsdfpo',
             surveyDefinition: {
                 key: "root",
                 version: 0,
@@ -76,6 +77,7 @@ describe('testing pageBreak items', () => {
     test('test page break item after each other (empty page)', () => {
         const testSurvey: Survey = {
             current: {
+                versionId: 'wfdojsdfpo',
                 surveyDefinition: {
                     key: "root",
                     version: 0,
@@ -107,6 +109,7 @@ describe('testing pageBreak items', () => {
     test('test page break item typical usecase', () => {
         const testSurvey: Survey = {
             current: {
+                versionId: 'wfdojsdfpo',
                 surveyDefinition: {
                     key: "root",
                     version: 0,
@@ -156,6 +159,7 @@ describe('testing max item per page together with page break', () => {
     test('max one item per page together with pagebreaks', () => {
         const testSurvey: Survey = {
             current: {
+                versionId: 'wfdojsdfpo',
                 surveyDefinition: surveyDef,
             },
             maxItemsPerPage: { large: 1, small: 1 },
@@ -172,6 +176,7 @@ describe('testing max item per page together with page break', () => {
     test('max four items per page together with pagebreak', () => {
         const testSurvey: Survey = {
             current: {
+                versionId: 'wfdojsdfpo',
                 surveyDefinition: surveyDef,
             },
             maxItemsPerPage: { large: 4, small: 4 },

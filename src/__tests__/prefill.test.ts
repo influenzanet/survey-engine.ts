@@ -4,6 +4,7 @@ import { SurveyEngineCore } from "../engine";
 test('testing survey initialized with prefills', () => {
     const testSurvey: Survey = {
         current: {
+            versionId: 'wfdojsdfpo',
             surveyDefinition: {
                 key: "root",
                 version: 0,

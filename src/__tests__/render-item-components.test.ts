@@ -148,6 +148,7 @@ const testItem: SurveySingleItem = {
 
 const testSurvey: Survey = {
     current: {
+        versionId: 'wfdojsdfpo',
         surveyDefinition: {
             key: '0',
             version: 0,

@@ -7,6 +7,7 @@ import { checkSurveyItemValidity, checkSurveyItemsValidity } from "../validation
 test('testing validations', () => {
     const testSurvey: Survey = {
         current: {
+            versionId: 'wfdojsdfpo',
             surveyDefinition: {
                 key: "root",
                 version: 0,
@@ -118,6 +119,7 @@ test('testing validations', () => {
 test('testing multiple survey items validation', () => {
     const testSurvey: Survey = {
         current: {
+            versionId: 'wfdojsdfpo',
             surveyDefinition: {
                 key: "root",
                 version: 0,
