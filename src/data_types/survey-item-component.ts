@@ -45,6 +45,7 @@ export interface LocalizedObjectBase {
 
 export interface LocalizedString extends LocalizedObjectBase {
     parts: Array<ExpressionArg>; // in case of an expression it should return a string
+    resolvedText?: string;
 }
 
 export interface LocalizedMedia extends LocalizedObjectBase {
