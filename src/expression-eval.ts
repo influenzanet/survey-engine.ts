@@ -843,15 +843,22 @@ export class ExpressionEval {
     }
 
     private timestampWithOffset(exp: Expression): number | undefined {
-        if (!exp.data || exp.data.length !== 1) {
-            console.log('timestampWithOffset: missing argument');
+        if (!exp.data || (exp.data.length !== 1 && exp.data.length !== 2)) {
+            console.log('timestampWithOffset: unexpected arguments');
             return undefined;
         }
         const arg1 = expressionArgParser(exp.data[0]);
         const a = isExpression(arg1) ? this.evalExpression(arg1) : arg1;
         if (a === undefined || typeof (a) !== 'number') { return undefined; }
-        const now = Date.now() / 1000.0;
-        return now + a;
+
+        let referenceTime = Date.now() / 1000.0;
+        if (exp.data.length === 2) {
+            const arg2 = expressionArgParser(exp.data[1]);
+            const b = isExpression(arg2) ? this.evalExpression(arg2) : arg2;
+            if (b === undefined || typeof (b) !== 'number') { return undefined; }
+            referenceTime = b;
+        }
+        return referenceTime + a;
     }
 
     private dateResponseDiffFromNow(exp: Expression): number | undefined {

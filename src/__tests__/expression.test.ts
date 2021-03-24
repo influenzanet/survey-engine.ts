@@ -191,6 +191,52 @@ test('testing expression: regexp', () => {
     expect(expEval.eval(regex3Exp, undefined, undefined, testSurveyResponses)).toBeFalsy();
 })
 
+test('testing expression: timestampWithOffset', () => {
+    const expEval = new ExpressionEval();
+
+    const withWrongType: Expression = {
+        name: 'timestampWithOffset', data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'R1' },
+        ]
+    };
+
+    const withMissingArgs: Expression = {
+        name: 'timestampWithOffset',
+    };
+
+    const withTooManyArgs: Expression = {
+        name: 'timestampWithOffset',
+        data: [
+            { dtype: 'num', num: 22432 },
+            { dtype: 'num', num: 342345342 },
+            { dtype: 'num', num: 342345342 },
+        ]
+    };
+
+    const withNowAsReference: Expression = {
+        name: 'timestampWithOffset',
+        data: [
+            { dtype: 'num', num: -1000 },
+        ]
+    };
+
+    const withAbsoluteReference: Expression = {
+        name: 'timestampWithOffset',
+        data: [
+            { dtype: 'num', num: -1000 },
+            { dtype: 'num', num: 2000 },
+        ]
+    };
+
+    expect(expEval.eval(withWrongType, undefined, undefined, undefined)).toBeUndefined();
+    expect(expEval.eval(withMissingArgs, undefined, undefined, undefined)).toBeUndefined();
+    expect(expEval.eval(withTooManyArgs, undefined, undefined, undefined)).toBeUndefined();
+    expect(expEval.eval(withNowAsReference, undefined, undefined, undefined)).toBeLessThan(Date.now() - 900);
+    expect(expEval.eval(withAbsoluteReference, undefined, undefined, undefined)).toEqual(1000);
+
+})
+
 // ---------- ROOT REFERENCES ----------------
 test('testing expression: getContext', () => {
     const expEval = new ExpressionEval();
