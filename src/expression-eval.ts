@@ -6,6 +6,7 @@ export class ExpressionEval {
     context?: SurveyContext;
     responses?: SurveyGroupItemResponse;
     temporaryItem?: SurveySingleItem; // for items not in the rendered tree yet
+    showDebugMsg?: boolean;
 
     public eval(
         expression?: Expression,
@@ -13,6 +14,7 @@ export class ExpressionEval {
         context?: SurveyContext,
         responses?: SurveyGroupItemResponse,
         temporaryItem?: SurveySingleItem,
+        showDebugMsg?: boolean,
     ): any {
         // Default if no conditions found:
         if (!expression) {
@@ -23,8 +25,15 @@ export class ExpressionEval {
         this.context = context;
         this.responses = responses;
         this.temporaryItem = temporaryItem;
+        this.showDebugMsg = showDebugMsg;
 
         return this.evalExpression(expression);
+    }
+
+    private logEvent(event: string) {
+        if (this.showDebugMsg) {
+            console.log(event);
+        }
     }
 
     private evalExpression(expression: Expression): any {
@@ -87,6 +96,10 @@ export class ExpressionEval {
                 return this.hasResponse(expression);
             case 'getResponseItem':
                 return this.getResponseItem(expression);
+            case 'getResponseValueAsNum':
+                return this.getResponseValueAsNum(expression);
+            case 'getResponseValueAsStr':
+                return this.getResponseValueAsStr(expression);
             case 'checkResponseValueWithRegex':
                 return this.checkResponseValueWithRegex(expression);
             case 'responseHasKeysAny':
@@ -103,7 +116,7 @@ export class ExpressionEval {
             case 'dateResponseDiffFromNow':
                 return this.dateResponseDiffFromNow(expression);
             default:
-                console.log('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
+                this.logEvent('expression name unknown for the current engine: ' + expression.name + '. Default return value is false.');
                 break;
         }
         return false;
@@ -112,7 +125,7 @@ export class ExpressionEval {
     // ---------- LOGIC OPERATORS ----------------
     private or(exp: Expression): boolean {
         if (!Array.isArray(exp.data)) {
-            console.log('or: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('or: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         return exp.data.some((value) => {
@@ -123,7 +136,7 @@ export class ExpressionEval {
 
     private and(exp: Expression): boolean {
         if (!Array.isArray(exp.data)) {
-            console.log('and: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('and: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         return exp.data.every((value) => {
@@ -134,7 +147,7 @@ export class ExpressionEval {
 
     private not(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data?.length !== 1) {
-            console.log('not: method expects a sinlge Expression as an argument ');
+            this.logEvent('not: method expects a sinlge Expression as an argument ');
             return false;
         }
 
@@ -144,7 +157,7 @@ export class ExpressionEval {
     // ---------- COMPARISONS ----------------
     private eq(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length < 1) {
-            console.log('eq: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('eq: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
 
@@ -165,7 +178,7 @@ export class ExpressionEval {
 
     private gt(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('gt: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('gt: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
 
@@ -179,7 +192,7 @@ export class ExpressionEval {
 
     private gte(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('gte: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('gte: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
 
@@ -193,7 +206,7 @@ export class ExpressionEval {
 
     private lt(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('lt: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('lt: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
 
@@ -207,7 +220,7 @@ export class ExpressionEval {
 
     private lte(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('lte: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('lte: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
 
@@ -221,7 +234,7 @@ export class ExpressionEval {
 
     private isDefined(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 1) {
-            console.log('isDefined: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('isDefined: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const arg1 = expressionArgParser(exp.data[0]);
@@ -249,12 +262,12 @@ export class ExpressionEval {
     // ---------- WORKING WITH OBJECT/ARRAYS ----------------
     private getAttribute(attributeRef: Expression): any {
         if (!Array.isArray(attributeRef.data) || attributeRef.data.length !== 2) {
-            console.log('getAttribute: data attribute is missing or wrong: ' + attributeRef.data);
+            this.logEvent('getAttribute: data attribute is missing or wrong: ' + attributeRef.data);
             return null;
         }
 
         if (!attributeRef.data[1].str) {
-            console.log(`getAttribute: second argument is not a valid string - ${JSON.stringify(attributeRef.data[1])}`);
+            this.logEvent(`getAttribute: second argument is not a valid string - ${JSON.stringify(attributeRef.data[1])}`);
             return null;
         }
 
@@ -262,7 +275,7 @@ export class ExpressionEval {
         let root: any;
         if (!isExpression(itemRef)) {
             if (!this.temporaryItem) {
-                console.log(`getAttribute: first argument is not a valid expression or temporary object not set - ${JSON.stringify(attributeRef.data[0])}`);
+                this.logEvent(`getAttribute: first argument is not a valid expression or temporary object not set - ${JSON.stringify(attributeRef.data[0])}`);
                 return null;
             }
             if (itemRef === 'this') {
@@ -273,7 +286,7 @@ export class ExpressionEval {
         }
 
         if (!root || typeof (root) !== 'object') {
-            console.log('getAttribute: received wrong type for referenced object: ' + itemRef);
+            this.logEvent('getAttribute: received wrong type for referenced object: ' + JSON.stringify(itemRef));
             return null;
         }
         const attr = root[attributeRef.data[1].str];
@@ -285,23 +298,23 @@ export class ExpressionEval {
 
     private getArrayItem(itemRef: Expression): any {
         if (!Array.isArray(itemRef.data) || itemRef.data.length !== 2) {
-            console.log('getArrayItem: data attribute is missing or wrong: ' + itemRef.data);
+            this.logEvent('getArrayItem: data attribute is missing or wrong: ' + itemRef.data);
             return null;
         }
         const arg1 = expressionArgParser(itemRef.data[0]);
         const arg2 = expressionArgParser(itemRef.data[1]);
         if (!isExpression(arg1)) {
-            console.log(`getArrayItem: first argument is not a valid expression - ${JSON.stringify(itemRef.data[0])}`);
+            this.logEvent(`getArrayItem: first argument is not a valid expression - ${JSON.stringify(itemRef.data[0])}`);
             return null;
         }
         if (typeof (arg2) !== 'number') {
-            console.log(`getArrayItem: first argument is not a valid number - ${JSON.stringify(itemRef.data[0])}`);
+            this.logEvent(`getArrayItem: first argument is not a valid number - ${JSON.stringify(itemRef.data[0])}`);
             return null;
         }
 
         const arr = this.evalExpression(arg1);
         if (!arr || !Array.isArray(arr)) {
-            console.log('getArrayItem: received wrong type for referenced array: ' + arr);
+            this.logEvent('getArrayItem: received wrong type for referenced array: ' + arr);
             return null;
         }
         const item = arr[arg2];
@@ -313,23 +326,23 @@ export class ExpressionEval {
 
     private getArrayItemByKey(exp: Expression): any {
         if (!exp.data || !Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('getArrayItemByKey: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('getArrayItemByKey: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
 
         if (!isExpression(exp.data[0].exp)) {
-            console.log(`getArrayItemByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
+            this.logEvent(`getArrayItemByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
             return null;
         }
         if (!exp.data[1].str) {
-            console.log(`getArrayItemByKey: second argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
+            this.logEvent(`getArrayItemByKey: second argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
             return null;
         }
         const key = exp.data[1].str;
 
         const arr = this.evalExpression(exp.data[0].exp);
         if (!arr || !Array.isArray(arr)) {
-            console.log('getArrayItemByKey: received wrong type for referenced array: ' + arr);
+            this.logEvent('getArrayItemByKey: received wrong type for referenced array: ' + arr);
             return null;
         }
         const item = arr.find(a => a.key === key);
@@ -344,30 +357,30 @@ export class ExpressionEval {
 
     private getObjByHierarchicalKey(exp: Expression): any {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('getObjByHierarchicalKey: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('getObjByHierarchicalKey: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
 
         const arg1 = expressionArgParser(exp.data[0]);
         const key = expressionArgParser(exp.data[1]);
         if (!isExpression(arg1)) {
-            console.log('getObjByHierarchicalKey: first argument is not a valid expression');
+            this.logEvent('getObjByHierarchicalKey: first argument is not a valid expression');
             return null;
         }
         if (!key || typeof (key) !== 'string') {
-            console.log('getObjByHierarchicalKey: second argument is not a valid string');
+            this.logEvent('getObjByHierarchicalKey: second argument is not a valid string');
             return null;
         }
 
         // find root:
         let root = this.evalExpression(arg1);
         if (!root) {
-            // console.log('getObjByHierarchicalKey: root is not found for: ');
-            // console.log(arg1);
+            // this.logEvent('getObjByHierarchicalKey: root is not found for: ');
+            // this.logEvent(arg1);
             return null;
         }
         if ((!root.items || root.items.length < 1) && root.key !== key) {
-            console.log('getObjByHierarchicalKey: root is not a group: ' + JSON.stringify(root));
+            this.logEvent('getObjByHierarchicalKey: root is not a group: ' + JSON.stringify(root));
             return null;
         }
 
@@ -389,7 +402,7 @@ export class ExpressionEval {
 
             if (!obj) {
                 if (root.key !== id) {
-                    // console.log('getObjByHierarchicalKey: cannot find root object for: ' + id);
+                    // this.logEvent('getObjByHierarchicalKey: cannot find root object for: ' + id);
                     return;
                 }
                 obj = root;
@@ -402,7 +415,7 @@ export class ExpressionEval {
 
             const ind = (obj as { items: any[] }).items.findIndex(item => item.key === compID);
             if (ind < 0) {
-                // console.log('getObjByHierarchicalKey: cannot find object for : ' + compID);
+                // this.logEvent('getObjByHierarchicalKey: cannot find object for : ' + compID);
                 return null;
             }
             obj = (obj as { items: any[] }).items[ind];
@@ -412,18 +425,18 @@ export class ExpressionEval {
 
     private getNestedObjectByKey(exp: Expression): any {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('getNestedObjectByKey: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('getNestedObjectByKey: data attribute is missing or wrong: ' + exp.data);
             return null;
         }
 
         const arg1 = expressionArgParser(exp.data[0]);
         const key = expressionArgParser(exp.data[1]);
         if (!isExpression(arg1)) {
-            console.log(`getNestedObjectByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
+            this.logEvent(`getNestedObjectByKey: first argument is not a valid expression - ${JSON.stringify(exp.data[0])}`);
             return null;
         }
         if (!key || typeof (key) !== 'string') {
-            console.log(`getNestedObjectByKey: first argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
+            this.logEvent(`getNestedObjectByKey: first argument is not a valid string - ${JSON.stringify(exp.data[1])}`);
             return null;
         }
 
@@ -433,7 +446,7 @@ export class ExpressionEval {
             return null;
         }
         if ((!root.items || root.items.length < 1) && root.key !== key) {
-            console.log('getNestedObjectByKey: root is not a group: ', JSON.stringify(root));
+            this.logEvent('getNestedObjectByKey: root is not a group: ' + JSON.stringify(root));
             return null;
         }
 
@@ -467,7 +480,7 @@ export class ExpressionEval {
 
             const ind = (obj as { items: any[] }).items.findIndex(item => item.key === compID);
             if (ind < 0) {
-                // console.log('getObjByHierarchicalKey: cannot find object for : ' + compID);
+                // this.logEvent('getObjByHierarchicalKey: cannot find object for : ' + compID);
                 return null;
             }
             obj = (obj as { items: any[] }).items[ind];
@@ -477,7 +490,7 @@ export class ExpressionEval {
 
     private getResponseItem(exp: Expression): ResponseItem | undefined {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('getResponseItem: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('getResponseItem: data attribute is missing or wrong: ' + exp.data);
             return;
         }
         const itemRef = expressionArgParser(exp.data[0]);
@@ -509,7 +522,7 @@ export class ExpressionEval {
 
     private hasResponse(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('hasResponse: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('hasResponse: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const getResponseItemExp: Expression = {
@@ -528,12 +541,12 @@ export class ExpressionEval {
 
     private checkResponseValueWithRegex(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 3) {
-            console.log('checkResponseValueWithRegex: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('checkResponseValueWithRegex: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const pattern = expressionArgParser(exp.data[2]);
         if (typeof (pattern) !== 'string') {
-            console.log('regexp wrong data type in the argument');
+            this.logEvent('regexp wrong data type in the argument');
             return false;
         }
 
@@ -553,7 +566,7 @@ export class ExpressionEval {
 
     private getSurveyItemValidation(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length !== 2) {
-            console.log('getSurveyItemValidation: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('getSurveyItemValidation: data attribute is missing or wrong: ' + exp.data);
             return true;
         }
         const itemRef = expressionArgParser(exp.data[0]);
@@ -583,9 +596,78 @@ export class ExpressionEval {
         return currentVal.rule as boolean;
     }
 
+    private getResponseValueAsNum(exp: Expression): number | undefined {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            this.logEvent('getResponseValueAsNum: data attribute is missing or wrong: ' + exp.data);
+            return;
+        }
+
+        const itemRef = expressionArgParser(exp.data[0]);
+        const respItemRef = expressionArgParser(exp.data[1]);
+
+        const getSurveyItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: { name: 'getResponses' } },
+                { str: itemRef }
+            ]
+        }
+
+        const getResponseRootExp: Expression = {
+            name: 'getAttribute', data: [
+                { dtype: 'exp', exp: getSurveyItemExp },
+                { str: 'response' }
+            ]
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getNestedObjectByKey', data: [
+                { dtype: 'exp', exp: getResponseRootExp },
+                { str: respItemRef }
+            ]
+        }
+
+        const responseItem = this.evalExpression(getResponseItemExp) as ResponseItem | undefined;
+        if (!responseItem || !responseItem.value) { return; }
+        return parseFloat(responseItem.value);
+    }
+
+    private getResponseValueAsStr(exp: Expression): string | undefined {
+        if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+            this.logEvent('getResponseValueAsStr: data attribute is missing or wrong: ' + exp.data);
+            return;
+        }
+        const itemRef = expressionArgParser(exp.data[0]);
+        const respItemRef = expressionArgParser(exp.data[1]);
+
+        const getSurveyItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: { name: 'getResponses' } },
+                { str: itemRef }
+            ]
+        }
+
+        const getResponseRootExp: Expression = {
+            name: 'getAttribute', data: [
+                { dtype: 'exp', exp: getSurveyItemExp },
+                { str: 'response' }
+            ]
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getNestedObjectByKey', data: [
+                { dtype: 'exp', exp: getResponseRootExp },
+                { str: respItemRef }
+            ]
+        }
+
+        const responseItem = this.evalExpression(getResponseItemExp) as ResponseItem | undefined;
+        if (!responseItem || !responseItem.value) { return; }
+        return responseItem.value;
+    }
+
     private responseHasKeysAny(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length < 3) {
-            console.log('responseHasKeysAny: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('responseHasKeysAny: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const itemRef = expressionArgParser(exp.data[0]);
@@ -620,7 +702,7 @@ export class ExpressionEval {
 
     private responseHasKeysAll(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length < 3) {
-            console.log('responseHasKeysAll: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('responseHasKeysAll: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const itemRef = expressionArgParser(exp.data[0]);
@@ -656,7 +738,7 @@ export class ExpressionEval {
 
     private responseHasOnlyKeysOtherThan(exp: Expression): boolean {
         if (!Array.isArray(exp.data) || exp.data.length < 3) {
-            console.log('responseHasOnlyKeysOtherThan: data attribute is missing or wrong: ' + exp.data);
+            this.logEvent('responseHasOnlyKeysOtherThan: data attribute is missing or wrong: ' + exp.data);
             return false;
         }
         const itemRef = expressionArgParser(exp.data[0]);
@@ -703,7 +785,7 @@ export class ExpressionEval {
     // ---------- QUERY METHODS ----------------
     private findPreviousSurveyResponsesByKey(exp: Expression): SurveyResponse[] {
         if (!exp.data || exp.data.length !== 1 || !exp.data[0].str) {
-            console.log('findPreviousSurveyResponsesByKey: key argument is missing');
+            this.logEvent('findPreviousSurveyResponsesByKey: key argument is missing');
             return [];
         }
         const key = exp.data[0].str;
@@ -715,7 +797,7 @@ export class ExpressionEval {
 
     private getLastFromSurveyResponses(exp: Expression): SurveyResponse | undefined {
         if (!exp.data || exp.data.length !== 1 || !exp.data[0].str) {
-            console.log('getLastFromSurveyResponses: missing argument');
+            this.logEvent('getLastFromSurveyResponses: missing argument');
             return undefined;
         }
         const previousResponses = this.findPreviousSurveyResponsesByKey(exp);
@@ -728,7 +810,7 @@ export class ExpressionEval {
 
     private getPreviousResponses(exp: Expression): SurveySingleItemResponse[] {
         if (!exp.data || exp.data.length !== 1 || !exp.data[0].str) {
-            console.log('getPreviousResponses: missing argument');
+            this.logEvent('getPreviousResponses: missing argument');
             return [];
         }
 
@@ -751,7 +833,7 @@ export class ExpressionEval {
 
     private filterResponsesByIncludesKeys(exp: Expression): SurveySingleItemResponse[] {
         if (!exp.data || exp.data.length < 3 || !exp.data[1].str || !exp.data[2].str) {
-            console.log('filterResponsesByIncludesKeys: missing arguments');
+            this.logEvent('filterResponsesByIncludesKeys: missing arguments');
             return [];
         }
 
@@ -781,7 +863,7 @@ export class ExpressionEval {
 
     private filterResponsesByValue(exp: Expression): SurveySingleItemResponse[] {
         if (!exp.data || exp.data.length !== 3 || !exp.data[1].str || !exp.data[2].str) {
-            console.log('filterResponsesByValue: missing arguments');
+            this.logEvent('filterResponsesByValue: missing arguments');
             return [];
         }
 
@@ -806,7 +888,7 @@ export class ExpressionEval {
 
     private getLastFromSurveyItemResponses(exp: Expression): SurveySingleItemResponse | undefined {
         if (!exp.data || exp.data.length !== 1) {
-            console.log('getLastFromSurveyItemResponses: missing arguments');
+            this.logEvent('getLastFromSurveyItemResponses: missing arguments');
             return undefined;
         }
 
@@ -832,7 +914,7 @@ export class ExpressionEval {
 
     private getSecondsSince(exp: Expression): number | undefined {
         if (!exp.data || exp.data.length !== 1) {
-            console.log('getSecondsSince: missing argument');
+            this.logEvent('getSecondsSince: missing argument');
             return undefined;
         }
         const arg1 = expressionArgParser(exp.data[0]);
@@ -844,7 +926,7 @@ export class ExpressionEval {
 
     private timestampWithOffset(exp: Expression): number | undefined {
         if (!exp.data || (exp.data.length !== 1 && exp.data.length !== 2)) {
-            console.log('timestampWithOffset: unexpected arguments');
+            this.logEvent('timestampWithOffset: unexpected arguments');
             return undefined;
         }
         const arg1 = expressionArgParser(exp.data[0]);
@@ -863,7 +945,7 @@ export class ExpressionEval {
 
     private dateResponseDiffFromNow(exp: Expression): number | undefined {
         if (!exp.data || exp.data.length < 3) {
-            console.log('dateResponseDiffFromNow: missing arguments');
+            this.logEvent('dateResponseDiffFromNow: missing arguments');
             return undefined;
         }
         const unit = expressionArgParser(exp.data[2]);
@@ -881,7 +963,7 @@ export class ExpressionEval {
             return;
         }
         if (responseItem.dtype !== 'date') {
-            console.log(`dateResponseDiffFromNow should receive response type 'date', but got ${responseItem.dtype}`);
+            this.logEvent(`dateResponseDiffFromNow should receive response type 'date', but got ${responseItem.dtype}`);
             return;
         }
         const ts = moment.unix(parseFloat(responseItem.value));
@@ -900,7 +982,7 @@ export class ExpressionEval {
             case 'float':
                 return typeof (value) === 'string' ? parseFloat(value) : value;
             default:
-                console.log('typeConvert: dtype is not known: ' + dtype);
+                this.logEvent('typeConvert: dtype is not known: ' + dtype);
                 return value;
         }
     }

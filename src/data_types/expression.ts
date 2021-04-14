@@ -6,7 +6,7 @@ export type SurveyPrefillRuleNames = 'GET_LAST_SURVEY_ITEM';
 export type StudyEngineExpNames =
     'checkEventType' |
     // Response checkers:
-    'checkSurveyResponseKey' | 'responseHasKeysAny' |
+    'checkSurveyResponseKey' | 'responseHasKeysAny' | 'getResponseValueAsNum' | 'getResponseValueAsStr' |
     // Participant state:
     'getStudyEntryTime' | 'hasSurveyKeyAssigned' | 'getSurveyKeyAssignedFrom' | 'getSurveyKeyAssignedUntil' |
     'hasStudyStatus' | 'lastSubmissionDateOlderThan' | 'hasParticipantFlag' |
@@ -29,7 +29,7 @@ export type ClientSideSurveyExpName =
     'findPreviousSurveyResponsesByKey' | 'getLastFromSurveyResponses' | 'getPreviousResponses' | 'filterResponsesByIncludesKeys' | 'filterResponsesByValue' | 'getLastFromSurveyItemResponses' |
     'getSecondsSince' |
     // client side shortcut methods:
-    'hasResponse' | 'getResponseItem' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
+    'hasResponse' | 'getResponseItem' | 'getResponseValueAsNum' | 'getResponseValueAsStr' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
     'timestampWithOffset' | 'dateResponseDiffFromNow';
 
 export type ExpressionName =

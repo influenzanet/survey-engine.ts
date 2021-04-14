@@ -140,6 +140,117 @@ test('testing expression: isDefined', () => {
     }, undefined, undefined, testSurveyResponses)).toBeFalsy();
 })
 
+
+test('testing expression: getResponseValueAsNum', () => {
+    const expEval = new ExpressionEval();
+    const testSurveyResponses: SurveyItemResponse = {
+        key: 'TS',
+        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        items: [
+            {
+                key: 'TS.I1',
+                meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+                response: {
+                    key: 'R1',
+                    items: [
+                        { key: 'V1', value: 'not a number' },
+                        { key: 'V2', value: '123.23' },
+                        { key: 'V3' }
+                    ]
+                }
+            }
+        ]
+    }
+
+
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsNum', data: [
+            { dtype: 'str', str: 'TS.wrong' },
+            { dtype: 'str', str: 'R1.V2' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsNum', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.Vwrong' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsNum', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.V3' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsNum', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.V1' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeNaN();
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsNum', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.V2' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toEqual(123.23);
+});
+
+test('testing expression: getResponseValueAsStr', () => {
+    const expEval = new ExpressionEval();
+    const testSurveyResponses: SurveyItemResponse = {
+        key: 'TS',
+        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        items: [
+            {
+                key: 'TS.I1',
+                meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+                response: {
+                    key: 'R1',
+                    items: [
+                        { key: 'V1' },
+                        { key: 'V2', value: 'something' }
+                    ]
+                }
+            }
+        ]
+    }
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsStr', data: [
+            { dtype: 'str', str: 'TS.wrong' },
+            { dtype: 'str', str: 'R1.V2' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsStr', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.Vwrong' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsStr', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.V1' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toBeUndefined();
+
+    expect(expEval.eval({
+        name: 'getResponseValueAsStr', data: [
+            { dtype: 'str', str: 'TS.I1' },
+            { dtype: 'str', str: 'R1.V2' },
+        ]
+    }, undefined, undefined, testSurveyResponses)).toEqual("something");
+});
+
+
 test('testing expression: regexp', () => {
     const expEval = new ExpressionEval();
     const testSurveyResponses: SurveyItemResponse = {

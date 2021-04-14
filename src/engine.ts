@@ -46,11 +46,13 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private prefills: SurveySingleItemResponse[];
 
     private evalEngine: ExpressionEval;
+    private showDebugMsg: boolean;
 
     constructor(
         survey: Survey,
         context?: SurveyContext,
         prefills?: SurveySingleItemResponse[],
+        showDebugMsg?: boolean,
     ) {
         // console.log('core engine')
         this.evalEngine = new ExpressionEval();
@@ -58,6 +60,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         this.surveyDef = survey;
         this.context = context ? context : {};
         this.prefills = prefills ? prefills : [];
+        this.showDebugMsg = showDebugMsg !== undefined ? showDebugMsg : false;
         this.responses = this.initResponseObject(this.surveyDef.current.surveyDefinition);
         this.renderedSurvey = {
             key: survey.current.surveyDefinition.key,
@@ -645,6 +648,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             this.context,
             this.responses,
             temporaryItem,
+            this.showDebugMsg,
         );
     }
 
@@ -655,6 +659,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             this.context,
             this.responses,
             temporaryItem,
+            this.showDebugMsg,
         );
     }
 
