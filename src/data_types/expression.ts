@@ -1,11 +1,14 @@
 export type SelectionMethodNames = 'sequential' | 'uniform' | 'highestPriority' | 'exponential';
-export type StudyActionNames = 'IFTHEN' | 'UPDATE_STUDY_STATUS' | 'UPDATE_FLAG' | 'REMOVE_FLAG' | 'ADD_NEW_SURVEY' | 'REMOVE_ALL_SURVEYS' | 'REMOVE_SURVEY_BY_KEY' | 'REMOVE_SURVEYS_BY_KEY' | 'ADD_REPORT' | 'REMOVE_ALL_REPORTS' | 'REMOVE_REPORT_BY_KEY' | 'REMOVE_REPORTS_BY_KEY';
+export type StudyActionNames =
+    'IF' | 'DO' |
+    'IFTHEN' | 'UPDATE_STUDY_STATUS' | 'UPDATE_FLAG' | 'REMOVE_FLAG' | 'ADD_NEW_SURVEY' | 'REMOVE_ALL_SURVEYS' | 'REMOVE_SURVEY_BY_KEY' | 'REMOVE_SURVEYS_BY_KEY' | 'ADD_REPORT' | 'REMOVE_ALL_REPORTS' | 'REMOVE_REPORT_BY_KEY' | 'REMOVE_REPORTS_BY_KEY';
 export type SurveyContextRuleNames = 'LAST_RESPONSES_BY_KEY' | 'ALL_RESPONSES_SINCE' | 'RESPONSES_SINCE_BY_KEY';
 export type SurveyPrefillRuleNames = 'GET_LAST_SURVEY_ITEM';
 
 export type StudyEngineExpNames =
     'checkEventType' |
     // Response checkers:
+    'checkConditionForOldResponses' |
     'checkSurveyResponseKey' | 'responseHasKeysAny' | 'getResponseValueAsNum' | 'getResponseValueAsStr' |
     // Participant state:
     'getStudyEntryTime' | 'hasSurveyKeyAssigned' | 'getSurveyKeyAssignedFrom' | 'getSurveyKeyAssignedUntil' |
