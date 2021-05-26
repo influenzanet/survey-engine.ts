@@ -400,7 +400,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             renderedItem = this.renderSingleSurveyItem(item);
         }
 
-        if (!atPosition) {
+        if (atPosition === undefined || atPosition < 0) {
             parent.items.push(renderedItem);
             this.setTimestampFor('rendered', renderedItem.key);
             return parent.items.length - 1;
