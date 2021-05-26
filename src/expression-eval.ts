@@ -108,6 +108,8 @@ export class ExpressionEval {
                 return this.responseHasKeysAll(expression);
             case 'responseHasOnlyKeysOtherThan':
                 return this.responseHasOnlyKeysOtherThan(expression);
+            case 'countResponseItems':
+                return this.countResponseItems(expression);
             case 'getSurveyItemValidation':
                 return this.getSurveyItemValidation(expression);
 
@@ -780,6 +782,41 @@ export class ExpressionEval {
         });
 
         return hasOtherKeys && !foundBlacklistKey;
+    }
+
+    private countResponseItems(exp: Expression): number {
+        if (!Array.isArray(exp.data) || exp.data.length != 2) {
+            this.logEvent('responseHasOnlyKeysOtherThan: data attribute is missing or wrong: ' + exp.data);
+            return -1;
+        }
+        const itemRef = expressionArgParser(exp.data[0]);
+        const respItemRef = expressionArgParser(exp.data[1]);
+
+        const getSurveyItemExp: Expression = {
+            name: 'getObjByHierarchicalKey', data: [
+                { dtype: 'exp', exp: { name: 'getResponses' } },
+                { str: itemRef }
+            ]
+        }
+
+        const getResponseRootExp: Expression = {
+            name: 'getAttribute', data: [
+                { dtype: 'exp', exp: getSurveyItemExp },
+                { str: 'response' }
+            ]
+        }
+
+        const getResponseItemExp: Expression = {
+            name: 'getNestedObjectByKey', data: [
+                { dtype: 'exp', exp: getResponseRootExp },
+                { str: respItemRef }
+            ]
+        }
+
+        const responseItem = this.evalExpression(getResponseItemExp) as ResponseItem | undefined;
+        if (!responseItem || responseItem.items === undefined) { return -1; }
+
+        return responseItem.items.length;
     }
 
     // ---------- QUERY METHODS ----------------

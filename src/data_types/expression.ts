@@ -9,7 +9,7 @@ export type StudyEngineExpNames =
     'checkEventType' |
     // Response checkers:
     'checkConditionForOldResponses' |
-    'checkSurveyResponseKey' | 'responseHasKeysAny' | 'getResponseValueAsNum' | 'getResponseValueAsStr' |
+    'checkSurveyResponseKey' | 'responseHasKeysAny' | 'getResponseValueAsNum' | 'getResponseValueAsStr' | 'countResponseItems' |
     // Participant state:
     'getStudyEntryTime' | 'hasSurveyKeyAssigned' | 'getSurveyKeyAssignedFrom' | 'getSurveyKeyAssignedUntil' |
     'hasStudyStatus' | 'lastSubmissionDateOlderThan' | 'hasParticipantFlag' |
@@ -33,7 +33,7 @@ export type ClientSideSurveyExpName =
     'getSecondsSince' |
     // client side shortcut methods:
     'hasResponse' | 'getResponseItem' | 'getResponseValueAsNum' | 'getResponseValueAsStr' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
-    'timestampWithOffset' | 'dateResponseDiffFromNow';
+    'timestampWithOffset' | 'dateResponseDiffFromNow' | 'countResponseItems';
 
 export type ExpressionName =
     ClientSideSurveyExpName |

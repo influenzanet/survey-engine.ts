@@ -348,6 +348,135 @@ test('testing expression: timestampWithOffset', () => {
 
 })
 
+test('testing expression: countResponseItems', () => {
+    const expEval = new ExpressionEval();
+
+    const withWrongType: Expression = {
+        name: 'countResponseItems', data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'num', num: 2 },
+        ]
+    };
+
+    const withMissingArgs: Expression = {
+        name: 'countResponseItems',
+    };
+
+    const withTooManyArgs: Expression = {
+        name: 'countResponseItems',
+        data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'rg.mcg' },
+            { dtype: 'str', str: 'rg.mcg' },
+        ]
+    };
+
+    const withCorrectExp: Expression = {
+        name: 'countResponseItems',
+        data: [
+            { dtype: 'str', str: 'TS.I2' },
+            { dtype: 'str', str: 'rg.mcg' },
+        ]
+    };
+
+    expect(expEval.eval(withWrongType, undefined, undefined, undefined)).toEqual(-1);
+    expect(expEval.eval(withMissingArgs, undefined, undefined, undefined)).toEqual(-1);
+    expect(expEval.eval(withTooManyArgs, undefined, undefined, undefined)).toEqual(-1);
+
+    // missing info
+    expect(expEval.eval(withCorrectExp, undefined, undefined, undefined)).toEqual(-1);
+
+
+    // missing question
+    expect(expEval.eval(withCorrectExp, undefined, undefined, {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.other',
+                response: {
+                    key: 'rg',
+                    items: [{ key: 'mcg', items: [] }]
+                }
+            }
+        ]
+    })).toEqual(-1);
+
+    // missing response group
+    expect(expEval.eval(withCorrectExp, undefined, undefined, {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'rg',
+                    items: [{ key: 'scg', items: [] }]
+                }
+            }
+        ]
+    })).toEqual(-1);
+
+    // zero item
+    expect(expEval.eval(withCorrectExp, undefined, undefined, {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'rg',
+                    items: [{ key: 'mcg', items: [] }]
+                }
+            }
+        ]
+    })).toEqual(0);
+
+    // with items
+    expect(expEval.eval(withCorrectExp, undefined, undefined, {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'rg',
+                    items: [{ key: 'mcg', items: [{ key: '1' }] }]
+                }
+            }
+        ]
+    })).toEqual(1);
+    expect(expEval.eval(withCorrectExp, undefined, undefined, {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'rg',
+                    items: [{ key: 'mcg', items: [{ key: '1' }, { key: '2' }, { key: '3' }] }]
+                }
+            }
+        ]
+    })).toEqual(3);
+
+    // combined exp:
+    const combExp: Expression = {
+        name: 'gt',
+        data: [
+            { dtype: 'exp', exp: withCorrectExp },
+            { dtype: 'num', num: 2 },
+        ]
+    }
+    expect(expEval.eval(combExp, undefined, undefined, {
+        key: 'TS',
+        items: [
+            {
+                key: 'TS.I2',
+                response: {
+                    key: 'rg',
+                    items: [{ key: 'mcg', items: [{ key: '1' }, { key: '2' }, { key: '3' }] }]
+                }
+            }
+        ]
+    })).toBeTruthy();
+})
+
 // ---------- ROOT REFERENCES ----------------
 test('testing expression: getContext', () => {
     const expEval = new ExpressionEval();
