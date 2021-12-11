@@ -44,6 +44,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     private responses: SurveyGroupItemResponse;
     private context: SurveyContext;
     private prefills: SurveySingleItemResponse[];
+    private openedAt: number;
 
     private evalEngine: ExpressionEval;
     private showDebugMsg: boolean;
@@ -67,6 +68,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             version: survey.current.surveyDefinition.version,
             items: []
         };
+        this.openedAt = Date.now();
         this.setTimestampFor('rendered', survey.current.surveyDefinition.key);
         this.initRenderedGroup(survey.current.surveyDefinition, survey.current.surveyDefinition.key);
     }
@@ -91,6 +93,10 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
         // Re-render whole tree
         this.reRenderGroup(this.renderedSurvey.key);
+    }
+
+    getSurveyOpenedAt(): number {
+        return this.openedAt;
     }
 
     getRenderedSurvey(): SurveyGroupItem {
@@ -527,22 +533,24 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             obj.meta.localeCode = localeCode;
         }
 
+        const timestampLimit = 100;
+
         switch (type) {
             case 'rendered':
                 obj.meta.rendered.push(Date.now());
-                if (obj.meta.rendered.length > 20) {
+                if (obj.meta.rendered.length > timestampLimit) {
                     obj.meta.rendered.splice(0, 1);
                 }
                 break;
             case 'displayed':
                 obj.meta.displayed.push(Date.now());
-                if (obj.meta.displayed.length > 20) {
+                if (obj.meta.displayed.length > timestampLimit) {
                     obj.meta.displayed.splice(0, 1);
                 }
                 break;
             case 'responded':
                 obj.meta.responded.push(Date.now());
-                if (obj.meta.responded.length > 20) {
+                if (obj.meta.responded.length > timestampLimit) {
                     obj.meta.responded.splice(0, 1);
                 }
                 break;
