@@ -1,6 +1,6 @@
 {
   "name": "survey-engine",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "Implementation of the survey engine to use in typescript/javascript projects.",
   "main": "index.js",
   "scripts": {
