@@ -11,6 +11,7 @@ export interface Survey {
   contextRules?: SurveyContextDef;
   maxItemsPerPage?: { large: number, small: number };
   availableFor?: string;
+  requireLoginBeforeSubmission?: boolean;
 }
 
 export interface SurveyVersion {
