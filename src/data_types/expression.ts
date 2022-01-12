@@ -16,6 +16,7 @@ export type ClientSideSurveyExpName =
   // query methods for previous names:
   'findPreviousSurveyResponsesByKey' | 'getLastFromSurveyResponses' | 'getPreviousResponses' | 'filterResponsesByIncludesKeys' | 'filterResponsesByValue' | 'getLastFromSurveyItemResponses' |
   'getSecondsSince' |
+  'parseValueAsNum' |
   // client side shortcut methods:
   'hasResponse' | 'getResponseItem' | 'getResponseValueAsNum' | 'getResponseValueAsStr' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
   'timestampWithOffset' | 'dateResponseDiffFromNow' | 'countResponseItems';
