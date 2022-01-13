@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.4] - 2022-01-13
+### Changed
+
+- Add isLoggedIn attribute to context.
+
+
 ## [v1.0.3] - 2022-01-12
 
 ### Added
