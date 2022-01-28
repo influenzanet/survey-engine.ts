@@ -711,13 +711,14 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
   private getOnlyRenderedResponses(items: SurveyItemResponse[]): SurveyItemResponse[] {
     const responses: SurveyItemResponse[] = [];
     items.forEach(item => {
-      const currentItem = {
-        ...item,
-        items: []
+      let currentItem: SurveyItemResponse = {
+        key: item.key,
+        meta: item.meta,
       }
       if (isSurveyGroupItemResponse(item)) {
-        item.items = this.getOnlyRenderedResponses(item.items);
+        (currentItem as SurveyGroupItemResponse).items = this.getOnlyRenderedResponses(item.items);
       } else {
+        currentItem.response = item.response;
         if (!this.findRenderedItem(item.key)) {
           return;
         }
@@ -732,6 +733,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
       ...this.responses,
       items: this.getOnlyRenderedResponses(this.responses.items)
     }
+    console.log(responsesForRenderedItems);
 
     return this.evalEngine.eval(
       condition,
