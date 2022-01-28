@@ -562,7 +562,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
 
   private clearResponseSubtree(targetKey: string) {
-    const itemDef = this.findSurveyDefItem(targetKey);
+    return;
+    // TODO: remove if works with other concept
+    /*const itemDef = this.findSurveyDefItem(targetKey);
     if (!itemDef) {
       return;
     }
@@ -596,7 +598,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         response: prefill ? prefill.response : undefined,
       };
       target.response = itemResp;
-    }
+    }*/
   }
 
   findSurveyDefItem(itemID: string): SurveyItem | undefined {
@@ -702,12 +704,35 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     );
   }
 
+  private getOnlyRenderedResponses(items: SurveyItemResponse[]): SurveyItemResponse[] {
+    const responses: SurveyItemResponse[] = [];
+    items.forEach(item => {
+      const currentItem = {
+        ...item,
+        items: []
+      }
+      if (!this.findRenderedItem(item.key)) {
+        return;
+      }
+      if (isSurveyGroupItemResponse(item)) {
+        item.items = this.getOnlyRenderedResponses(item.items);
+      }
+      responses.push(currentItem)
+    })
+    return responses;
+  }
+
   evalConditions(condition?: Expression, temporaryItem?: SurveySingleItem): boolean {
+    const responsesForRenderedItems: SurveyGroupItemResponse = {
+      ...this.responses,
+      items: this.getOnlyRenderedResponses(this.responses.items)
+    }
+
     return this.evalEngine.eval(
       condition,
       this.renderedSurvey,
       this.context,
-      this.responses,
+      responsesForRenderedItems,
       temporaryItem,
       this.showDebugMsg,
     );
