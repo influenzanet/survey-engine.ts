@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.1.0] - 2022-01-28
+
+### Changed
+
+- Survey engine's expression eval gets only the responses that are currently rendered in the survey Rendered means, they are in the survey tree, not necessarily on the screen. This change intends to prevent previously answered questions to influce the survey expressions, if they are hidden due to changed previous responses. The responses are not removed from the cache when an item gets hidden due to changed values, to prevent the user to loose the survey's state by accidentaly clicking an option that would cause a large portion of the survey to be hidden. At the end of the survey, only responses are submitted for the items that are part of the rendered survey, so this change makes the survey evaluation consistent with this behaviour.
+
+
 ## [v1.0.4] - 2022-01-13
 ### Changed
 

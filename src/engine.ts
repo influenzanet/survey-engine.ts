@@ -236,12 +236,10 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             this.addRenderedItem(itemDef, parent, currentIndex);
           }
         } else {
-          this.clearResponseSubtree(itemDef.key);
           return;
         }
       } else {
         if (!itemCond) {
-          this.clearResponseSubtree(itemDef.key);
           parent.items = removeItemByKey(parent.items, itemDef.key);
           return
         }
@@ -322,7 +320,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         // Remove item if condition not true
         if (!itemDef || !this.evalConditions(itemDef.condition)) {
           renderedGroup.items = removeItemByKey(renderedGroup.items, item.key);
-          this.clearResponseSubtree(item.key);
           // console.log('removed item: ' + item.key);
           return;
         }
@@ -560,47 +557,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     }
   }
 
-
-  private clearResponseSubtree(targetKey: string) {
-    return;
-    // TODO: remove if works with other concept
-    /*const itemDef = this.findSurveyDefItem(targetKey);
-    if (!itemDef) {
-      return;
-    }
-
-    const target = this.findResponseItem(targetKey);
-    if (!target) {
-      console.error('setResponse: cannot find target object for key: ' + targetKey);
-      return;
-    }
-
-    if (isSurveyGroupItemResponse(target)) {
-      if (!isSurveyGroupItem(itemDef)) {
-        console.warn(`should be a group: ${itemDef.key}`)
-        return;
-      }
-      const emptyResp = this.initResponseObject(itemDef);
-      target.items = emptyResp.items;
-    } else {
-      const prefill = this.prefills.find(ri => ri.key === itemDef.key);
-
-      const itemResp: SurveySingleItemResponse = {
-        key: itemDef.key,
-        meta: {
-          rendered: [],
-          displayed: [],
-          responded: [],
-          position: -1,
-          localeCode: '',
-          version: itemDef.version,
-        },
-        response: prefill ? prefill.response : undefined,
-      };
-      target.response = itemResp;
-    }*/
-  }
-
   findSurveyDefItem(itemID: string): SurveyItem | undefined {
     const ids = itemID.split('.');
     let obj: SurveyItem | undefined;
@@ -733,7 +689,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
       ...this.responses,
       items: this.getOnlyRenderedResponses(this.responses.items)
     }
-    console.log(responsesForRenderedItems);
 
     return this.evalEngine.eval(
       condition,
