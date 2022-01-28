@@ -622,7 +622,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
       }
       const ind = obj.items.findIndex(item => item.key === compID);
       if (ind < 0) {
-        console.warn('findSurveyDefItem: cannot find object for : ' + compID);
+        if (this.showDebugMsg) {
+          console.warn('findSurveyDefItem: cannot find object for : ' + compID);
+        }
         obj = undefined;
         return;
       }
@@ -653,7 +655,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
       }
       const ind = obj.items.findIndex(item => item.key === compID);
       if (ind < 0) {
-        console.warn('findRenderedItem: cannot find object for : ' + compID);
+        if (this.showDebugMsg) {
+          console.warn('findRenderedItem: cannot find object for : ' + compID);
+        }
         obj = undefined;
         return;
       }
@@ -711,11 +715,12 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         ...item,
         items: []
       }
-      if (!this.findRenderedItem(item.key)) {
-        return;
-      }
       if (isSurveyGroupItemResponse(item)) {
         item.items = this.getOnlyRenderedResponses(item.items);
+      } else {
+        if (!this.findRenderedItem(item.key)) {
+          return;
+        }
       }
       responses.push(currentItem)
     })
