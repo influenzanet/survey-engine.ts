@@ -1,3 +1,5 @@
+import { ConfidentialMode } from "./survey-item";
+
 export type TimestampType = 'rendered' | 'displayed' | 'responded';
 
 export interface SurveyResponse {
@@ -19,6 +21,7 @@ interface SurveyItemResponseBase {
 
 export interface SurveySingleItemResponse extends SurveyItemResponseBase {
   response?: ResponseItem;
+  confidentialMode?: ConfidentialMode;
 }
 
 export interface SurveyGroupItemResponse extends SurveyItemResponseBase {

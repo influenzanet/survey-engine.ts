@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.3] - 2022-02-02
+
+### Changed
+
+- Added new attribute for survey item and responses to handle confidential data (marked as such in the survey def). For these items, the meta data will be removed.
+
 ## [v1.1.2] - 2022-02-02
 
 ### Changed
