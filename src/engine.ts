@@ -484,13 +484,19 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
 
     return contents.map(cont => {
       if ((cont as LocalizedString).parts && (cont as LocalizedString).parts.length > 0) {
-        const resolvedText = (cont as LocalizedString).parts.map(
-          p => p.dtype === 'exp' ? this.resolveExpression(p.exp) : p.str
+        const resolvedContents = (cont as LocalizedString).parts.map(
+          p => {
+            if (typeof (p) === 'string' || typeof (p) === "number") {
+              // should not happen - only after resolved content is generated
+              return
+            }
+            return p.dtype === 'exp' ? this.resolveExpression(p.exp) : p.str
+          }
         );
         return {
           code: cont.code,
-          parts: resolvedText,
-          resolvedText: resolvedText.join(''),
+          parts: resolvedContents,
+          resolvedText: resolvedContents.join(''),
         }
       }
       return {
