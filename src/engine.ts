@@ -492,7 +492,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
           p => {
             if (typeof (p) === 'string' || typeof (p) === "number") {
               // should not happen - only after resolved content is generated
-              return
+              return p
             }
             return p.dtype === 'exp' ? this.resolveExpression(p.exp) : p.str
           }
