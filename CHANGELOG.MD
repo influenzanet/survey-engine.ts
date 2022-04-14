@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.6] - 2022-04-14
+
+### Changed
+
+- Included security update PRs.
+
 ## [v1.1.5] - 2022-04-14
 
 ### Changed
