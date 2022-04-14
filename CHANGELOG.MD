@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.5] - 2022-04-14
+
+### Changed
+
+- Rerender tree after initialisation immediately to handle prefill validations.
+
 ## [v1.1.4] - 2022-02-04
 
 ### Changed

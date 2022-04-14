@@ -71,6 +71,9 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     this.openedAt = Date.now();
     this.setTimestampFor('rendered', survey.current.surveyDefinition.key);
     this.initRenderedGroup(survey.current.surveyDefinition, survey.current.surveyDefinition.key);
+
+    // Re-render whole tree (to handle prefill validation correctly)
+    this.reRenderGroup(this.renderedSurvey.key);
   }
 
   // PUBLIC METHODS
