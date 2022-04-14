@@ -71,9 +71,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     this.openedAt = Date.now();
     this.setTimestampFor('rendered', survey.current.surveyDefinition.key);
     this.initRenderedGroup(survey.current.surveyDefinition, survey.current.surveyDefinition.key);
-
-    // Re-render whole tree (to handle prefill validation correctly)
-    this.reRenderGroup(this.renderedSurvey.key);
   }
 
   // PUBLIC METHODS
@@ -429,10 +426,17 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     }
 
     if (item.validations) {
+      // question is not rendered yet, so to be able to handle validation using prefills, we need to add response extra:
+      const extraResponses: SurveyItemResponse[] = [];
+      const currentResponse = this.getResponses().find(r => r.key === item.key)
+      if (currentResponse) {
+        extraResponses.push(currentResponse);
+      }
+
       renderedItem.validations = item.validations.map(validation => {
         return {
           ...validation,
-          rule: this.evalConditions(validation.rule as Expression)
+          rule: this.evalConditions(validation.rule as Expression, undefined, extraResponses)
         }
       });
     }
@@ -697,10 +701,11 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     return responses;
   }
 
-  evalConditions(condition?: Expression, temporaryItem?: SurveySingleItem): boolean {
+  evalConditions(condition?: Expression, temporaryItem?: SurveySingleItem, extraResponses?: SurveyItemResponse[]): boolean {
+    const extra = (extraResponses !== undefined) ? [...extraResponses] : [];
     const responsesForRenderedItems: SurveyGroupItemResponse = {
       ...this.responses,
-      items: this.getOnlyRenderedResponses(this.responses.items)
+      items: [...this.getOnlyRenderedResponses(this.responses.items), ...extra]
     }
 
     return this.evalEngine.eval(
