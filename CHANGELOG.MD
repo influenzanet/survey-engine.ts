@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.1.7] - 2022-04-14
+
+### Changed
+
+- Fix validation issue after first rendering as well.
+
 ## [v1.1.6] - 2022-04-14
 
 ### Changed

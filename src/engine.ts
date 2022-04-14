@@ -428,7 +428,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     if (item.validations) {
       // question is not rendered yet, so to be able to handle validation using prefills, we need to add response extra:
       const extraResponses: SurveyItemResponse[] = [];
-      const currentResponse = this.getResponses().find(r => r.key === item.key)
+      const currentResponse = this.findResponseItem(item.key);
       if (currentResponse) {
         extraResponses.push(currentResponse);
       }
