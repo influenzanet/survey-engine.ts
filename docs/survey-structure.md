@@ -2,7 +2,7 @@
 
 ## Overview
 
-Usually a survey is describes as a set of (ordered) questions. 
+Usually a survey is described as a set of (ordered) questions. 
 
 In this engine a survey is a hierarchical structure composed by 2 kind of elements:
 
@@ -16,7 +16,7 @@ Survey items tree describes the survey organization, determining the way questio
 Two kind of `SurveyItem:`
 
 - `SurveySingleItem`, is the logical unit of the survey (usually known as "question"). It can show text, and/or data collection components with more or less complex layouts.
-- `SurveyGroupItem` represents a group of
+- `SurveyGroupItem` represents a group of SurveyItem(s)
 
 Each kind of SurveyItem can react to rules of the survey (see Survey Engine Logic), so you can have a rule to show a single question (targeting a `SurveySingleItem`) or a group of questions (`SurveyGroupItem`)
 
@@ -60,7 +60,7 @@ Examples:
 
 - Key segments should be alphanumerical words, including underscores
 - As meaningful as possible
-- If a word separator is choosen (dash or underscore) it should be the same everywhere
+- If a word separator is chosen (dash or underscore) it should be the same everywhere
 
 ** Best practices for InfluenzaNet **
 
@@ -71,22 +71,21 @@ Besides the previous naming rules, there are some naming convention, inherited f
 - [must] Question keys are arbitrary but the common questions must have the assigned key in the survey standard definition 
 - [should] Non common question, should have a prefix to clearly identify them as non standard question (like a namespace), for example 
 
-
 ## Survey Item Components
 
-Components describes the properties of a SurveySingleItem (e.g. a question). 
+Components describe the properties of a SurveySingleItem (e.g. a question). 
 
 Every elements of a question is a component with a specific role. For example the label, the input widget or an option is a component. 
 
 Several kind of components are proposed :
 
-- Display component, describing the visual parts of the questions like texts (title, description, tooltip)
+- Display component, describing the visual parts of the question like texts (title, description, tooltip)
 - Response component describing the data collection process
 - Group component containing a list of components (the first level component of a `SurveySingleItem` is a Group component)
 
 Components can also be described as a tree, nodes as Group components, and leaf with other kinds.
 
-All components is described by a 'role' field, determining the purpose of the component and how the survey engine will handle it.
+Each component has a 'role' field, giving the purpose of the component and how the survey engine will handle it.
 
 Common roles:
 - 'root' : the group component of a survey item, containing all the components of a Survey item.
