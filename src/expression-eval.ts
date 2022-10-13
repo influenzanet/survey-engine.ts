@@ -1,5 +1,8 @@
 import { Expression, expressionArgParser, isExpression, ResponseItem, SurveyContext, SurveyGroupItem, SurveyGroupItemResponse, SurveyItem, SurveyItemResponse, SurveySingleItem, SurveyResponse, SurveySingleItemResponse } from "./data_types";
-import moment from 'moment';
+import {
+  fromUnixTime, differenceInSeconds, differenceInMinutes, differenceInHours,
+  differenceInDays, differenceInMonths, differenceInWeeks, differenceInYears,
+} from 'date-fns';
 
 export class ExpressionEval {
   renderedSurvey?: SurveyGroupItem;
@@ -1018,9 +1021,31 @@ export class ExpressionEval {
       this.logEvent(`dateResponseDiffFromNow should receive response type 'date', but got ${responseItem.dtype}`);
       return;
     }
-    const ts = moment.unix(parseFloat(responseItem.value));
-    const now = moment();
-    const diff = ts.diff(now, unit);
+    const ts = fromUnixTime(parseFloat(responseItem.value));
+    const now = new Date();
+    var diff = 0;
+    switch (unit) {
+      case 'years':
+        diff = differenceInYears(ts, now);
+        break;
+      case 'months':
+        diff = differenceInMonths(ts, now);
+        break;
+      case 'weeks':
+        diff = differenceInWeeks(ts, now);
+        break;
+      case 'hours':
+        diff = differenceInHours(ts, now);
+        break;
+      case 'minutes':
+        diff = differenceInMinutes(ts, now);
+        break;
+      case 'seconds':
+      default:
+        diff = differenceInSeconds(ts, now);
+        break;
+    }
+
     if (ignoreSign) {
       return Math.abs(diff);
     }

@@ -1,6 +1,6 @@
+import { add, getUnixTime } from 'date-fns';
 import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType, SurveyGroupItemResponse } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
-import moment from 'moment';
 
 
 // ---------- LOGIC OPERATORS ----------------
@@ -1468,8 +1468,8 @@ test('testing expression: dateResponseDiffFromNow', () => {
             items: [{
               key: '1',
               items: [
-                { key: '1', dtype: 'date', value: (moment().subtract(2, 'years').unix()).toString() },
-                { key: '2', dtype: 'date', value: (moment().add(18, 'months').unix()).toString() },
+                { key: '1', dtype: 'date', value: getUnixTime(add(new Date(), { years: -2 })).toString() },
+                { key: '2', dtype: 'date', value: getUnixTime(add(new Date(), { months: 18 })).toString() },
                 { key: '3', value: '15323422332' },
               ]
             }]
