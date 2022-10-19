@@ -62,15 +62,14 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
     this.context = context ? context : {};
     this.prefills = prefills ? prefills : [];
     this.showDebugMsg = showDebugMsg !== undefined ? showDebugMsg : false;
-    this.responses = this.initResponseObject(this.surveyDef.current.surveyDefinition);
+    this.responses = this.initResponseObject(this.surveyDef.surveyDefinition);
     this.renderedSurvey = {
-      key: survey.current.surveyDefinition.key,
-      version: survey.current.surveyDefinition.version,
+      key: survey.surveyDefinition.key,
       items: []
     };
     this.openedAt = Date.now();
-    this.setTimestampFor('rendered', survey.current.surveyDefinition.key);
-    this.initRenderedGroup(survey.current.surveyDefinition, survey.current.surveyDefinition.key);
+    this.setTimestampFor('rendered', survey.surveyDefinition.key);
+    this.initRenderedGroup(survey.surveyDefinition, survey.surveyDefinition.key);
   }
 
   // PUBLIC METHODS
@@ -193,7 +192,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         responded: [],
         position: -1,
         localeCode: '',
-        version: qGroup.version,
       },
       items: [],
     };
@@ -215,7 +213,6 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
             responded: [],
             position: -1,
             localeCode: '',
-            version: item.version,
           },
           response: prefill ? prefill.response : undefined,
         };
@@ -585,8 +582,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         compID += '.' + id;
       }
       if (!obj) {
-        if (compID === this.surveyDef.current.surveyDefinition.key) {
-          obj = this.surveyDef.current.surveyDefinition;
+        if (compID === this.surveyDef.surveyDefinition.key) {
+          obj = this.surveyDef.surveyDefinition;
         }
         return;
       }

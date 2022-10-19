@@ -4,8 +4,9 @@ import { ItemGroupComponent } from './survey-item-component';
 
 interface SurveyItemBase {
   key: string;
-  version: number;
-  versionTags?: Array<string>;
+  metadata?: {
+    [key: string]: string
+  }
   follows?: Array<string>;
   condition?: Expression;
   priority?: number; // can be used to sort items in the list

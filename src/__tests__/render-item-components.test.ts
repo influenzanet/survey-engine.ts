@@ -4,7 +4,6 @@ import { SurveyEngineCore } from '../engine';
 // ---------- Create a test survey definition ----------------
 const testItem: SurveySingleItem = {
   key: '0.1',
-  version: 0,
   validations: [],
   components: {
     role: 'root',
@@ -148,7 +147,6 @@ const testItem: SurveySingleItem = {
 
 const testItem2: SurveySingleItem = {
   key: '0.2',
-  version: 0,
   validations: [],
   components: {
     role: 'root',
@@ -198,16 +196,14 @@ const testItem2: SurveySingleItem = {
 }
 
 const testSurvey: Survey = {
-  current: {
-    versionId: 'wfdojsdfpo',
-    surveyDefinition: {
-      key: '0',
-      version: 0,
-      items: [
-        testItem,
-        testItem2,
-      ]
-    }
+
+  versionId: 'wfdojsdfpo',
+  surveyDefinition: {
+    key: '0',
+    items: [
+      testItem,
+      testItem2,
+    ]
   }
 }
 

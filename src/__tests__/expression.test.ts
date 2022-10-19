@@ -98,11 +98,11 @@ test('testing expression: isDefined', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
         }
@@ -202,11 +202,11 @@ test('testing expression: getResponseValueAsNum', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           items: [
@@ -262,11 +262,11 @@ test('testing expression: getResponseValueAsStr', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           items: [
@@ -579,7 +579,7 @@ test('testing expression: getResponses', () => {
   expect(expEval.eval({ name: 'getResponses' })).toBeUndefined();
   expect(expEval.eval({ name: 'getResponses' }, undefined, undefined, {
     key: 'test',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: []
   })).toBeDefined();
 })
@@ -589,7 +589,6 @@ test('testing expression: getRenderedItems', () => {
   expect(expEval.eval({ name: 'getRenderedItems' })).toBeUndefined();
   expect(expEval.eval({ name: 'getRenderedItems' }, {
     key: 'test',
-    version: 1,
     items: []
   })).toBeDefined();
 })
@@ -631,11 +630,11 @@ test('testing expression: getArrayItemAtIndex', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           value: 'testvalue'
@@ -643,7 +642,7 @@ test('testing expression: getArrayItemAtIndex', () => {
       },
       {
         key: 'TS.I2',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           value: 'testvalue2'
@@ -705,11 +704,11 @@ test('testing expression: getArrayItemByKey', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           value: 'testvalue'
@@ -717,7 +716,7 @@ test('testing expression: getArrayItemByKey', () => {
       },
       {
         key: 'TS.I2',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           value: 'testvalue2'
@@ -776,11 +775,11 @@ test('testing expression: getObjByHierarchicalKey', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'R1',
           value: 'testvalue'
@@ -811,11 +810,11 @@ test('testing expression: getResponseItem', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {
     key: 'TS',
-    meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
     items: [
       {
         key: 'TS.I1',
-        meta: { position: 0, localeCode: 'de', version: 1, rendered: [], displayed: [], responded: [] },
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
         response: {
           key: 'RG1',
           items: [
@@ -855,7 +854,6 @@ test('testing expression: getSurveyItemValidation', () => {
   const expEval = new ExpressionEval();
   const testRenderedSurveyItem: SurveySingleItem = {
     key: 'TS',
-    version: 1,
     type: 'test',
     components: {
       role: 'root',

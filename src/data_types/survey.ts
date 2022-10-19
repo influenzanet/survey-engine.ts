@@ -5,21 +5,21 @@ import { SurveyContextDef } from "./context";
 export interface Survey {
   id?: string;
   props?: SurveyProps;
-  current: SurveyVersion;
-  history?: SurveyVersion[];
   prefillRules?: Expression[];
   contextRules?: SurveyContextDef;
   maxItemsPerPage?: { large: number, small: number };
   availableFor?: string;
   requireLoginBeforeSubmission?: boolean;
-}
-
-export interface SurveyVersion {
-  versionId: string;
+  //
   surveyDefinition: SurveyGroupItem;
   published?: number;
   unpublished?: number;
+  versionId: string;
+  metadata?: {
+    [key: string]: string
+  }
 }
+
 
 export interface SurveyProps {
   name?: LocalizedObject[];
