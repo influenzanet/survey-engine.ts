@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.2.0] - 2022-10-
+
+### BREAKING CHANGE
+
+Updated survey data model to fix issues with limited history size. This change should be deployed together with changes in other components, especially on the backend side.
+
+### Changed
+
+- Replacing moment.js with date-fns.
+
 ## [v1.1.7] - 2022-04-14
 
 ### Changed
