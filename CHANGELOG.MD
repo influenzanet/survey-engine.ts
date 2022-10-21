@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.2.0] - 2022-10-
+## [v1.2.0] - 2022-10-21
 
 ### BREAKING CHANGE
 
