@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.1] - 2022-12-13
+
+### Changed
+
+- Fix default values for response meta that prevented submitting confidential responses
+
 ## [v1.2.0] - 2022-10-21
 
 ### BREAKING CHANGE

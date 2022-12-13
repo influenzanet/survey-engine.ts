@@ -22,6 +22,7 @@ import {
   expressionArgParser,
   Survey,
   ScreenSize,
+  ResponseMeta,
 } from "./data_types";
 import {
   removeItemByKey, flattenSurveyItemTree
@@ -29,13 +30,12 @@ import {
 import { ExpressionEval } from "./expression-eval";
 import { SelectionMethod } from "./selection-method";
 
-const initMeta = {
+const initMeta: ResponseMeta = {
   rendered: [],
   displayed: [],
   responded: [],
   position: -1,
   localeCode: '',
-  version: -1,
 }
 
 export class SurveyEngineCore implements SurveyEngineCoreInterface {
