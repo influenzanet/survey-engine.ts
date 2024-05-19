@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.2] - 2024-05-19
+
+### Changed
+
+- Added resolving disabled attribute to component groups.
+
 ## [v1.2.1] - 2022-12-13
 
 ### Changed
