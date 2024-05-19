@@ -2,6 +2,11 @@ import { add, getUnixTime } from 'date-fns';
 import { Expression, SurveyItemResponse, SurveySingleItem, SurveyContext, ExpressionArg, ExpressionArgDType, SurveyGroupItemResponse } from '../data_types';
 import { ExpressionEval } from '../expression-eval';
 
+test('testing undefined expression', () => {
+  const expEval = new ExpressionEval();
+  expect(expEval.eval(undefined)).toBeTruthy();
+  expect(expEval.eval({ name: undefined } as any)).toBeTruthy();
+})
 
 // ---------- LOGIC OPERATORS ----------------
 test('testing OR expression', () => {

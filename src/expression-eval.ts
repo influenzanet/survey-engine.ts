@@ -45,6 +45,11 @@ export class ExpressionEval {
   }
 
   private evalExpression(expression: Expression): any {
+    if (expression === undefined) {
+      this.logEvent('evalExpression: expression is undefined');
+      return true;
+    }
+
     switch (expression.name) {
       // logical operators -->
       case 'or':
