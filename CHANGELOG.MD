@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.5] - 2024-05-10
+
+### Changed
+
+Improved handling when expression arguments are not valid expressions (threw client side error before crashing the application).
+
 ## [v1.2.2] - 2024-05-19
 
 ### Changed
