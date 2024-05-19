@@ -37,7 +37,7 @@ export interface Expression {
 }
 
 export const isExpression = (value: Expression | any): value is Expression => {
-  return typeof (value) === 'object' && (value as Expression).name !== undefined && (value as Expression).name.length > 0;
+  return value !== undefined && typeof (value) === 'object' && (value as Expression).name !== undefined && (value as Expression).name.length > 0;
 }
 
 export type ExpressionArgDType = 'exp' | 'num' | 'str';

@@ -24,6 +24,11 @@ export class ExpressionEval {
       return true;
     }
 
+    if (!isExpression(expression)) {
+      console.error('expression is not an expression: ' + JSON.stringify(expression));
+      return true;
+    }
+
     this.renderedSurvey = renderedSurvey;
     this.context = context;
     this.responses = responses;

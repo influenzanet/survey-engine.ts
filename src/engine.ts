@@ -455,7 +455,7 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
           ...group,
           content: this.resolveContent(group.content),
           description: this.resolveContent(group.description),
-          disabled: group.disabled ? this.evalConditions(group.disabled as Expression, parentItem) : undefined,
+          disabled: isExpression(group.disabled) ? this.evalConditions(group.disabled as Expression, parentItem) : undefined,
           displayCondition: group.displayCondition ? this.evalConditions(group.displayCondition as Expression, parentItem) : undefined,
         }
       }
@@ -463,15 +463,16 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
         ...group,
         content: this.resolveContent(group.content),
         description: this.resolveContent(group.description),
-        disabled: group.disabled ? this.evalConditions(group.disabled as Expression, parentItem) : undefined,
+        disabled: isExpression(group.disabled) ? this.evalConditions(group.disabled as Expression, parentItem) : undefined,
         displayCondition: group.displayCondition ? this.evalConditions(group.displayCondition as Expression, parentItem) : undefined,
         items: group.items.map(comp => {
           if (isItemGroupComponent(comp)) {
             return this.resolveComponentGroup(parentItem, comp);
           }
+
           return {
             ...comp,
-            disabled: comp.disabled ? this.evalConditions(comp.disabled as Expression, parentItem) : undefined,
+            disabled: isExpression(comp.disabled) ? this.evalConditions(comp.disabled as Expression, parentItem) : undefined,
             displayCondition: comp.displayCondition ? this.evalConditions(comp.displayCondition as Expression, parentItem) : undefined,
             content: this.resolveContent(comp.content),
             description: this.resolveContent(comp.description),
