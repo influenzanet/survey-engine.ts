@@ -52,8 +52,14 @@ export interface ExpressionArg {
 export const expressionArgParser = (arg: ExpressionArg): any => {
   switch (arg.dtype) {
     case 'num':
+      if (arg.num === undefined) {
+        return 0;
+      }
       return arg.num;
     case 'str':
+      if (arg.str === undefined) {
+        return '';
+      }
       return arg.str;
     case 'exp':
       return arg.exp;

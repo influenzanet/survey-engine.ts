@@ -1,6 +1,12 @@
 # Changelog
 
-## [v1.2.5] - 2024-05-10
+## [v1.2.6] - 2024-05-23
+
+### Changed
+
+- When expression arg "num" or "str" are undefined, return 0 or empty string respectively. This is to avoid issues where server omits the value of the expression argument in case of zero or empty string.
+
+## [v1.2.5] - 2024-05-19
 
 ### Changed
 
