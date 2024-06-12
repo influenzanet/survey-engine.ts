@@ -25,7 +25,9 @@ export class ExpressionEval {
     }
 
     if (!isExpression(expression)) {
-      console.error('expression is not an expression: ' + JSON.stringify(expression));
+      if (this.showDebugMsg) {
+        console.error('value is not an expression: ' + JSON.stringify(expression));
+      }
       return true;
     }
 
@@ -127,6 +129,9 @@ export class ExpressionEval {
         return this.countResponseItems(expression);
       case 'getSurveyItemValidation':
         return this.getSurveyItemValidation(expression);
+
+      case 'validateSelectedOptionHasValueDefined':
+        return this.validateSelectedOptionHasValueDefined(expression);
 
       case 'timestampWithOffset':
         return this.timestampWithOffset(expression);
@@ -611,6 +616,34 @@ export class ExpressionEval {
       return true;
     }
     return currentVal.rule as boolean;
+  }
+
+  /**
+   * Validate if a selected option has a value - return false if response is selected but no value is set, true otherwise
+   */
+  private validateSelectedOptionHasValueDefined(exp: Expression): boolean {
+    if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+      this.logEvent('validateSelectedOptionHasValue: data attribute is missing or wrong: ' + exp.data);
+      return true;
+    }
+
+    const getResponseItemExp: Expression = {
+      name: 'getResponseItem', data: [
+        exp.data[0],
+        exp.data[1],
+      ]
+    }
+    const respItem = this.evalExpression(getResponseItemExp) as ResponseItem;
+
+    if (!respItem) {
+      return true;
+    }
+
+    if (respItem.value === undefined || respItem.value === null) {
+      return false;
+    }
+    return true;
+
   }
 
   private parseValueAsNum(exp: Expression): number | undefined {

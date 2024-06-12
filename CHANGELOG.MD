@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.8] - 2024-06-12
+
+### Changed
+
+- Added new expression: `validateSelectedOptionHasValueDefined` that returns false if the selected option has no value defined.
+
 ## [v1.2.7] - 2024-05-23
 
 ### Changed

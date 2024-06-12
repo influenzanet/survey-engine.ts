@@ -1458,6 +1458,53 @@ test('testing expression: responseHasOnlyKeysOtherThan', () => {
   )).toBeFalsy();
 });
 
+test('testing expression: validateSelectedOptionHasValueDefined', () => {
+  const expEval = new ExpressionEval();
+  const testSurveyResponses: SurveyItemResponse = {
+    key: 'TS',
+    meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
+    items: [
+      {
+        key: 'TS.I1',
+        meta: { position: 0, localeCode: 'de', rendered: [], displayed: [], responded: [] },
+        response: {
+          key: 'R1',
+          items: [
+            { key: 'V1', value: '' },
+            { key: 'V2', value: '123.23' },
+            { key: 'V3' }
+          ]
+        }
+      }
+    ]
+  }
+
+  expect(expEval.eval({
+    name: 'validateSelectedOptionHasValueDefined', data: [
+      { str: 'TS.I1' }, { str: 'R1.V1' },
+    ]
+  }, undefined, undefined, testSurveyResponses)).toBeTruthy();
+
+  expect(expEval.eval({
+    name: 'validateSelectedOptionHasValueDefined', data: [
+      { str: 'TS.I1' }, { str: 'R1.V2' },
+    ]
+  }, undefined, undefined, testSurveyResponses)).toBeTruthy();
+
+  expect(expEval.eval({
+    name: 'validateSelectedOptionHasValueDefined', data: [
+      { str: 'TS.I1' }, { str: 'R1.V3' },
+    ]
+  }, undefined, undefined, testSurveyResponses)).toBeFalsy();
+
+  expect(expEval.eval({
+    name: 'validateSelectedOptionHasValueDefined', data: [
+      { str: 'TS.I1' }, { str: 'R1.V4' },
+    ]
+  }, undefined, undefined, testSurveyResponses)).toBeTruthy();
+
+})
+
 test('testing expression: dateResponseDiffFromNow', () => {
   const expEval = new ExpressionEval();
   const testResp: SurveyGroupItemResponse = {
