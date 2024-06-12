@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.2.9] - 2024-06-12
+
+### Changed
+
+- Upgraded dependencies to fix security vulnerabilities.
+
 ## [v1.2.8] - 2024-06-12
 
 ### Changed
