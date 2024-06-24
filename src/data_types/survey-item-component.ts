@@ -34,6 +34,7 @@ export interface ComponentProperties {
   max?: ExpressionArg | number;
   stepSize?: ExpressionArg | number;
   dateInputMode?: ExpressionArg | string;
+  pattern?: string;
 }
 
 // ----------------------------------------------------------------------
