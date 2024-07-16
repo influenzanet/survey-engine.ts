@@ -1458,6 +1458,90 @@ test('testing expression: responseHasOnlyKeysOtherThan', () => {
   )).toBeFalsy();
 });
 
+test('testing expression: hasParticipantFlagKey', () => {
+  const expEval = new ExpressionEval();
+  const testContext: SurveyContext = {
+    participantFlags: {
+      test: '2'
+    }
+  };
+
+  expect(expEval.eval(
+    {
+      name: 'hasParticipantFlagKey', data: [
+        { str: 'test' }
+      ]
+    }, undefined, testContext
+  )).toBeTruthy();
+
+  expect(expEval.eval(
+    {
+      name: 'hasParticipantFlagKey', data: [
+        { str: 'wrong' }
+      ]
+    }, undefined, testContext
+  )).toBeFalsy();
+});
+
+test('testing expression: hasParticipantFlagKeyAndValue', () => {
+  const expEval = new ExpressionEval();
+  const testContext: SurveyContext = {
+    participantFlags: {
+      test: '2'
+    }
+  };
+
+  expect(expEval.eval(
+    {
+      name: 'hasParticipantFlagKeyAndValue', data: [
+        { str: 'test' }, { str: '2' }
+      ]
+    }, undefined, testContext
+  )).toBeTruthy();
+
+  expect(expEval.eval(
+    {
+      name: 'hasParticipantFlagKeyAndValue', data: [
+        { str: 'wrong' }, { str: '2' }
+      ]
+    }, undefined, testContext
+  )).toBeFalsy();
+
+  expect(expEval.eval(
+    {
+      name: 'hasParticipantFlagKeyAndValue', data: [
+        { str: 'test' }, { str: 'wrong' }
+      ]
+    }, undefined, testContext
+  )).toBeFalsy();
+});
+
+test('testing expression: getParticipantFlagValue', () => {
+  const expEval = new ExpressionEval();
+  const testContext: SurveyContext = {
+    participantFlags: {
+      test: '2'
+    }
+  };
+
+  expect(expEval.eval(
+    {
+      name: 'getParticipantFlagValue', data: [
+        { str: 'test' }
+      ]
+    }, undefined, testContext
+  )).toEqual('2');
+
+  expect(expEval.eval(
+    {
+      name: 'getParticipantFlagValue', data: [
+        { str: 'wrong' }
+      ]
+    }, undefined, testContext
+  )).toBeUndefined();
+});
+
+
 test('testing expression: validateSelectedOptionHasValueDefined', () => {
   const expEval = new ExpressionEval();
   const testSurveyResponses: SurveyItemResponse = {

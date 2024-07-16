@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.3.0] - 2024-07-16
+
+### Added
+
+- new shortcut expressions for `hasParticipantFlagKey`, `getParticipantFlagValue` and `hasParticipantFlagKeyAndValue` to make it easier to access participant flags.
+
 ## [v1.2.9] - 2024-06-12
 
 ### Changed

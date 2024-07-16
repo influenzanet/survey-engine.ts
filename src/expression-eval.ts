@@ -130,6 +130,13 @@ export class ExpressionEval {
       case 'getSurveyItemValidation':
         return this.getSurveyItemValidation(expression);
 
+      case 'hasParticipantFlagKey':
+        return this.hasParticipantFlagKey(expression);
+      case 'hasParticipantFlagKeyAndValue':
+        return this.hasParticipantFlagKeyAndValue(expression);
+      case 'getParticipantFlagValue':
+        return this.getParticipantFlagValue(expression);
+
       case 'validateSelectedOptionHasValueDefined':
         return this.validateSelectedOptionHasValueDefined(expression);
 
@@ -616,6 +623,49 @@ export class ExpressionEval {
       return true;
     }
     return currentVal.rule as boolean;
+  }
+
+  private hasParticipantFlagKey(exp: Expression): boolean {
+    if (!Array.isArray(exp.data) || exp.data.length !== 1) {
+      this.logEvent('hasParticipantFlagKey: data attribute is missing or wrong: ' + exp.data);
+      return false;
+    }
+    const key = expressionArgParser(exp.data[0]);
+
+    if (!this.context || !this.context.participantFlags) {
+      return false;
+    }
+
+    return this.context.participantFlags.hasOwnProperty(key);
+  }
+
+  private hasParticipantFlagKeyAndValue(exp: Expression): boolean {
+    if (!Array.isArray(exp.data) || exp.data.length !== 2) {
+      this.logEvent('hasParticipantFlagKeyAndValue: data attribute is missing or wrong: ' + exp.data);
+      return false;
+    }
+    const key = expressionArgParser(exp.data[0]);
+    const value = expressionArgParser(exp.data[1]);
+
+    if (!this.context || !this.context.participantFlags) {
+      return false;
+    }
+
+    return this.context.participantFlags.hasOwnProperty(key) && this.context.participantFlags[key] === value;
+  }
+
+  private getParticipantFlagValue(exp: Expression): string | undefined {
+    if (!Array.isArray(exp.data) || exp.data.length !== 1) {
+      this.logEvent('getParticipantFlagValue: data attribute is missing or wrong: ' + exp.data);
+      return undefined;
+    }
+    const key = expressionArgParser(exp.data[0]);
+
+    if (!this.context || !this.context.participantFlags) {
+      return undefined;
+    }
+
+    return this.context.participantFlags[key];
   }
 
   /**

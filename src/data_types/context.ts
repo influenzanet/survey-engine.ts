@@ -6,7 +6,7 @@ export interface SurveyContext {
   profile?: any; // TODO: define
   mode?: string;
   isLoggedIn?: boolean;
-  participantFlags?: any; // string key value pairs
+  participantFlags?: { [key: string]: string };
   // TODO: have geolocation and other attributes
 }
 
