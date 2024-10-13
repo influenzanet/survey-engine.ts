@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.3.1] - 2024-10-13
+
+### Changed
+
+Add new attribute for survey item and responses to be able to define mapping to an other key for confidential data (marked as such in the survey def).
+
 ## [v1.3.0] - 2024-07-16
 
 ### Added

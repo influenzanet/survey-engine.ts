@@ -174,7 +174,8 @@ export class SurveyEngineCore implements SurveyEngineCoreInterface {
       }
       if (item.confidentialMode) {
         obj.meta = { ...initMeta }; // reset meta
-        (obj as SurveySingleItemResponse).confidentialMode = item.confidentialMode
+        (obj as SurveySingleItemResponse).confidentialMode = item.confidentialMode;
+        (obj as SurveySingleItemResponse).mapToKey = item.mapToKey
       }
       obj.meta.position = index;
       responses.push({ ...obj });

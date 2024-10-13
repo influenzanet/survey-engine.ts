@@ -36,6 +36,7 @@ export interface SurveySingleItem extends SurveyItemBase {
   components?: ItemGroupComponent; // any sub-type of ItemComponent
   validations?: Array<Validation>;
   confidentialMode?: ConfidentialMode;
+  mapToKey?: string; // if the response should be mapped to another key in confidential mode
 }
 
 export interface Validation {

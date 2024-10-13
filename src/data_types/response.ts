@@ -22,6 +22,7 @@ interface SurveyItemResponseBase {
 export interface SurveySingleItemResponse extends SurveyItemResponseBase {
   response?: ResponseItem;
   confidentialMode?: ConfidentialMode;
+  mapToKey?: string; // if the response should be mapped to another key in confidential mode
 }
 
 export interface SurveyGroupItemResponse extends SurveyItemResponseBase {
