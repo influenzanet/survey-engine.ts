@@ -19,7 +19,10 @@ export type ClientSideSurveyExpName =
   'parseValueAsNum' |
   // client side shortcut methods:
   'hasResponse' | 'getResponseItem' | 'getResponseValueAsNum' | 'getResponseValueAsStr' | 'checkResponseValueWithRegex' | 'responseHasKeysAny' | 'responseHasKeysAll' | 'responseHasOnlyKeysOtherThan' | 'getSurveyItemValidation' |
-  'timestampWithOffset' | 'dateResponseDiffFromNow' | 'countResponseItems';
+  'timestampWithOffset' | 'dateResponseDiffFromNow' | 'countResponseItems' |
+  'hasParticipantFlagKey' | 'hasParticipantFlagKeyAndValue' | 'getParticipantFlagValue'
+  | 'validateSelectedOptionHasValueDefined';
+
 
 type StudyEngineExpNames = string;
 
